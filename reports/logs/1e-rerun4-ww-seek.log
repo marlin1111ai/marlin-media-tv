@@ -1,0 +1,1311 @@
+7:04:36.148 PM [log] started 2026-09-14 23:04:36 +0000 VLCKit 4.0.0-dev Otto Chriek
+[DBG] VLC media player - 4.0.0-dev Otto Chriek
+[DBG] Copyright © 1996-2026 the VideoLAN team
+[DBG] revision 4.0.0-dev-38818-ge50d9ac36a
+[DBG] configured with ~/vlckit-build/VLCKit/libvlc/vlc/configure  '--host=aarch64-apple-darwin' '--build=aarch64-apple-darwin25.6.0' '--prefix=~/vlckit-build/VLCKit/libvlc/vlc/build-appletvos-arm64/vlc-appletvos27.0-arm64' '--with-contrib=~/vlckit-build/VLCKit/libvlc/vlc/contrib/arm64-appletvos27.0' '--disable-sse' '--disable-vcd' '--disable-macosx' '--disable-macosx-avfoundation' '--disable-lua' '--disable-qt' '--disable-skins2' '--disable-vlc' '--disable-vlm' '--disable-nls' '--disable-notify' '--disable-projectm' '--disable-goom' '--disable-dvdread' '--disable-dvdnav' '--disable-bluray' '--disable-linsys' '--disable-libva' '--disable-gme' '--disable-tremor' '--disable-fluidsynth' '--disable-jack' '--disable-pulse' '--disable-mtp' '--disable-screen' '--disable-sparkle' '--disable-addonmanagermodules' '--disable-mad' '--disable-upnp-server' '--disable-debug' '--disable-shared' '--enable-static' 'CFLAGS=-mtvos-version-min=11.0 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk -g' 'OBJCFLAGS=-mtvos-version-min=11.0 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk -g' 'CXXFLAGS=-mtvos-version-min=11.0 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk -g' 'OBJCXXFLAGS=-mtvos-version-min=11.0 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk -g' 'ac_cv_prog_cc_c23=no' 'ac_cv_func_basename_r=no' 'ac_cv_func_clock_getres=no' 'ac_cv_func_clock_gettime=no' 'ac_cv_func_clock_settime=no' 'ac_cv_func_dirname_r=no' 'ac_cv_func_getentropy=no' 'ac_cv_func_mkostemp=no' 'ac_cv_func_mkostemps=no' 'ac_cv_func_timingsafe_bcmp=no' 'ac_cv_func_open_wmemstream=no' 'ac_cv_func_fmemopen=no' 'ac_cv_func_open_memstream=no' 'ac_cv_func_futimens=no' 'ac_cv_func_utimensat=no' 'ac_cv_func_dup3=no' 'ac_cv_func_pipe2=no' 'ac_cv_func_thread_get_register_pointer_values=no' 'ac_cv_func_aligned_alloc=no' 'ac_cv_func_timespec_get=no' 'build_alias=aarch64-apple-darwin25.6.0' 'host_alias=aarch64-apple-darwin' 'CC=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang' 'LDFLAGS=-mtvos-version-min=11.0 -mtvos-version-min=11.0 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk ' 'CPPFLAGS=-arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk' 'CXX=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++' 'CPP=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -E' 'OBJC=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang' 'OBJCXX=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++' 'PKG_CONFIG_LIBDIR='
+[DBG] creating audio output
+[DBG] looking for audio output module matching "any": 2 candidates
+[DBG] using audio output module "avsamplebuffer"
+[DBG] keeping audio output
+7:04:36.157 PM [player] request Wonder Woman — Wonder Woman (2017).mkv · 4K HDR · TrueHD 7.1 — http://192.168.1.250:8093/stream/4
+7:04:36.157 PM [player] file Movies/Wonder Woman/Wonder Woman (2017).mkv 3840x2160 hdr=true video=hevc Main 10 audio=truehd 7.1, ac3 5.1(side), ac3 5.1(side)
+7:04:36.180 PM [display] before: maxFPS=60 edrHeadroom=1.00/1.00 gamut=1 matchingEnabled=true switchInProgress=false criteria=nil
+[DBG] Creating an input for preparsing '4'
+7:04:36.293 PM [display] parse finished with status 6
+7:04:36.293 PM [display] request (from parsed media) refresh=23.976 range=HDR10 (PQ, BT.2020) codec=MPEG-H Part2/HEVC (H.265) 3840x2160 — after set: maxFPS=60 edrHeadroom=1.00/1.00 gamut=1 matchingEnabled=true switchInProgress=false criteria=set
+[DBG] Creating an input for playback'Wonder Woman'
+7:04:36.294 PM [player] play() called
+7:04:36.294 PM [player] state Opening at 0 ms
+[DBG] using timeshift granularity of 50 MiB
+7:04:36.294 PM [player] buffering 0.0
+[DBG] using default timeshift path
+[DBG] `http://192.168.1.250:8093/stream/4' gives access `http' demux `mkv_trusted' path `192.168.1.250:8093/stream/4'
+[DBG] creating access: http://192.168.1.250:8093/stream/4
+[DBG] looking for access module matching "http": 2 candidates
+[DBG] looking for keystore module matching "any": 1 candidates
+[DBG] using keystore module "keychain"
+[DBG] Lookup keychain entry for server 192.168.1.250
+[WARN] lookup failed (-25300: 'Item not found')
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+Range: bytes=0-
+
+
+7:04:36.295 PM [display] mode switch start: maxFPS=60 edrHeadroom=1.00/1.00 gamut=1 matchingEnabled=true switchInProgress=true criteria=set
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58483322537
+Content-Range: bytes 0-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:04:36 GMT
+
+
+[DBG] removing "keystore" module "keychain"
+[DBG] using access module "http"
+[DBG] looking for stream_filter module matching "prefetch,cache": 2 candidates
+[DBG] using 16777216 bytes buffer
+[DBG] using stream_filter module "prefetch"
+[DBG] looking for stream_filter module matching "any": 4 candidates
+[DBG] no stream_filter modules matched with name any
+[DBG] looking for stream_directory module matching "any": 0 candidates
+[DBG] no stream_directory modules matched with name any
+[DBG] attachment of directory-extractor failed for http://192.168.1.250:8093/stream/4
+[DBG] looking for stream_filter module matching "record": 1 candidates
+[DBG] using stream_filter module "record"
+[DBG] creating demux "mkv_trusted", URL: http://192.168.1.250:8093/stream/4, path: (null)
+[DBG] looking for demux module matching "mkv_trusted": 1 candidates
+[DBG] |   + Seek head
+[DBG] |   - info at 1207
+[DBG] |   + Information
+[DBG] |   |   + TimecodeScale=1000000
+[DBG] |   |   + Muxing Application=libmakemkv v1.18.4 (1.3.10/1.5.2) darwin(arm64-release)
+[DBG] |   |   + Writing Application=MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   |   + Duration=8476217
+[DBG] |   |   + Title=Wonder Woman
+[DBG] |   |   + Date=Sat Jul 18 02:53:09 2026
+[DBG] |   |   + UID=eeb254af3d3f42f7
+[DBG] |   - tracks at 1370
+[DBG] |   + Tracks
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=1
+[DBG] |   |   |   + Track UID=1
+[DBG] |   |   |   + Track Type=video
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track MinCache=1
+[DBG] |   |   |   + Track CodecId=V_MPEGH/ISO/HEVC
+[DBG] |   |   |   + Track CodecPrivate size=140
+[DBG] |   |   |   + Track Default Duration=41708
+[DBG] |   |   |   + Track Video
+[DBG] |   |   |   |   + width=3840
+[DBG] |   |   |   |   + height=2160
+[DBG] |   |   |   |   + display width=3840
+[DBG] |   |   |   |   + display height=2160
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=2
+[DBG] |   |   |   + Track UID=2
+[DBG] |   |   |   + Track Type=audio
+[DBG] |   |   |   + Track Default=1
+[DBG] |   |   |   + Track Lacing=1
+[DBG] |   |   |   + Track CodecId=A_TRUEHD
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   |   |   + Track Default Duration=833
+[DBG] |   |   |   + Track Name=Surround 7.1
+[DBG] |   |   |   + Track Audio
+[DBG] |   |   |   |   + afreq=48000
+[DBG] |   |   |   |   + achan=8
+[DBG] |   |   |   |   + abits=24
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=3
+[DBG] |   |   |   + Track UID=3
+[DBG] |   |   |   + Track Type=audio
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=1
+[DBG] |   |   |   + Track CodecId=A_AC3
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   |   |   + Track Default Duration=32000
+[DBG] |   |   |   + Track Name=Surround 5.1
+[DBG] |   |   |   + Track Audio
+[DBG] |   |   |   |   + afreq=48000
+[DBG] |   |   |   |   + achan=6
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=4
+[DBG] |   |   |   + Track UID=4
+[DBG] |   |   |   + Track Type=audio
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=1
+[DBG] |   |   |   + Track CodecId=A_AC3
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   |   |   + Track Default Duration=32000
+[DBG] |   |   |   + Track Name=Surround 5.1
+[DBG] |   |   |   + Track Audio
+[DBG] |   |   |   |   + afreq=48000
+[DBG] |   |   |   |   + achan=6
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=5
+[DBG] |   |   |   + Track UID=5
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_HDMV/PGS
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   - cues at 58483154136
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=58483154136-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 168401
+Content-Range: bytes 58483154136-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:04:36 GMT
+
+
+[DBG] connection failed
+[DBG] |   + Cues
+[DBG] end of stream
+[DBG] |   - loading cues done.
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=123-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58483322414
+Content-Range: bytes 123-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:04:36 GMT
+
+
+[DBG] |   - chapters at 1867
+[DBG] |   + Chapters
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=51a2015c4c6a68bf
+[DBG] |   |   |   |   + ChapterTimeStart=0
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=626876250
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 01
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=c4fa5d8dea3aa499
+[DBG] |   |   |   |   + ChapterTimeStart=626876250
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=1392182458
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 02
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=c7b4812d013bd5f5
+[DBG] |   |   |   |   + ChapterTimeStart=1392182458
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=1990488500
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 03
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=e8e45c9bd8dc3ec3
+[DBG] |   |   |   |   + ChapterTimeStart=1990488500
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=2635132500
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 04
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=3403ecb3e4626f89
+[DBG] |   |   |   |   + ChapterTimeStart=2635132500
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=3265553958
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 05
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=41cdff1db36ec6c8
+[DBG] |   |   |   |   + ChapterTimeStart=3265553958
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=4057928875
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 06
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=f3c45d12ce17a665
+[DBG] |   |   |   |   + ChapterTimeStart=4057928875
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=4949903291
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 07
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=13535fb7c0c22a51
+[DBG] |   |   |   |   + ChapterTimeStart=4949903291
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=5642845541
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 08
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=dd56efa8c1a99720
+[DBG] |   |   |   |   + ChapterTimeStart=5642845541
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=6337873208
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 09
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=d8355c87bf2c7226
+[DBG] |   |   |   |   + ChapterTimeStart=6337873208
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=7063556500
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 10
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=b9e58f4978c89894
+[DBG] |   |   |   |   + ChapterTimeStart=7063556500
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=7841416916
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 11
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=7ec30063235a7997
+[DBG] |   |   |   |   + ChapterTimeStart=7841416916
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=8476217750
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 12
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   - tags at 58483320462
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=58483320462-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 2075
+Content-Range: bytes 58483320462-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:04:36 GMT
+
+
+[DBG] connection failed
+[DBG] end of stream
+[DBG] |   + Tags
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 1
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 49979184
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.217750000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 203226
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 52954301233
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001011
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 2
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 4278858
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.217500000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 10171461
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 4533566668
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001100
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 3
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 448000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.224000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 264882
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 474668544
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001100
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 4
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 448000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.224000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 264882
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 474668544
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001101
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 5
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 29579
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:20:19.890645833
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 3654
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 31131628
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 0012A0
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] loading tags done.
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=183-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58483322354
+Content-Range: bytes 183-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:04:36 GMT
+
+
+[DBG] |   + Void
+[DBG] |   + Information
+[DBG] |   + Tracks
+[DBG] |   + Chapters
+[DBG] |   + Void
+[DBG] |   + Cluster
+[DBG] Virtual chapter  Chapter 01 from 0 to 626876250 - 
+[DBG] Virtual chapter  Chapter 02 from 626876250 to 1392182458 - 
+[DBG] Virtual chapter  Chapter 03 from 1392182458 to 1990488500 - 
+[DBG] Virtual chapter  Chapter 04 from 1990488500 to 2635132500 - 
+[DBG] Virtual chapter  Chapter 05 from 2635132500 to 3265553958 - 
+[DBG] Virtual chapter  Chapter 06 from 3265553958 to 4057928875 - 
+[DBG] Virtual chapter  Chapter 07 from 4057928875 to 4949903291 - 
+[DBG] Virtual chapter  Chapter 08 from 4949903291 to 5642845541 - 
+[DBG] Virtual chapter  Chapter 09 from 5642845541 to 6337873208 - 
+[DBG] Virtual chapter  Chapter 10 from 6337873208 to 7063556500 - 
+[DBG] Virtual chapter  Chapter 11 from 7063556500 to 7841416916 - 
+[DBG] Virtual chapter  Chapter 12 from 7841416916 to 8476217750 - 
+[DBG] Virtual chapter  from 0 to -1 - 
+[DBG] NEW START CHAPTER uid=5882265559229950143
+[DBG] found 5 es
+[DBG] selecting program id=0
+[DBG] ES track added: 'video/1' (fourcc: 'hevc')
+[DBG] ES track added: 'audio/2' (fourcc: 'mlpa')
+7:04:36.410 PM [player] track added video/1 type=1
+[DBG] ES track added: 'audio/3' (fourcc: 'a52 ')
+[DBG] ES track added: 'audio/4' (fourcc: 'a52 ')
+[DBG] ES track added: 'spu/5' (fourcc: 'bdpg')
+[DBG] seek: preroll{ track: 1, pts: 0, fpos: 3592 skip: 3592} 
+7:04:36.410 PM [player] track added audio/2 type=0
+[DBG] seek: preroll{ req: 1, start-pts: 1, start-fpos: 3592} 
+[DBG] using demux module "mkv"
+7:04:36.410 PM [player] track added audio/3 type=0
+[DBG] looking for video decoder module matching "any": 14 candidates
+7:04:36.410 PM [player] track added audio/4 type=0
+7:04:36.410 PM [player] track added spu/5 type=2
+7:04:36.410 PM [player] length 8476217 ms
+[DBG] vout: none found
+[DBG] vout change: decoder size
+[DBG] vout change: visible size
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] 32x32 (32x32) chroma: YUVA colorspace: Undefined -> 16x16 (16x16) chroma: RGBA colorspace: Undefined with scaling using Bicubic (good quality)
+[DBG] using video converter module "swscale"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] YUVP to YUVA converter
+[DBG] using video converter module "yuvp"
+[DBG] Deinterlacing available
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] looking for vout window module matching "any": 2 candidates
+[DBG] resized to 1920x1080
+[DBG] using vout window module "uiview_window"
+[DBG] looking for inhibit module matching "any": 1 candidates
+[DBG] using inhibit module "uikit_inhibit"
+[DBG] looking for decoder device module matching "any": 1 candidates
+[DBG] using decoder device module "videotoolbox"
+[DBG] new VPS parsed: 0
+[DBG] new SPS parsed: 0
+[DBG] new PPS parsed: 0
+[WARN] forcing output chroma (kCVPixelFormatType): x420
+[INF] Using Video Toolbox to decode 'hevc'
+[DBG] using video decoder module "videotoolbox"
+[DBG] ES track selected: 'video/1' (fourcc: 'hevc')
+[DBG] looking for audio packetizer module matching "any": 11 candidates
+[DBG] using audio packetizer module "mlp"
+[DBG] looking for audio decoder module matching "any": 15 candidates
+[DBG] reusing audio output
+[ERR] too low audio sample frequency (0)
+7:04:36.440 PM [player] track selected type=1 selected=video/1 unselected=
+[DBG] keeping audio output
+[DBG] using Lavc63.1.100
+[DBG] CPU flags: 0x00062360
+[DBG] codec (truehd) started
+[DBG] using audio decoder module "avcodec"
+[DBG] ES track selected: 'audio/2' (fourcc: 'mlpa')
+[DBG] `http://192.168.1.250:8093/stream/4' successfully opened
+7:04:36.442 PM [player] track selected type=0 selected=audio/2 unselected=
+[DBG] program(0): using clock source: 'audio'
+7:04:36.442 PM [player] state Playing at 0 ms
+[DBG] Buffering 0%
+7:04:36.443 PM [player] buffering 0.0
+[INF] MLP channels: 8 samplerate: 48000
+[DBG] restarting module due to input format change
+[DBG] 'decoder in/packetizer out' i_rate 0 / 48000
+[DBG] 'decoder in/packetizer out' i_channels 0 / 8
+[DBG] removing "audio decoder" module "avcodec"
+[DBG] looking for audio decoder module matching "any": 15 candidates
+[DBG] reusing audio output
+[WARN] failed to start passthrough audio output, failing back to linear format
+[DBG] keeping audio output
+[DBG] using Lavc63.1.100
+[DBG] CPU flags: 0x00062360
+[DBG] codec (truehd) started
+[DBG] using audio decoder module "avcodec"
+[DBG] reusing audio output
+[DBG] Buffering 4%
+[DBG] Buffering 9%
+[DBG] Buffering 16%
+[DBG] Buffering 20%
+[DBG] Buffering 29%
+[DBG] Buffering 37%
+[DBG] session accepted first frame 1
+[DBG] Buffering 41%
+[DBG] Buffering 49%
+[DBG] Buffering 58%
+[DBG] Buffering 62%
+[DBG] Buffering 69%
+[DBG] Buffering 79%
+[DBG] Buffering 83%
+[DBG] Buffering 89%
+[DBG] output chroma (kCVPixelFormatType): x420
+[DBG] vout change: chroma
+[DBG] requested window size: 3840x2160
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] Opening vout display wrapper
+[DBG] looking for vout display module matching "any": 3 candidates
+[DBG] using vout display module "samplebufferdisplay"
+[DBG] original format sz 3840x2160, of (0,0), vsz 3840x2160, 4cc CVPP, sar 1:1, orient: normal
+[DBG] removing "text renderer" module "freetype"
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] requested window size: 3840x2160
+[DBG] resetting projection_mode to 0
+[DBG] setting projection_mode to 0
+[DBG] Stream buffering done (1000 ms in 14 ms)
+7:04:36.457 PM [player] buffering 1.0
+[DBG] Received first picture
+[DBG] resized to 3840x2160
+[DBG] Output on HDMI, channel count: 8
+[DBG] swapping Surround and RearSurround channels for 7.1 Rear Surround
+[DBG] VLC keeping the same input layout
+[DBG] output 'f32l' 48000 Hz 3F2M2R/LFE frame=1 samples/32 bytes
+[DBG] looking for audio volume module matching "any": 2 candidates
+[DBG] using audio volume module "float_mixer"
+[DBG] input 's32l' 48000 Hz 3F2M2R/LFE frame=1 samples/32 bytes
+[DBG] looking for audio filter module matching "scaletempo": 1 candidates
+[DBG] format: 48000 rate, 8 nch, 4 bps, fl32
+[DBG] params: 30 stride, 0.200 overlap, 14 search
+[DBG] 1.000 scale, 1440.000 stride_in, 1440 stride_out, 1152 standing, 288 overlap, 672 search, 2400 queue, fl32 mode
+[DBG] using audio filter module "scaletempo"
+[DBG] conversion: 's32l'->'f32l' 48000 Hz->48000 Hz 3F2M2R/LFE->3F2M2R/LFE
+[DBG] looking for audio converter module matching "any": 8 candidates
+[DBG] s32l->f32l, bits per sample: 32->32
+[DBG] using audio converter module "audio_format"
+[DBG] conversion pipeline complete
+[DBG] conversion: 'f32l'->'f32l' 48000 Hz->48000 Hz 3F2M2R/LFE->3F2M2R/LFE
+[DBG] conversion pipeline complete
+[DBG] looking for audio resampler module matching "soxr": 2 candidates
+[DBG] Using SoX Resampler with 'cr32s' engine and 'Medium 16-bit with medium roll-off' quality to convert f32l/48000Hz to f32l/48000Hz.
+[DBG] using audio resampler module "soxr"
+[DBG] coalescing 40-sample decoder frames into 960-sample blocks (20 ms) before the audio output
+[DBG] Decoder wait done in 74 ms
+[DBG] deferring start (79616 us)
+[DBG] deferring start (56073 us)
+[DBG] deferring start (55825 us)
+[DBG] deferring start (55619 us)
+[DBG] deferring start (55441 us)
+[DBG] deferring start (55241 us)
+[DBG] deferring start (55011 us)
+[DBG] deferring start (54796 us)
+[DBG] deferring start (54663 us)
+[DBG] deferring start (54413 us)
+[DBG] deferring start (54278 us)
+[DBG] deferring start (54098 us)
+[DBG] deferring start (53990 us)
+[DBG] deferring start (53803 us)
+[DBG] deferring start (53698 us)
+[DBG] deferring start (53557 us)
+[DBG] deferring start (53373 us)
+[DBG] deferring start (53202 us)
+[DBG] deferring start (53124 us)
+[DBG] deferring start (52999 us)
+[DBG] deferring start (52882 us)
+[DBG] deferring start (52771 us)
+[DBG] deferring start (52620 us)
+[DBG] deferring start (52425 us)
+[DBG] deferring start (52245 us)
+[DBG] deferring start (52063 us)
+[DBG] deferring start (51884 us)
+[DBG] deferring start (51712 us)
+[DBG] deferring start (51527 us)
+[DBG] deferring start (51333 us)
+[DBG] deferring start (51206 us)
+[DBG] deferring start (51008 us)
+[DBG] deferring start (50914 us)
+[DBG] deferring start (50781 us)
+[DBG] deferring start (50672 us)
+[DBG] deferring start (50556 us)
+[DBG] deferring start (50435 us)
+[DBG] deferring start (50206 us)
+[DBG] deferring start (50032 us)
+[DBG] deferring start (49917 us)
+[DBG] deferring start (49810 us)
+[DBG] deferring start (49678 us)
+[DBG] deferring start (49574 us)
+[DBG] deferring start (49449 us)
+[DBG] deferring start (49329 us)
+[DBG] deferring start (49202 us)
+[DBG] deferring start (49058 us)
+[DBG] deferring start (48936 us)
+[DBG] deferring start (48830 us)
+[DBG] deferring start (48711 us)
+[DBG] deferring start (48591 us)
+[DBG] deferring start (48468 us)
+[DBG] deferring start (48527 us)
+[DBG] deferring start (48412 us)
+[DBG] deferring start (48289 us)
+[DBG] deferring start (48179 us)
+[DBG] deferring start (48042 us)
+[DBG] deferring start (47924 us)
+[DBG] deferring start (47814 us)
+[DBG] deferring start (47653 us)
+[DBG] deferring start (47461 us)
+[DBG] deferring start (47314 us)
+[DBG] deferring start (47191 us)
+[DBG] deferring start (47067 us)
+[DBG] deferring start (46962 us)
+[DBG] deferring start (46853 us)
+[DBG] started
+7:04:39.185 PM [display] mode switch end: maxFPS=24 edrHeadroom=1.00/1.00 gamut=1 matchingEnabled=true switchInProgress=false criteria=set
+7:04:40.310 PM [display] 4 s after request: maxFPS=24 edrHeadroom=1.00/1.00 gamut=1 matchingEnabled=true switchInProgress=false criteria=set
+[DBG] ES_OUT_RESET_PCR called
+7:05:07.607 PM [skip] +30 s (click) before=30671 ms target=60671 ms
+7:05:07.621 PM [player] buffering 0.0
+[DBG] SET_TIME to 60671000
+[DBG] seek request to i_pos = 60671000
+[DBG] seek: preroll{ track: 1, pts: 59768000, fpos: 120198951 skip: 120198951} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=120198951-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58363123586
+Content-Range: bytes 120198951-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:05:07 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 60671001, start-pts: 59768001, start-fpos: 120198951} 
+[DBG] Buffering 0%
+7:05:07.799 PM [player] buffering 0.0
+[DBG] Buffering 2%
+[DBG] Buffering 5%
+[DBG] Buffering 8%
+[DBG] Buffering 10%
+[DBG] Buffering 15%
+[DBG] Buffering 19%
+[DBG] Buffering 21%
+[DBG] Buffering 26%
+[DBG] Buffering 30%
+[DBG] Buffering 32%
+[DBG] Buffering 36%
+[DBG] Buffering 41%
+[DBG] Buffering 43%
+[DBG] Buffering 47%
+[DBG] end of audio preroll
+[DBG] Buffering 52%
+[DBG] Buffering 54%
+[DBG] Buffering 57%
+[DBG] Buffering 61%
+[DBG] Buffering 63%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 68%
+[DBG] Buffering 72%
+[DBG] Buffering 74%
+[DBG] Buffering 78%
+[DBG] Buffering 83%
+[DBG] Buffering 85%
+[DBG] Buffering 89%
+[DBG] Buffering 94%
+[DBG] Buffering 96%
+[DBG] Buffering 99%
+[DBG] Stream buffering done (2001 ms in 240 ms)
+[DBG] Decoder wait done in 0 ms
+7:05:08.039 PM [player] buffering 1.0
+[DBG] deferring start (98079 us)
+[DBG] deferring start (71208 us)
+[DBG] deferring start (50802 us)
+[DBG] deferring start (50494 us)
+[DBG] deferring start (49670 us)
+[DBG] deferring start (49407 us)
+[DBG] deferring start (49018 us)
+[DBG] deferring start (48492 us)
+[DBG] deferring start (48059 us)
+[DBG] deferring start (47626 us)
+[DBG] deferring start (47110 us)
+[DBG] deferring start (46643 us)
+[DBG] deferring start (46195 us)
+[DBG] deferring start (45758 us)
+[DBG] deferring start (45305 us)
+[DBG] deferring start (44898 us)
+[DBG] deferring start (44542 us)
+[DBG] deferring start (44193 us)
+[DBG] deferring start (43853 us)
+[DBG] deferring start (43508 us)
+[DBG] deferring start (43161 us)
+[DBG] deferring start (42808 us)
+[DBG] deferring start (42463 us)
+[DBG] deferring start (42099 us)
+[DBG] deferring start (41677 us)
+[DBG] deferring start (41237 us)
+[DBG] deferring start (40623 us)
+[DBG] deferring start (40206 us)
+[DBG] deferring start (39812 us)
+[DBG] deferring start (39393 us)
+[DBG] deferring start (38955 us)
+[DBG] deferring start (38513 us)
+[DBG] deferring start (38082 us)
+[DBG] deferring start (37656 us)
+[DBG] deferring start (37243 us)
+[DBG] deferring start (36753 us)
+[DBG] deferring start (36299 us)
+[DBG] deferring start (35744 us)
+[DBG] deferring start (35356 us)
+[DBG] deferring start (34918 us)
+[DBG] deferring start (34493 us)
+[DBG] deferring start (33942 us)
+[DBG] deferring start (33525 us)
+[DBG] deferring start (33098 us)
+[DBG] deferring start (32740 us)
+[DBG] deferring start (32373 us)
+[DBG] deferring start (32014 us)
+[DBG] deferring start (31639 us)
+[DBG] deferring start (31287 us)
+[DBG] deferring start (30926 us)
+[DBG] deferring start (30520 us)
+[DBG] deferring start (30164 us)
+[DBG] deferring start (29788 us)
+[DBG] deferring start (29427 us)
+[DBG] deferring start (29075 us)
+[DBG] deferring start (28703 us)
+[DBG] deferring start (28447 us)
+[DBG] deferring start (28129 us)
+[DBG] deferring start (27780 us)
+[DBG] deferring start (27398 us)
+[DBG] started
+7:05:08.136 PM [skip] after=60671 ms
+[DBG] ES_OUT_RESET_PCR called
+7:05:08.849 PM [skip] +30 s (click) before=60671 ms target=90671 ms
+7:05:08.853 PM [player] buffering 0.0
+[DBG] SET_TIME to 90671000
+[DBG] seek request to i_pos = 90671000
+[DBG] seek: preroll{ track: 1, pts: 90007000, fpos: 250650711 skip: 250650711} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=250650711-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58232671826
+Content-Range: bytes 250650711-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:05:09 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 90671001, start-pts: 90007001, start-fpos: 250650711} 
+[DBG] Buffering 0%
+7:05:09.009 PM [player] buffering 0.0
+[DBG] Buffering 2%
+[DBG] Buffering 5%
+[DBG] Buffering 9%
+[DBG] Buffering 12%
+[DBG] Buffering 17%
+[DBG] Buffering 22%
+[DBG] Buffering 25%
+[DBG] Buffering 29%
+[DBG] Buffering 35%
+[DBG] Buffering 37%
+[DBG] Buffering 42%
+[DBG] end of audio preroll
+[DBG] Buffering 47%
+[DBG] Buffering 50%
+[DBG] Buffering 54%
+[DBG] Buffering 60%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 62%
+[DBG] Buffering 66%
+[DBG] Buffering 70%
+[DBG] Buffering 72%
+[DBG] Buffering 78%
+[DBG] Buffering 82%
+[DBG] Buffering 85%
+[DBG] Buffering 90%
+[DBG] Buffering 95%
+[DBG] Buffering 97%
+7:05:09.230 PM [player] buffering 1.0
+[DBG] Stream buffering done (1700 ms in 221 ms)
+[DBG] Decoder wait done in 0 ms
+[DBG] deferring start (117190 us)
+[DBG] deferring start (89087 us)
+[DBG] deferring start (68755 us)
+[DBG] deferring start (48443 us)
+[DBG] deferring start (48182 us)
+[DBG] deferring start (47458 us)
+[DBG] deferring start (46874 us)
+[DBG] deferring start (46306 us)
+[DBG] deferring start (45776 us)
+[DBG] deferring start (44641 us)
+[DBG] deferring start (44371 us)
+[DBG] deferring start (43843 us)
+[DBG] deferring start (43327 us)
+[DBG] deferring start (42860 us)
+[DBG] deferring start (42439 us)
+[DBG] deferring start (41467 us)
+[DBG] deferring start (40869 us)
+[DBG] deferring start (40639 us)
+[DBG] deferring start (40440 us)
+[DBG] deferring start (40072 us)
+[DBG] deferring start (39688 us)
+[DBG] deferring start (39308 us)
+[DBG] deferring start (38929 us)
+[DBG] deferring start (38570 us)
+[DBG] deferring start (38227 us)
+[DBG] deferring start (37684 us)
+[DBG] deferring start (37251 us)
+[DBG] deferring start (36779 us)
+[DBG] deferring start (36342 us)
+[DBG] deferring start (35925 us)
+[DBG] deferring start (35462 us)
+[DBG] deferring start (35030 us)
+[DBG] deferring start (34599 us)
+[DBG] deferring start (34139 us)
+[DBG] deferring start (33741 us)
+[DBG] deferring start (33266 us)
+[DBG] deferring start (32857 us)
+[DBG] deferring start (32426 us)
+[DBG] deferring start (31978 us)
+[DBG] deferring start (31507 us)
+[DBG] deferring start (31067 us)
+[DBG] deferring start (30665 us)
+[DBG] deferring start (30228 us)
+[DBG] deferring start (29805 us)
+[DBG] deferring start (29390 us)
+[DBG] deferring start (29032 us)
+[DBG] deferring start (28668 us)
+[DBG] deferring start (28312 us)
+[DBG] deferring start (27937 us)
+[DBG] deferring start (27569 us)
+[DBG] deferring start (27162 us)
+[DBG] deferring start (26828 us)
+[DBG] deferring start (26487 us)
+[DBG] deferring start (26008 us)
+[DBG] deferring start (25644 us)
+[DBG] deferring start (25251 us)
+[DBG] deferring start (24913 us)
+[DBG] deferring start (24533 us)
+[DBG] deferring start (24176 us)
+[DBG] deferring start (23812 us)
+[DBG] deferring start (23424 us)
+[DBG] deferring start (23092 us)
+[DBG] started
+7:05:09.355 PM [skip] after=90671 ms
+7:05:10.096 PM [skip] +30 s (click) before=90671 ms target=120671 ms
+[DBG] ES_OUT_RESET_PCR called
+7:05:10.103 PM [player] buffering 0.0
+[DBG] SET_TIME to 120671000
+[DBG] seek request to i_pos = 120671000
+[DBG] seek: preroll{ track: 1, pts: 119828000, fpos: 451369990 skip: 451369990} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=451369990-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58031952547
+Content-Range: bytes 451369990-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:05:10 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 120671001, start-pts: 119828001, start-fpos: 451369990} 
+[DBG] Buffering 0%
+7:05:10.283 PM [player] buffering 0.0
+[DBG] Buffering 2%
+[DBG] Buffering 5%
+[DBG] Buffering 9%
+[DBG] Buffering 11%
+[DBG] Buffering 16%
+[DBG] Buffering 20%
+[DBG] Buffering 22%
+[DBG] Buffering 27%
+[DBG] Buffering 31%
+[DBG] Buffering 33%
+[DBG] Buffering 37%
+[DBG] Buffering 38%
+[DBG] end of audio preroll
+[DBG] Buffering 40%
+[DBG] Buffering 47%
+[DBG] Buffering 49%
+[DBG] Buffering 54%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 56%
+[DBG] Buffering 59%
+[DBG] Buffering 63%
+[DBG] Buffering 65%
+[DBG] Buffering 70%
+7:05:10.629 PM [skip] after=120671 ms
+[DBG] Buffering 74%
+[DBG] Buffering 76%
+[DBG] Buffering 81%
+[DBG] Buffering 86%
+[DBG] Buffering 88%
+[DBG] Buffering 92%
+[DBG] Buffering 97%
+[DBG] Buffering 99%
+[DBG] Stream buffering done (1900 ms in 467 ms)
+[DBG] Decoder wait done in 0 ms
+7:05:10.751 PM [player] buffering 1.0
+[DBG] deferring start (116024 us)
+[DBG] deferring start (87851 us)
+[DBG] deferring start (67444 us)
+[DBG] deferring start (47056 us)
+[DBG] deferring start (46337 us)
+[DBG] deferring start (45031 us)
+[DBG] deferring start (44058 us)
+[DBG] deferring start (43715 us)
+[DBG] deferring start (42945 us)
+[DBG] deferring start (42264 us)
+[DBG] deferring start (41953 us)
+[DBG] deferring start (41520 us)
+[DBG] deferring start (40593 us)
+[DBG] deferring start (58933 us)
+[DBG] deferring start (38663 us)
+[DBG] deferring start (38213 us)
+[DBG] deferring start (37604 us)
+[DBG] deferring start (37158 us)
+[DBG] deferring start (36534 us)
+[DBG] deferring start (35809 us)
+[DBG] deferring start (34783 us)
+[DBG] deferring start (32984 us)
+[DBG] deferring start (32701 us)
+[DBG] deferring start (32339 us)
+[DBG] deferring start (31935 us)
+[DBG] deferring start (31407 us)
+[DBG] deferring start (30890 us)
+[DBG] deferring start (30493 us)
+[DBG] deferring start (30061 us)
+[DBG] deferring start (29515 us)
+[DBG] deferring start (29119 us)
+[DBG] deferring start (28661 us)
+[DBG] deferring start (28255 us)
+[DBG] deferring start (27746 us)
+[DBG] deferring start (27347 us)
+[DBG] deferring start (26936 us)
+[DBG] deferring start (26487 us)
+[DBG] deferring start (26041 us)
+[DBG] deferring start (25615 us)
+[DBG] deferring start (25172 us)
+[DBG] deferring start (24539 us)
+[DBG] deferring start (24236 us)
+[DBG] deferring start (23814 us)
+[DBG] deferring start (23426 us)
+[DBG] deferring start (23054 us)
+[DBG] deferring start (22704 us)
+[DBG] deferring start (22352 us)
+[DBG] deferring start (21952 us)
+[DBG] deferring start (21613 us)
+[DBG] deferring start (21226 us)
+[DBG] deferring start (20868 us)
+[DBG] deferring start (20514 us)
+[DBG] deferring start (20119 us)
+[DBG] deferring start (19738 us)
+[DBG] deferring start (19362 us)
+[DBG] deferring start (19028 us)
+[DBG] deferring start (18635 us)
+[DBG] deferring start (18304 us)
+[DBG] deferring start (17920 us)
+[DBG] deferring start (17732 us)
+[DBG] deferring start (17358 us)
+[DBG] deferring start (16997 us)
+[DBG] deferring start (16634 us)
+[DBG] started
+[DBG] picture displayed late (missing 10 ms)
+[DBG] ES_OUT_RESET_PCR called
+7:05:11.335 PM [skip] +30 s (click) before=120671 ms target=150671 ms
+7:05:11.338 PM [player] buffering 0.0
+[DBG] SET_TIME to 150671000
+[DBG] seek request to i_pos = 150671000
+[DBG] seek: preroll{ track: 1, pts: 150359000, fpos: 630956070 skip: 630956070} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=630956070-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 57852366467
+Content-Range: bytes 630956070-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:05:11 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 150671001, start-pts: 150359001, start-fpos: 630956070} 
+[DBG] Buffering 0%
+7:05:11.550 PM [player] buffering 0.0
+[DBG] Buffering 3%
+[DBG] Buffering 7%
+[DBG] Buffering 12%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 15%
+[DBG] Buffering 22%
+[DBG] end of audio preroll
+[DBG] Buffering 28%
+[DBG] end of video preroll
+[DBG] Buffering 31%
+[DBG] Buffering 37%
+[DBG] Buffering 44%
+[DBG] Buffering 47%
+[DBG] Buffering 53%
+[DBG] Buffering 60%
+[DBG] Buffering 63%
+[DBG] Buffering 68%
+[DBG] Buffering 76%
+[DBG] Buffering 79%
+[DBG] Buffering 83%
+7:05:11.847 PM [skip] after=150671 ms
+[DBG] Buffering 88%
+[DBG] Buffering 92%
+[DBG] Buffering 99%
+[DBG] Stream buffering done (1376 ms in 343 ms)
+7:05:11.893 PM [player] buffering 1.0
+[DBG] Decoder wait done in 0 ms
+[DBG] deferring start (78613 us)
+[DBG] deferring start (50312 us)
+[DBG] deferring start (49843 us)
+[DBG] deferring start (49163 us)
+[DBG] deferring start (48515 us)
+[DBG] deferring start (47875 us)
+[DBG] deferring start (47224 us)
+[DBG] deferring start (46604 us)
+[DBG] deferring start (45947 us)
+[DBG] deferring start (44949 us)
+[DBG] deferring start (44685 us)
+[DBG] deferring start (44158 us)
+[DBG] deferring start (43682 us)
+[DBG] deferring start (43220 us)
+[DBG] deferring start (42771 us)
+[DBG] deferring start (42291 us)
+[DBG] deferring start (41627 us)
+[DBG] deferring start (41224 us)
+[DBG] deferring start (40582 us)
+[DBG] deferring start (40125 us)
+[DBG] deferring start (39669 us)
+[DBG] deferring start (39201 us)
+[DBG] deferring start (38751 us)
+[DBG] deferring start (38304 us)
+[DBG] deferring start (37849 us)
+[DBG] deferring start (37405 us)
+[DBG] deferring start (37003 us)
+[DBG] deferring start (36665 us)
+[DBG] deferring start (36301 us)
+[DBG] deferring start (35729 us)
+[DBG] deferring start (35358 us)
+[DBG] deferring start (34984 us)
+[DBG] deferring start (34649 us)
+[DBG] deferring start (34283 us)
+[DBG] deferring start (33925 us)
+[DBG] deferring start (33914 us)
+[DBG] deferring start (33347 us)
+[DBG] deferring start (32951 us)
+[DBG] deferring start (32526 us)
+[DBG] deferring start (32086 us)
+[DBG] deferring start (31651 us)
+[DBG] deferring start (31199 us)
+[DBG] deferring start (30667 us)
+[DBG] deferring start (30202 us)
+[DBG] deferring start (29742 us)
+[DBG] deferring start (29296 us)
+[DBG] deferring start (28864 us)
+[DBG] deferring start (28418 us)
+[DBG] deferring start (28001 us)
+[DBG] deferring start (27555 us)
+[DBG] deferring start (27134 us)
+[DBG] deferring start (26684 us)
+[DBG] deferring start (26233 us)
+[DBG] deferring start (25764 us)
+[DBG] deferring start (25448 us)
+[DBG] deferring start (25059 us)
+[DBG] deferring start (24677 us)
+[DBG] deferring start (24324 us)
+[DBG] deferring start (23969 us)
+[DBG] started
+7:05:12.580 PM [skip] +30 s (click) before=150671 ms target=180671 ms
+[DBG] ES_OUT_RESET_PCR called
+7:05:12.585 PM [player] buffering 0.0
+[DBG] SET_TIME to 180671000
+[DBG] seek request to i_pos = 180671000
+[DBG] seek: preroll{ track: 1, pts: 180472000, fpos: 828176139 skip: 828176139} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=828176139-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 57655146398
+Content-Range: bytes 828176139-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 23:05:12 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 180671001, start-pts: 180472001, start-fpos: 828176139} 
+[DBG] Buffering 0%
+7:05:12.750 PM [player] buffering 0.0
+[DBG] Buffering 3%
+[DBG] Buffering 8%
+[DBG] Buffering 13%
+[DBG] end of audio preroll
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 17%
+[DBG] Buffering 25%
+[DBG] Buffering 31%
+[DBG] Buffering 34%
+[DBG] Buffering 41%
+[DBG] Buffering 45%
+[DBG] Buffering 52%
+[DBG] Buffering 55%
+[DBG] Buffering 60%
+[DBG] Buffering 66%
+[DBG] Buffering 69%
+[DBG] Buffering 77%
+[DBG] Buffering 83%
+[DBG] Buffering 86%
+[DBG] Buffering 93%
+[DBG] Stream buffering done (1210 ms in 223 ms)
+[DBG] Decoder wait done in 0 ms
+7:05:12.973 PM [player] buffering 1.0
+[DBG] deferring start (116834 us)
+[DBG] deferring start (89464 us)
+[DBG] deferring start (68944 us)
+[DBG] deferring start (48600 us)
+[DBG] deferring start (44036 us)
+[DBG] deferring start (43217 us)
+[DBG] deferring start (42887 us)
+[DBG] deferring start (42282 us)
+[DBG] deferring start (41743 us)
+[DBG] deferring start (41307 us)
+[DBG] deferring start (40833 us)
+[DBG] deferring start (40364 us)
+[DBG] deferring start (39683 us)
+[DBG] deferring start (39233 us)
+[DBG] deferring start (38877 us)
+[DBG] deferring start (38544 us)
+[DBG] deferring start (38191 us)
+[DBG] deferring start (37763 us)
+[DBG] deferring start (37231 us)
+[DBG] deferring start (36824 us)
+[DBG] deferring start (36389 us)
+[DBG] deferring start (35933 us)
+[DBG] deferring start (36013 us)
+[DBG] deferring start (35524 us)
+[DBG] deferring start (35040 us)
+[DBG] deferring start (34637 us)
+[DBG] deferring start (34172 us)
+[DBG] deferring start (33694 us)
+[DBG] deferring start (33260 us)
+[DBG] deferring start (32822 us)
+[DBG] deferring start (32366 us)
+[DBG] deferring start (31882 us)
+[DBG] deferring start (31442 us)
+[DBG] deferring start (30983 us)
+[DBG] deferring start (30568 us)
+[DBG] deferring start (30098 us)
+[DBG] deferring start (29672 us)
+[DBG] deferring start (29325 us)
+[DBG] deferring start (28970 us)
+[DBG] deferring start (28602 us)
+[DBG] deferring start (28236 us)
+[DBG] deferring start (27875 us)
+[DBG] deferring start (27515 us)
+[DBG] deferring start (27146 us)
+[DBG] deferring start (26783 us)
+[DBG] deferring start (26426 us)
+[DBG] deferring start (26070 us)
+[DBG] deferring start (25705 us)
+[DBG] deferring start (25311 us)
+[DBG] deferring start (24849 us)
+[DBG] deferring start (24392 us)
+[DBG] deferring start (24085 us)
+[DBG] deferring start (23691 us)
+[DBG] deferring start (23343 us)
+[DBG] deferring start (22984 us)
+[DBG] deferring start (22619 us)
+[DBG] deferring start (22280 us)
+[DBG] deferring start (21973 us)
+[DBG] deferring start (21633 us)
+[DBG] deferring start (21337 us)
+[DBG] deferring start (21010 us)
+[DBG] deferring start (15293 us)
+[DBG] deferring start (14866 us)
+[DBG] deferring start (14477 us)
+[DBG] deferring start (14094 us)
+[DBG] deferring start (13696 us)
+[DBG] started
+7:05:13.109 PM [skip] after=180671 ms
+7:06:14.335 PM [player] dismiss at 240891 ms, state Playing
+7:06:14.337 PM [display] cleared: maxFPS=24 edrHeadroom=1.00/1.00 gamut=1 matchingEnabled=true switchInProgress=false criteria=nil
+7:06:14.339 PM [player] state Stopping at 241785 ms
+[DBG] killing decoder fourcc `hevc'
+[DBG] removing "video decoder" module "videotoolbox"
+[DBG] saving a free vout
+[DBG] ES track unselected: 'video/1' (fourcc: 'hevc')
+7:06:14.354 PM [player] track selected type=1 selected= unselected=video/1
+[DBG] killing decoder fourcc `mlpa'
+[DBG] removing "audio decoder" module "avcodec"
+[DBG] removing "audio packetizer" module "mlp"
+[DBG] removing "audio resampler" module "soxr"
+[DBG] removing "audio converter" module "audio_format"
+[DBG] removing "audio filter" module "scaletempo"
+[DBG] removing "audio volume" module "float_mixer"
+[DBG] keeping audio output
+[DBG] ES track unselected: 'audio/2' (fourcc: 'mlpa')
+[DBG] removing "demux" module "mkv"
+7:06:14.445 PM [player] track selected type=0 selected= unselected=audio/2
+[DBG] ES track deleted: 'video/1' (fourcc: 'hevc')
+[DBG] ES track deleted: 'audio/2' (fourcc: 'mlpa')
+[DBG] ES track deleted: 'audio/3' (fourcc: 'a52 ')
+[DBG] ES track deleted: 'audio/4' (fourcc: 'a52 ')
+[DBG] ES track deleted: 'spu/5' (fourcc: 'bdpg')
+[DBG] Program doesn't contain anymore ES
+[DBG] removing "stream_filter" module "record"
+[DBG] removing "stream_filter" module "prefetch"
+[DBG] removing "access" module "http"
+[DBG] connection failed
+[DBG] stop free vout
+7:06:14.446 PM [player] state Stopped at 241785 ms

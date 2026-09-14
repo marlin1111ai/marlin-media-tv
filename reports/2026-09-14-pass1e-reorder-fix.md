@@ -558,3 +558,95 @@ Unchanged: `~/vlckit-build` (the step 2d edit has not run, so `VLCKit.xcodeproj`
 
 1. **How much a rerun would rebuild.** The size of the recompile is inferred from make's timestamp rules and the files the patches touch, not measured. It could be only the ~52 libvlc files plus relinks, or also FFmpeg and live555.
 2. **Whether `-l` still regenerates anything per slice** before `lipo`. The code shows it goes straight from the existing `libvlc-full-static.a` to `xcodebuild archive`, but that path has never been run in this project.
+
+---
+
+# Pass 1e RERUN 4 — PACKAGE_ONLY packaging, then device proof — 2026-09-14
+
+**Wonder Woman's judder is fixed on Home Theater.** With patch 0019 in the Xcode 27 framework:
+- **Wonder Woman:** a traced 3-minute run dropped **0** pictures (642 before) and the decoder released **0** out of order (642 before). Audio stayed at 50 blocks/s with no underrun, late or silence line.
+- **Divergent** is unchanged at 0.
+- **Magicians (H.264 via VideoToolbox)** released in order with one start-up drop during tvOS's display mode switch.
+- **Stargate (MPEG-2, avcodec)** matches pass 1d.
+- **The pass 1c seek** resumes in 0.393 s, and the Stargate frame step is unchanged.
+
+The framework is rerun 2's clean Xcode 27 build, packaged without recompiling (the slices' SHA-1s are unchanged). Committed locally, not pushed.
+
+## Result per item
+
+| Item | Result |
+|---|---|
+| 1 `PACKAGE_ONLY=1` in the recipe | **Done.** `tools/vlckit-truehd/build.sh`: with `PACKAGE_ONLY=1` it checks that `VLCKit/libvlc/vlc` and the three `build-appletv*/static-lib/libvlc-full-static.a` exist, skips the clone, the 0007 edit, the host-tool tarballs, the local GNU make and the 0018/0019 copies, runs step 2d (tvOS target 26.0), calls VideoLAN's script with `-v -f -t -r -n -l`, then does the `nm` proof and the copy. Default unchanged (full build). README: one line. `sh -n` ok. |
+| 2 Package-only run | **Done, no recompile.** 18:41:34–18:42:06, `build.sh` exit 0. A watchdog polling build.log every 3 s for any patch/compile marker before VLCKit's archive stopped nothing (`stopped=[]`). Step 2d: `VLCKit.xcodeproj TVOS_DEPLOYMENT_TARGET = 26.0 (4 build configurations)`. `** ARCHIVE SUCCEEDED **` ×2, `xcframework successfully written out`. `nm`: `_ff_mlp_decoder`, `_ff_mlp_parser`, `_ff_truehd_decoder`. Both slices `MinimumOSVersion 26.0`, `LC_BUILD_VERSION minos 26.0 sdk 27.0`, `DTXcodeBuild 27A266a`. Snapshot before (18:40:22) vs after (18:43:17): the three `libvlc-full-static.a` have identical size, time (16:53:02 / 16:58:57 / 16:56:03) and SHA-1 (`7be54068a065` / `7d3c64b99f36` / `9babe59bce85`); their `dpb.o`, every contrib, `dpb.c` and libvlc HEAD `e50d9ac36a` are unchanged; only the project's tvOS target, `VLCKit/build` and the `Frameworks/` copy changed. `Frameworks/` = build output (`diff -rq`), 725 M, git-ignored. Evidence: `reports/logs/1e-rerun4-package.txt`. |
+| 3 App build, install, fresh container | **Done.** `** TEST BUILD SUCCEEDED **` on Xcode 27; app `MinimumOSVersion 26.0`, `DTXcode 2700`. The embedded VLCKit is the packaged one plus its signature: with both signatures removed the binaries differ in 2 bytes, `__LINKEDIT` `vmsize` 0x544000 vs 0x59c000 (same `filesize`). Before install the container held the diag4 files (`vlc-trace-*.json` ×5, 284.6 MB, `Library/Logs/vlc-log.json`). `devicectl device uninstall app` (18:44:26, exit 0), then `devicectl device install app` (18:44:29, exit 0). Container afterwards: `Documents`, `Library`, `Library/Caches`, `Library/Preferences`, `tmp` — nothing else. |
+| 4 Device verification | **Done** (§R4-2, §R4-3). |
+| 5 Notebook | **Done.** D017 and D018 in `DECISIONS.md`; COLD-START: the VLCKit and build-prerequisite facts, the current-state paragraph. |
+
+## R4-1. Method
+
+- **Traced runs.** Console launch (`devicectl device process launch --console`) with VLCParams `--tracer=json --json-tracer-file=<container>/Library/Caches/vlc-trace-<run>.json`. The container path comes from libvlc's own `opening logfile` line in a probe run after the reinstall (`t0_AttachAndPlay`, Magicians 20 s). XCUITest `Diag1eUITests` attaches and does a 3-minute watch with a stamped subtitle-panel anchor per minute.
+- **Seek and frame step.** Plain XCUITest launch, pass 1c method, no tracer.
+- **Counts.**
+  - Per-minute: vout lines between anchors (`perminute.py`).
+  - Order and audio: the trace (`tracecheck.py`, which reproduces diag4's 642/642 and 50.0 blocks/s on diag4's own trace).
+  - Seek: last press → `[player] buffering 1.0` (`seekcheck.py`, which reproduces pass 1c's 0.446 s).
+  - Frame step: the position chain in the stepping window (`framecheck.py`).
+- **Evidence.**
+  - Six app logs: `reports/logs/1e-rerun4-{ww-traced,divergent-traced,magicians-traced,stargate-extended-traced,ww-seek,stargate-framestep}.log`.
+  - Every analysis output: `reports/logs/1e-rerun4-device-analysis.txt`.
+  - The traces (99 / 14 / 12 / 9.9 MB) stay off-repo.
+
+## R4-2. Before / after
+
+| Run | Before | After (patch 0019, Xcode 27 framework) |
+|---|---|---|
+| **Wonder Woman TrueHD**, 3 min traced | diag4 (`d4-ww-traced.log`): dropped **153 / 230 / 246** (642, missing 43–54 ms); shown late 0; misordered releases **642**; audio 50.0 blocks/s (43–56) | (`1e-rerun4-ww-traced.log`, 18:47): dropped **0 / 0 / 0**; shown late 1 (31 ms, 239 ms after the first picture, at start-up — directly after the audio output's `started`, before the display mode switch to 24 Hz ended); misordered releases **0**; pictures out / rendered 4 600 / 4 602; audio **50.0** blocks/s (43–56); `underrun`, `too slow`, `playing silence`, `way too early`, `discarded audio`, `discontinuity`, `resampling`, `drift`, `flushedAutomatically`, `StatusFailed`, `resetting master clock`, `decoder dropped frame`: 0 each; `codec (truehd) started`, `Output on HDMI, channel count: 8`, `coalescing` 1 |
+| **Divergent** HEVC / DTS, 3 min traced | diag4 (`d4-divergent-traced.log`): 0 / 0 / 0; shown late 0; misordered 0; decoder output gap median 41.9 ms | (`1e-rerun4-divergent-traced.log`, 18:51): **0 / 0 / 0**; shown late 0; misordered **0**; gap median 41.8 ms (33 gaps > 80 ms, as before); audio 94 blocks/s; anomaly lines 0 |
+| **The Magicians S1E1** H.264 MP4 / AAC, VideoToolbox (`Using Video Toolbox to decode 'h264'`) | pass 1d (`1d-magicians-aac.log`, 3 min 11 s): dropped 0; shown late 1 (10 ms, at start-up, directly after `started`, before the 29.97 Hz mode switch ended); not traced. diag1 (8 min): 0 / 0 | (`1e-rerun4-magicians-traced.log`, 18:55): dropped **1 / 0 / 0** — one picture 37 ms late at start-up, 252 ms after the first picture, directly after `started` and before the 29.97 Hz mode switch ended (the same point as pass 1d's shown-late picture); shown late 0; misordered **0**; pictures out / rendered 5 746 / 5 748; audio 43 blocks/s; anomaly lines 0 |
+| **Stargate Extended** MPEG-2 480i / AC-3, avcodec (not VideoToolbox) | pass 1d (`1d-stargate-extended-ac3.log`, 3 min 11 s): dropped 2 (79, 46 ms); shown late 6 (0–14 ms); not traced | (`1e-rerun4-stargate-extended-traced.log`, 19:00): dropped **2 / 0 / 0** (82, 49 ms); shown late **3 / 0 / 2** (6–14 ms); decoder output steps backwards twice: at 1 254 ms (PTS 1 701 → 1 635; the two pictures behind it, PTS 1 635 and 1 668, are the two dropped) and at 191 371 ms, after `[player] dismiss` (stop flush); audio 31 blocks/s; anomaly lines 0 |
+| **Wonder Woman seek**, pass 1c method | pass 1c (`1c-seek-wonder-woman-A.log`, ten +30 s presses): last press → picture **0.446 s**; then 873 too-late lines to dismiss | (`1e-rerun4-ww-seek.log`, 19:04, five +30 s presses ~1.2 s apart): last press (19:05:12.580) → `[player] buffering 1.0` (19:05:12.973) **0.393 s**; position after 180 671 ms; last press → dismiss (61 s): **0** too late, **0** shown late; whole run: 0 dropped, 1 shown late (10 ms, directly after the audio restart that followed press 3, before press 4) |
+| **Stargate Extended frame step**, five forward clicks while paused | pass 1c (`1c-framestep-stargate-extended.log`): 24 134 → 24 241 → 24 274 → 24 324 → 24 358 → 24 408 ms; steps 107, 33, 50, 34, 50; in the stepping window 0 too late, 2 shown late, 0 `Buffering` | (`1e-rerun4-stargate-framestep.log`, 19:06): 23 966 → 24 074 → 24 107 → 24 157 → 24 191 → 24 241 ms; steps **108, 33, 50, 34, 50**; 0 too late, 2 shown late, 0 `Buffering`, 0 `RESET_PCR` |
+
+## R4-3. The pictures that were still late or dropped
+
+All in `reports/logs/1e-rerun4-device-analysis.txt`, with log line numbers.
+- **Wonder Woman:** one picture 31 ms late at start-up.
+- **Magicians:** one picture dropped 37 ms late at start-up.
+- **Seek run:** one picture 10 ms late after press 3's audio restart.
+
+These three each sit directly after the audio output's `started` line (start of playback or restart after a seek). Wonder Woman's and Magicians' also precede the end of tvOS's display mode switch. None comes with an out-of-order release.
+
+- **Stargate:** the two start-up drops are the two pictures avcodec released behind a later one. That decoder does not use `dpb.c`, so patch 0019 cannot be involved; pass 1d had the same two drops but was not traced.
+
+## R4-4. Files touched, by step
+
+| Step | Files |
+|---|---|
+| 1 | `tools/vlckit-truehd/build.sh` (`PACKAGE_ONLY`), `tools/vlckit-truehd/README.md` (one line) |
+| 2 | `reports/logs/1e-rerun4-package.txt`; outside the repo: `~/vlckit-build/VLCKit/VLCKit.xcodeproj/project.pbxproj` (step 2d, tvOS target 26.0), `~/vlckit-build/VLCKit/build` (archives, xcframework), `Frameworks/VLCKit.xcframework` (git-ignored) |
+| 3 | none in the repo; on Home Theater the app was uninstalled and reinstalled |
+| 4 | `reports/logs/1e-rerun4-{ww-traced,divergent-traced,magicians-traced,stargate-extended-traced,ww-seek,stargate-framestep}.log`, `reports/logs/1e-rerun4-device-analysis.txt`; temporary `Marlin Media TVUITests/Diag1eUITests.swift` (restored from Appendix R2-A, a `t0_AttachAndPlay` probe added; deleted before the commit) |
+| 5 | `DECISIONS.md` (D017, D018), `COLD-START.md` (Xcode line from rerun 1, VLCKit and build-prerequisite facts, current state), this record |
+
+## R4-5. What could not be tested
+
+- **Wonder Woman's audibility** on TrueHD and **the HDR/24 Hz indication on the TV**: the owner's checks (the harness cannot hear or see the panel).
+- **Whether Magicians exercised the patched guard at all.** Its release order was correct, but whether its SPS carries a latency limit that is ever reached was not measured. An H.264 stream that does reach one was not available.
+- **Longer playback than 3 minutes** after the fix, and **seek or frame step on titles other than** Wonder Woman / Stargate Extended in this pass.
+- **The Stargate Theatrical edition; the tvOS simulator slice** (built, not run).
+- **The paused frame-back step (D008),** which is still open and was not part of this pass.
+- **The mechanism of the start-up late pictures.** Placed by log position and trace time, not traced inside the display or audio path.
+
+## R4-6. Questions for the owner
+
+1. **Start-up late pictures.** Wonder Woman (31 ms shown late) and Magicians (37 ms, dropped) each have one picture at the moment the audio output starts, while tvOS switches the display mode; the seek run has one after a seek's audio restart. Pass 1d had the same event on Magicians (10 ms, shown). Accept as start-up behaviour, or a later diagnosis pass?
+2. **Stargate's two start-up drops** are two MPEG-2 pictures released out of order by avcodec (not the patched code). Worth a separate item?
+3. **Upstream.** Report the `dpb.c` defect and the `dpb_test.c` expectation to VideoLAN, with patch 0019?
+4. **Screenshots.** The harness saved screenshots for the seek and frame-step runs. They are not committed; do you want them in `reports/screenshots/`?
+
+## R4-7. Least-sure items
+
+1. **H.264 coverage.** The guard is shared by H.264 and HEVC; only HEVC (Wonder Woman) is shown to hit the latency case. H.264's correct order on Magicians is evidence of no regression, not of the guard working there.
+2. **Host tools kept from Xcode 26.6** (`extras/tools/build`): they build nothing into the framework, but this "clean" build excludes them.
+3. **libvlc's own minimum stays tvOS 11.0** inside a framework whose `minos` is 26.0. It builds, links and plays on tvOS 26.6 here; nothing beyond these runs checks it.
+4. **Start-up late pictures.** Their cause is placed by timing only (§R4-3).

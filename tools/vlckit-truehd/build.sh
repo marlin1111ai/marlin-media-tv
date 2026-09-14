@@ -4,6 +4,8 @@
 # scripts cannot take spaces in paths (the repo is "~/Xcode/Marlin Media TV"):
 #   BUILD_DIR   where VLCKit and libvlc are cloned and built (default ~/vlckit-build; no spaces)
 #   REPO        the app repo, receives Frameworks/VLCKit.xcframework (git-ignored)
+#   PACKAGE_ONLY=1  package the libvlc slices already built in BUILD_DIR: no clone, no patching, no host tools,
+#               no contrib/libvlc compile (VideoLAN's script with -n -l); step 2d still runs. Default: full build.
 # Log: $BUILD_DIR/build.log. Result: $BUILD_DIR/VLCKit/build/tvOS/VLCKit.xcframework → $REPO/Frameworks/.
 set -e
 BUILD_DIR="${BUILD_DIR:-$HOME/vlckit-build}"
@@ -14,9 +16,19 @@ ls -d /Library/Frameworks/Python.framework/Versions/3.[1-9][0-9]/bin >/dev/null 
 # Step 1/2 — VLCKit source at the tag the app used as a Swift package.
 mkdir -p "$BUILD_DIR" "$REPO/Frameworks"
 cd "$BUILD_DIR"
+if [ "$PACKAGE_ONLY" = "1" ]; then
+    # pass 1e rerun 4 (D018): reuse what a previous full run built; stop if any of it is missing.
+    [ -d VLCKit/libvlc/vlc ] || { echo "PACKAGE_ONLY=1 needs an existing $BUILD_DIR/VLCKit/libvlc/vlc" >&2; exit 1; }
+    for slice in build-appletvos-arm64 build-appletvsimulator-arm64 build-appletvsimulator-x86_64; do
+        [ -f "VLCKit/libvlc/vlc/$slice/static-lib/libvlc-full-static.a" ] || { echo "PACKAGE_ONLY=1: missing $slice/static-lib/libvlc-full-static.a" >&2; exit 1; }
+    done
+    echo "PACKAGE_ONLY=1: packaging the existing libvlc slices (no clone, patches, host tools or compile)"
+else
 [ -d VLCKit ] || git clone --depth 1 --branch 4.0.0-a24 https://code.videolan.org/videolan/VLCKit.git VLCKit
+fi
 cd VLCKit
 
+if [ "$PACKAGE_ONLY" != "1" ]; then
 # Step 2 — drop the hunk of VLCKit's patch 0007 that disables ffmpeg's mlp decoder/demuxer/parser
 # (its commit message: "to be in compliance with the App Store ToS"). The AudioToolbox AC-3 part stays.
 # Idempotent: skipped when the diff is already applied.
@@ -65,6 +77,7 @@ echo "patch 0018 installed"
 cp "$REPO/tools/vlckit-truehd/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arriving-picture.diff" \
    "$BUILD_DIR/VLCKit/libvlc/patches/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arriving-picture.patch"
 echo "patch 0019 installed"
+fi # PACKAGE_ONLY
 
 # Step 2d — pass 1e rerun 3 (D018): Xcode 27 refuses to archive VLCKit.xcodeproj with its tvOS deployment target 11.0
 # ("supported deployment target versions is 15.0 to 27.0.x"); VideoLAN's archive call overrides only the iOS target.
@@ -79,7 +92,13 @@ echo "VLCKit.xcodeproj TVOS_DEPLOYMENT_TARGET = 26.0 ($(grep -c 'TVOS_DEPLOYMENT
 # applies the 17 patches, builds host tools under extras/tools, the contribs, libvlc, then the framework.
 # -v verbose, -f device + simulator + xcframework, -t tvOS, -r Release.
 echo "build start: $(date '+%Y-%m-%d %H:%M:%S')" | tee "$BUILD_DIR/build.log"
-./compileAndBuildVLCKit.sh -v -f -t -r >> "$BUILD_DIR/build.log" 2>&1
+if [ "$PACKAGE_ONLY" = "1" ]; then
+    # -n: no fetch / reset / git am of libvlc; -l: no host tools and no buildLibVLC — the existing
+    # build-appletv*/static-lib/libvlc-full-static.a are lipo'd and archived as they are.
+    ./compileAndBuildVLCKit.sh -v -f -t -r -n -l >> "$BUILD_DIR/build.log" 2>&1
+else
+    ./compileAndBuildVLCKit.sh -v -f -t -r >> "$BUILD_DIR/build.log" 2>&1
+fi
 echo "build end:   $(date '+%Y-%m-%d %H:%M:%S')" | tee -a "$BUILD_DIR/build.log"
 
 # Step 4 — the proof: the decoder symbols in the tvOS device slice.

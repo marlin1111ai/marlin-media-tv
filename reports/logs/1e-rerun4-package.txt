@@ -1,0 +1,141 @@
+# Pass 1e rerun 4 — PACKAGE_ONLY=1 packaging of the rerun-2 Xcode 27 slices, app build, clean install (2026-09-14)
+
+## PACKAGE_ONLY=1 tools/vlckit-truehd/build.sh — console output, with the compile watchdog's verdict
+```
+== started 18:41:34 pid 13399
+PACKAGE_ONLY=1: packaging the existing libvlc slices (no clone, patches, host tools or compile)
+VLCKit.xcodeproj TVOS_DEPLOYMENT_TARGET = 26.0 (4 build configurations)
+build start: 2026-09-14 18:41:34
+build end:   2026-09-14 18:42:06
+000000000236e680 S _ff_mlp_decoder
+000000000236e648 S _ff_mlp_parser
+000000000236e730 S _ff_truehd_decoder
+done: ~/Xcode/Marlin Media TV/Frameworks/VLCKit.xcframework
+== build.sh exit 0 18:42:07
+== watchdog done 18:42:10 stopped=[]
+```
+
+Watchdog: polled build.log every 3 s and would have killed the run on any of `^Applying:`, `Building tools`, `Compiling <arch> with SDK version`, `Building contribs`, `Building VLC for`, a CC/CXX/OBJC compile line or `[n/m] Compiling`, seen before VLCKit's own archive began. Result above: `stopped=[]`.
+
+## build.log markers for this run (6758 lines; colour codes stripped)
+```
+1:build start: 2026-09-14 18:41:34
+2511:** ARCHIVE SUCCEEDED **
+6754:** ARCHIVE SUCCEEDED **
+6756:xcframework successfully written out to: ~/vlckit-build/VLCKit/build/tvOS/VLCKit.xcframework
+6757:[info] Build of VLCKit.xcframework for tvOS completed
+6758:build end:   2026-09-14 18:42:06
+--- last 6 lines
+
+** ARCHIVE SUCCEEDED **
+
+xcframework successfully written out to: ~/vlckit-build/VLCKit/build/tvOS/VLCKit.xcframework
+[info] Build of VLCKit.xcframework for tvOS completed
+build end:   2026-09-14 18:42:06
+```
+
+## Before/after snapshot of the libvlc slices, contribs and tree (before 18:40:22, after 18:43:17)
+### before
+```
+snapshot at 18:40:22
+build-appletvos-arm64/static-lib/libvlc-full-static.a size 783444336 mtime 16:53:02 sha1 7be54068a065
+  dpb.o mtime 16:52:37
+  newest file under build-appletvos-arm64: 16:53:02 ~/vlckit-build/VLCKit/libvlc/vlc/build-appletvos-arm64/static-lib/libvlc-full-static.a
+build-appletvsimulator-arm64/static-lib/libvlc-full-static.a size 786906840 mtime 16:58:57 sha1 7d3c64b99f36
+  dpb.o mtime 16:58:34
+  newest file under build-appletvsimulator-arm64: 16:58:57 ~/vlckit-build/VLCKit/libvlc/vlc/build-appletvsimulator-arm64/static-lib/static-module-list.o
+build-appletvsimulator-x86_64/static-lib/libvlc-full-static.a size 823167856 mtime 16:56:03 sha1 9babe59bce85
+  dpb.o mtime 16:55:37
+  newest file under build-appletvsimulator-x86_64: 16:56:03 ~/vlckit-build/VLCKit/libvlc/vlc/build-appletvsimulator-x86_64/static-lib/static-module-list.o
+arm64-appletvos27.0: libavcodec.a mtime 16:51:38; newest: 16:51:51
+arm64-appletvsimulator27.0: libavcodec.a mtime 16:57:39; newest: 16:57:52
+x86_64-appletvsimulator27.0: libavcodec.a mtime 16:54:43; newest: 16:54:56
+contrib-arm64-apple-tvOS_11.0: newest file 16:51:52
+contrib-arm64-apple-tvOS-Simulator_12.0: newest file 16:57:52
+contrib-x86_64-apple-tvOS-Simulator_12.0: newest file 16:54:56
+modules/codec/videotoolbox/dpb.c mtime 16:49:49
+libvlc HEAD e50d9ac36a videotoolbox: dpb: do not bump ahead of the arriving picture on latency alone; dirty entries 0
+VLCKit.xcodeproj: 4 × TVOS 11.0, 0 × TVOS 26.0
+VLCKit/build exists: no
+Frameworks copy: Sep 14 12:50:11 2026
+```
+### diff before → after
+```
+1c1
+< snapshot at 18:40:22
+---
+> snapshot at 18:43:17
+19,21c19,21
+< VLCKit.xcodeproj: 4 × TVOS 11.0, 0 × TVOS 26.0
+< VLCKit/build exists: no
+< Frameworks copy: Sep 14 12:50:11 2026
+---
+> VLCKit.xcodeproj: 0 × TVOS 11.0, 4 × TVOS 26.0
+> VLCKit/build exists: yes
+> Frameworks copy: Sep 14 18:42:06 2026
+```
+
+## The packaged framework (Frameworks/VLCKit.xcframework)
+```
+tvos-arm64: MinimumOSVersion 26.0; DTSDKName appletvos27.0; DTXcode 2700; DTXcodeBuild 27A266a
+  is architecture: arm64
+  LC_BUILD_VERSION:  platform 3 minos 26.0 sdk 27.0
+  binary 43538392 bytes, Sep 14 18:42:06 2026
+tvos-arm64_x86_64-simulator: MinimumOSVersion 26.0; DTSDKName appletvsimulator27.0; DTXcode 2700; DTXcodeBuild 27A266a
+  are: x86_64 arm64 
+  LC_BUILD_VERSION:  platform 8 minos 26.0 sdk 27.0 platform 8 minos 26.0 sdk 27.0
+  binary 98106704 bytes, Sep 14 18:42:06 2026
+nm tvos-arm64:
+000000000236e680 S _ff_mlp_decoder
+000000000236e648 S _ff_mlp_parser
+000000000236e730 S _ff_truehd_decoder
+0018 string 'coalescing %u-sample' in tvos-arm64: 1
+diff -rq Frameworks/VLCKit.xcframework ~/vlckit-build/VLCKit/build/tvOS/VLCKit.xcframework: identical
+size: 725M; git check-ignore: ignored
+```
+
+## App build on Xcode 27 (build-for-testing, destination Home Theater)
+```
+** TEST BUILD SUCCEEDED **
+xcodebuild -version: Xcode 27.0 Build version 27A266a
+app Info.plist: MinimumOSVersion 26.0, DTXcode 2700, DTSDKName appletvos27.0
+embedded VLCKit: 43897008 bytes, Sep 14 18:43:53 2026; TrueHD symbols 3
+```
+
+### Embedded VLCKit vs Frameworks/ (code-sign on copy)
+```
+Frameworks/ tvos-arm64 binary: Frameworks/VLCKit.xcframework/tvos-arm64/VLCKit.framework/VLCKit: code object is not signed at all
+embedded binary: Identifier=org.videolan.vlckit Signature size=4781 TeamIdentifier=<redacted>
+after codesign --remove-signature on scratch copies: sizes 43538392 / 43538392; cmp -l differing bytes: 2 at offsets 3242,3243 (load commands end at byte 5488)
+otool -l difference:
+486c486
+<    vmsize 0x0000000000544000
+---
+>    vmsize 0x000000000059c000
+      cmd LC_SEGMENT_64
+  cmdsize 72
+  segname __LINKEDIT
+   vmaddr 0x0000000002de8000
+   vmsize 0x0000000000544000
+```
+
+## Clean install on Home Theater
+```
+before (diag4 leftovers in the container, listed 18:43):
+  Library/Caches/marlin-media-tv.log, vlc-trace-div-trace.json 14.4 MB, vlc-trace-ww-420v.json 87.9 MB, vlc-trace-ww-noaudio.json 6.2 MB, vlc-trace-ww-nodroplate.json 88.2 MB, vlc-trace-ww-trace.json 87.9 MB, Library/Logs/vlc-log.json 0 KB
+18:44:26 xcrun devicectl device uninstall app --device "Home Theater" com.marlin1111.marlin-media-tv → App uninstalled. (exit 0)
+18:44:29 xcrun devicectl device install app --device "Home Theater" <Debug-appletvos/Marlin Media TV.app> → App installed: bundleID com.marlin1111.marlin-media-tv (exit 0)
+after (xcrun devicectl device info files … --domain-type appDataContainer):
+  49 files: 
+  Name URL Resources
+  --------------------------------------------------------------------------------------------------------------------------------- ----------------------------- ---------
+  Documents Writable, Readable,
+  Library Writable, Readable,
+  Library/Caches Writable, Readable,
+  Library/Caches/Saved Application State
+  Library/Caches/Saved Application State/com.marlin1111.marlin-media-tv.savedState
+  Library/Caches/Saved Application State/com.marlin1111.marlin-media-tv.savedState/com.marlin1111.marlin-media-tv-default
+  Library/Caches/Saved Application State/com.marlin1111.marlin-media-tv.savedState/com.marlin1111.marlin-media-tv-default/data.data
+  Library/Caches/com.apple.dyld Writable, Readable,
+  Library/Caches/com.apple.dyld/Marlin Media TV.dyld4
+```

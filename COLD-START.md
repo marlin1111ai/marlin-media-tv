@@ -30,17 +30,25 @@ the file bytes with HTTP Range support at `/stream/{fileId}`.
 ## Toolchain facts
 
 - **VLCKit:** a custom build of VideoLAN's VLCKit 4.0.0-a24 with the TrueHD/MLP decoder compiled in
-  (D012). It lives at `Frameworks/VLCKit.xcframework` (git-ignored, 716 MB; tvOS device + simulator
-  slices) and the Xcode project links and embeds it by path — the Swift package is gone (D013).
-  Built by `tools/vlckit-truehd/build.sh` at `~/vlckit-build` (VideoLAN's scripts cannot take spaces
-  in paths) from libvlc master 5dd4aebda + VLCKit's 17 patches, patch 0007 minus its mlp hunk;
-  ffmpeg 9.0 (`Lavc63.1.100`), Video Toolbox decoding, `samplebufferdisplay` video output,
-  `avsamplebuffer` audio output. Reported version string: `4.0.0-dev Otto Chriek`.
+  (D012). It lives at `Frameworks/VLCKit.xcframework` (git-ignored, 725 MB; tvOS device arm64 +
+  simulator arm64/x86_64 slices) and the Xcode project links and embeds it by path — the Swift package
+  is gone (D013). Built by `tools/vlckit-truehd/build.sh` at `~/vlckit-build` (VideoLAN's scripts cannot
+  take spaces in paths) from libvlc master 5dd4aebda + 19 patches: VLCKit's 17 (0007 minus its mlp hunk),
+  **0018** (TrueHD/MLP decoder frames coalesced into 20 ms blocks, D015) and **0019** (VideoToolbox
+  picture-reorder fix, D017). Current framework (2026-09-14 18:42): contribs and libvlc compiled clean on
+  Xcode 27.0 / tvOS SDK 27.0, packaged with VLCKit's project tvOS target set to 26.0 (`MinimumOSVersion`
+  26.0, `LC_BUILD_VERSION minos 26.0 sdk 27.0`, D018). ffmpeg 9.0 (`Lavc63.1.100`), Video Toolbox decoding,
+  `samplebufferdisplay` video output, `avsamplebuffer` audio output. Reported version string:
+  `4.0.0-dev Otto Chriek`.
 - **VLCKit build prerequisites (not the app's):** python.org Python 3.14.7 at
   `/Library/Frameworks/Python.framework` (installed 2026-09-13; VideoLAN's script looks only there)
   and GNU make 4.4.1 built into `~/vlckit-build/tools` and passed as `VLC_PATH` (Xcode's make 3.81
-  breaks the jobserver with VLC's ninja). A full build took 9 min 13 s on the M2 Ultra; the first
-  run also builds VLC's host tools (about 8 min more). `~/vlckit-build` is 22 GB.
+  breaks the jobserver with VLC's ninja). On Xcode 27 a clean build compiled the contribs and all three
+  libvlc slices in 9 min 11 s (16:49:46–16:58:57, 2026-09-14; the host tools in `extras/tools/build`
+  were kept). `PACKAGE_ONLY=1 tools/vlckit-truehd/build.sh` re-packages the slices already built (no
+  clone, patching, host tools or compiles; VideoLAN's script with `-n -l`) in about 30 s. Any change to
+  the patches or the toolchain needs the full build, which resets libvlc and re-applies every patch.
+  `~/vlckit-build` was 22 GB on 2026-09-13 (not re-measured since).
 - **Minimum tvOS:** 26.0 exactly (`TVOS_DEPLOYMENT_TARGET = 26.0`, D004). Both Apple TVs run 26.6.
 - **No CocoaPods, no xcodegen, no brew installs.** The project file was written by hand
   (objectVersion 71, file-system-synchronized groups); Xcode opens it normally.
@@ -109,3 +117,21 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 **Pass 1c (2026-09-14):** MKV seeks now use the file's Cues — one media option, `:demux=mkv_trusted`, on `.mkv` streams only (D014). Ten +30 s skips bring the picture back in under 0.6 s on all four MKVs (8–51 s before); nothing else changed. Numbers in `reports/2026-09-14-pass1c-mkv-seek.md`; the two diagnosis reports of 2026-09-14 (`…-diag-mkv-stutter.md`, `…-diag2-seek.md`) hold the evidence and VLC's code path. Still open: Wonder Woman's steady ~3.6 dropped pictures/s (2160p HEVC decode/display path, not the network), and the paused frame-back step, which now starts from the previous cue instead of the file start but still runs VLC's paused-seek rebuffer loop until the next input (pass-1 open question 2, D008).
 
 **Pass 1d (2026-09-14):** three changes. (1) VLCKit patch 0018 (D015) coalesces TrueHD/MLP decoder frames into 20 ms blocks — the framework was rebuilt with `tools/vlckit-truehd/build.sh` (which now installs that patch too; 3 min when contribs are already built) and `Frameworks/VLCKit.xcframework` replaced. (2) The player requests display matching per stream (D016): frame rate from VLC's parse or the player's video track, HDR10/SDR from the server's flag; tvOS switches to 24 Hz for the 4K films. (3) Menu closes an open track panel instead of exiting. Numbers in `reports/2026-09-14-pass1d-truehd-audio-and-framerate.md`. Still open: Wonder Woman's ~3.6 dropped pictures/s (unchanged at 24 Hz — a decode/output limit for that stream, `…-diag3-wonder-woman.md` §B), the paused frame-back step (D008, pass-1 open question 2), and whether TrueHD is now audible (the owner's check).
+
+**Pass 1e (2026-09-14):** Wonder Woman's judder is fixed.
+- **Cause.** VLC's VideoToolbox reorder buffer released each mini-GOP's anchor before its last B-picture when only the max-latency count triggered a release (diag4), so the vout dropped 642 pictures per 3 minutes.
+- **Fix.** VLCKit patch 0019 (D017) stops such releases at the arriving picture. VLC's own `dpb_test.c` expected the misorder and is corrected in the same patch. The framework is now built clean on Xcode 27.0 / tvOS SDK 27.0 with VLCKit's project tvOS target set to 26.0 (D018). `PACKAGE_ONLY=1` re-packages existing slices without recompiling.
+- **Device proof on Home Theater, 3-minute traced runs.**
+  - Wonder Woman: 0 dropped, 0 out-of-order releases, audio 50 blocks/s with no anomaly line.
+  - Divergent: 0.
+  - Magicians (H.264): in order, one start-up drop.
+  - Stargate (MPEG-2, avcodec): 2 dropped / 5 shown late, as in pass 1d.
+  - Seek: resumes in 0.393 s. Stargate frame step: unchanged.
+- **Where it is written up.** `reports/2026-09-14-pass1e-reorder-fix.md` (rerun 4).
+- **Still open.**
+  - A single late picture at audio start / display mode switch (Wonder Woman, Magicians, after a seek).
+  - The paused frame-back step (D008).
+  - TrueHD audibility and the TV's 24 Hz/HDR indication (the owner's checks).
+  - An upstream report to VideoLAN.
+- **Not pushed** — the owner tests first.
+
