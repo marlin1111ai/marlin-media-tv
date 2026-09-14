@@ -1,0 +1,71 @@
+# p1e-candidates.py — run 2026-09-14 on the diag4 per-picture decode order (mkvframes.py, first 250 s of each file)
+```
+# p1e-candidates.py: VLC videotoolbox DPB step variants over each file's real decode order (IDR flush included).
+#   vlc : latency++ (foc > current) -> IRAP flush | bump(full >= 5, reorder, latency) -> insert           [dpb.c + decoder.c as built]
+#   L   : insert current -> latency++ -> IRAP flush (EmptyDPB, current included) | bump(full, reorder, latency)   [literal "insert first"]
+#   A   : IRAP flush | bump(full, reorder) -> insert -> latency++ -> bump(reorder, latency)   [diag4 counter-simulation; needs decoder.c]
+#   B   : as vlc, but a release triggered only by latency stops when the head follows the arriving picture   [dpb.c-only guard]
+import csv, sys
+def run(fc, reorder, lat, full, mode):
+    rows = sorted(csv.DictReader(open(fc)), key=lambda r: int(r['decode_idx']))
+    disp = sorted(float(r['pts_ms']) for r in rows); di = {m: i for i, m in enumerate(disp)}
+    dpb, out, last, peak = [], [], 0, 0
+    def flush():
+        out.extend(e[1] for e in sorted(dpb)); dpb.clear()
+    def bump(poc, use_full, use_reo, use_lat, guard):
+        while dpb:
+            dpb.sort()
+            cf = use_full and len(dpb) >= full
+            cr = use_reo and len(dpb) > reorder
+            cl = use_lat and any(e[2] >= lat for e in dpb)
+            if not (cf or cr or cl): break
+            if guard and not (cf or cr) and dpb[0][0] > poc: break
+            out.append(dpb.pop(0)[1])
+    for r in rows:
+        pts = float(r['pts_ms']); idr = r['key'] == 'True'
+        if idr: last = di[pts]
+        poc = di[pts] - last; cur = [poc, pts, 0]
+        if mode in ('vlc', 'B'):
+            if not idr:
+                for e in dpb:
+                    if e[0] > poc: e[2] += 1
+            if idr: flush()
+            else: bump(poc, True, True, True, mode == 'B')
+            dpb.append(cur)
+        elif mode == 'L':
+            dpb.append(cur)
+            for e in dpb:
+                if e[0] > poc: e[2] += 1
+            if idr: flush()
+            else: bump(poc, True, True, True, False)
+        elif mode == 'A':
+            if idr: flush()
+            else: bump(poc, True, True, False, False)
+            dpb.append(cur)
+            for e in dpb:
+                if e[0] > poc: e[2] += 1
+            bump(poc, False, True, True, False)
+        peak = max(peak, len(dpb))
+    flush()
+    back = sum(1 for a, b in zip(out, out[1:]) if b < a)
+    return back, len(out), peak
+d = sys.argv[1]
+print('file | mode | backward releases / pictures released | most pictures held after a step')
+for name, f, reo, lat in [('Wonder Woman', 'ww-frames.csv', 3, 4), ('Divergent', 'div-frames.csv', 2, 6)]:
+    for mode in ('vlc', 'L', 'A', 'B'):
+        back, n, peak = run(f'{d}/{f}', reo, lat, 5, mode)
+        print(f'{name} | {mode} | {back} / {n} | {peak}')
+```
+
+## output
+```
+file | mode | backward releases / pictures released | most pictures held after a step
+Wonder Woman | vlc | 869 / 5995 | 4
+Wonder Woman | L | 260 / 5995 | 3
+Wonder Woman | A | 0 / 5995 | 3
+Wonder Woman | B | 0 / 5995 | 4
+Divergent | vlc | 0 / 5995 | 3
+Divergent | L | 46 / 5995 | 2
+Divergent | A | 0 / 5995 | 2
+Divergent | B | 0 / 5995 | 3
+```
