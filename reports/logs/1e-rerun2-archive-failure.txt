@@ -1,0 +1,137 @@
+# Pass 1e rerun 2 — VLCKit clean rebuild on Xcode 27: archive failure (2026-09-14)
+
+Recipe run: tools/vlckit-truehd/build.sh, 16:49:46 → exit 65 at 16:59:00. build.log (VT100 colour codes stripped), selected lines:
+```
+1:build start: 2026-09-14 16:49:46
+23:Applying: Revert "contrib: live555: update to 2022.07.14"
+24:Applying: contrib: use live555 version that is compatible with LGPL2
+25:Applying: modules:common: Use the full module name as MODULE_NAME
+26:Applying: http access: retain auth struct for the runtime of the module
+27:Applying: access_output: file: Add error dialog for write/open
+28:Applying: http: add vlc_http_cookies_clear
+29:Applying: contrib/ffmpeg: use audiotoolbox on iOS for AC-3
+30:Applying: Add property to configure an http access token
+31:Applying: contrib/ffmpeg: fix cross-compilation for macOS on macOS
+32:Applying: libvlc_media: add cookie_jar API
+33:Applying: extras/tools: prefer shasum over sha512sum
+34:Applying: json: use function pointers to avoid duplicate symbols when statically linking
+35:Applying: vlc_stream: add STREAM_CAN_DOWNLOAD control query
+36:Applying: lib: add libvlc_downloader API
+37:Applying: input: add vlctest_ protocol
+38:Applying: test: add tests for libvlc_downloader
+39:Applying: doc: add samples_libvlc_downloader
+40:Applying: avcodec audio: coalesce TrueHD/MLP decoder frames into ~20 ms blocks
+41:Applying: videotoolbox: dpb: do not bump ahead of the arriving picture on latency alone
+46:[info] Compiling aarch64 with SDK version 27.0, platform appletvos
+51:  SDK Version:      27.0
+37139:[info] Finished compiling libvlc for aarch64 with SDK version 27.0, platform appletvos
+37140:[info] Compiling x86_64 with SDK version 27.0, platform appletvsimulator
+37145:  SDK Version:      27.0
+87621:[info] Finished compiling libvlc for x86_64 with SDK version 27.0, platform appletvsimulator
+87622:[info] Compiling aarch64 with SDK version 27.0, platform appletvsimulator
+87627:  SDK Version:      27.0
+137046:[info] Finished compiling libvlc for aarch64 with SDK version 27.0, platform appletvsimulator
+```
+
+Last 60 lines of build.log:
+```
+[info] building simulator static lib for appletv
+Directory ~/vlckit-build/VLCKit/libvlc/vlc/build-appletv-arm64 doesn't exist
+Directory ~/vlckit-build/VLCKit/libvlc/vlc/build-appletv-x86_64 doesn't exist
+[info] building device static lib for appletv
+Directory ~/vlckit-build/VLCKit/libvlc/vlc/build-appletv-x86_64 doesn't exist
+Directory ~/vlckit-build/VLCKit/libvlc/vlc/build-appletv-arm64 doesn't exist
+[info] all done
+[info] Building VLCKit.xcframework for tvOS
+[info] Building VLCKit (Release, appletvos)
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild archive -project VLCKit.xcodeproj -sdk appletvos -configuration Release -scheme VLCKit -destination generic/platform=tvOS -archivePath build/VLCKit-appletvos.xcarchive ARCHS=arm64 IPHONEOS_DEPLOYMENT_TARGET=10.2 -verbose SKIP_INSTALL=
+
+Build settings from command line:
+    ARCHS = arm64
+    IPHONEOS_DEPLOYMENT_TARGET = 10.2
+    ONLY_ACTIVE_ARCH = NO
+    SDKROOT = appletvos27.0
+    SKIP_INSTALL = no
+
+2026-09-14 16:58:59.528 xcodebuild[5940:10052683] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (2 targets)
+    Target 'VLCKit' in project 'VLCKit'
+        ➜ Implicit dependency on target 'Static libVLC' in project 'VLCKit' via file 'libstatic-libvlc.a' in build phase 'Link Binary'
+    Target 'Static libVLC' in project 'VLCKit' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk -x objective-c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool -V
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: f4cec82ecdc12f018d880e2f75a4dc9b
+Build description path: ~/Library/Developer/Xcode/DerivedData/VLCKit-bzxsgobjuynvzmagmdryiluhnfbc/Build/Intermediates.noindex/ArchiveIntermediates/VLCKit/IntermediateBuildFilesPath/XCBuildData/f4cec82ecdc12f018d880e2f75a4dc9b.xcbuilddata
+~/vlckit-build/VLCKit/VLCKit.xcodeproj: error: The tvOS deployment target 'TVOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 15.0 to 27.0.x. (in target 'VLCKit' from project 'VLCKit')
+** ARCHIVE FAILED **
+
+
+The following build commands failed:
+	Archiving project VLCKit with scheme VLCKit
+(1 failure)
+```
+
+VLCKit.xcodeproj deployment targets (grep of project.pbxproj):
+```
+   4 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+   2 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+   4 				TVOS_DEPLOYMENT_TARGET = 11.0;
+```
+
+libvlc extras/package/apple/build.conf:
+```
+19:export VLC_DEPLOYMENT_TARGET_TVOS="11.0"
+20:export VLC_DEPLOYMENT_TARGET_TVOS_SIMULATOR="12.0"
+```
+
+compileAndBuildVLCKit.sh xcodebuild archive call (lines 165-186):
+```
+    local deploymentTargetFlag=""
+    if [ "$XROS" != "yes" ]; then
+        deploymentTargetFlag="IPHONEOS_DEPLOYMENT_TARGET=${SDK_MIN}"
+    fi
+
+    local defs="$GCC_PREPROCESSOR_DEFINITIONS"
+
+    xcodebuild archive \
+               -project "$1.xcodeproj" \
+               -sdk $PLATFORM$SDK \
+               -configuration ${CONFIGURATION} \
+               -scheme "VLCKit" \
+               -destination "generic/platform=${PLATFORMNAME}" \
+               -archivePath build/VLCKit-$PLATFORM$SDK.xcarchive \
+               ARCHS="${architectures}" \
+               ${deploymentTargetFlag} \
+               ${bitcodeflag} \
+               ${verboseflag} \
+               SKIP_INSTALL=no \
+               ONLY_ACTIVE_ARCH=NO \
+               > ${out}
+}
+```

@@ -1,0 +1,69 @@
+From 1c3c6161dd377d8734b25b4db00b46a984f0aa48 Mon Sep 17 00:00:00 2001
+From: marlin1111ai <marlin1111ai@gmail.com>
+Date: Mon, 14 Sep 2026 16:48:00 -0400
+Subject: [PATCH] videotoolbox: dpb: do not bump ahead of the arriving picture
+ on latency alone
+
+When the only reason to output is the max latency count, the bump runs before
+the arriving picture is stored, so it could release pictures that follow the
+arriving one in output order (anchor released before the last B of a mini-GOP
+with sps_max_num_reorder_pics 3 and sps_max_latency_increase_plus1 2), and the
+vout then drops the late picture. Stop the latency-only bump at the first
+picture that follows the arriving one; it is output after the arriving picture
+is stored. The Max latency test expected the out-of-order release; it now
+expects display order.
+---
+ modules/codec/videotoolbox/dpb.c      | 6 ++++++
+ modules/codec/videotoolbox/dpb_test.c | 4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/modules/codec/videotoolbox/dpb.c b/modules/codec/videotoolbox/dpb.c
+index 684bbaee8f..8b092401a1 100644
+--- a/modules/codec/videotoolbox/dpb.c
++++ b/modules/codec/videotoolbox/dpb.c
+@@ -153,6 +153,7 @@ static picture_t * BumpDPB(struct dpb_s *dpb, date_t *ptsdate, const frame_info_
+     for(;dpb->i_stored_fields;)
+     {
+         bool b_output = false;
++        bool b_latency_only = false;
+ 
+         if(p_info->b_flush && dpb->i_stored_fields > 0)
+             b_output = true;
+@@ -170,6 +171,7 @@ static picture_t * BumpDPB(struct dpb_s *dpb, date_t *ptsdate, const frame_info_
+                    p->i_latency >= p_info->i_max_latency_pics)
+                 {
+                     b_output = true;
++                    b_latency_only = true;
+                     break;
+                 }
+             }
+@@ -178,6 +180,10 @@ static picture_t * BumpDPB(struct dpb_s *dpb, date_t *ptsdate, const frame_info_
+         if(!b_output)
+             break;
+ 
++        /* never release ahead of the arriving picture on latency alone */
++        if(b_latency_only && dpb->p_entries->i_foc > p_info->i_foc)
++            break;
++
+         *pp_output_next = DPBOutputFrame(dpb, ptsdate, dpb->p_entries);
+         if(*pp_output_next)
+             pp_output_next = &((*pp_output_next)->p_next);
+diff --git a/modules/codec/videotoolbox/dpb_test.c b/modules/codec/videotoolbox/dpb_test.c
+index 1bc0e00924..4ee017b92c 100644
+--- a/modules/codec/videotoolbox/dpb_test.c
++++ b/modules/codec/videotoolbox/dpb_test.c
+@@ -353,9 +353,9 @@ static void CheckDPBWithFramesTest(void)
+     info.i_foc = 2;
+     info.i_poc = info.i_foc & ~1;
+     info.b_flush = (info.i_foc == 0);
+-    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), 6, 8, 10, -1); /* 10 has latency == 3 */
++    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1); /* 10 has latency == 3, but 2 precedes it */
+ 
+-    CheckDrain(&dpb, &pts, 2, -1);
++    CheckDrain(&dpb, &pts, 2, 6, 8, 10, -1);
+ 
+     assert(dpb.i_size == 0);
+ }
+-- 
+2.54.0
+

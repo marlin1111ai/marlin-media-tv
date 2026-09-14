@@ -60,6 +60,12 @@ export VLC_PATH="$BUILD_DIR/tools/bin"
 cp "$REPO/tools/vlckit-truehd/0018-avcodec-audio-coalesce-TrueHD-MLP-frames.patch" "$BUILD_DIR/VLCKit/libvlc/patches/"
 echo "patch 0018 installed"
 
+# Step 2c — pass 1e (D017): the VideoToolbox DPB fix as VLCKit patch 0019, applied by git am after 0018. Kept in the
+# repo as a .diff (git format-patch output); VideoLAN's script only picks up libvlc/patches/*.patch. Idempotent copy.
+cp "$REPO/tools/vlckit-truehd/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arriving-picture.diff" \
+   "$BUILD_DIR/VLCKit/libvlc/patches/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arriving-picture.patch"
+echo "patch 0019 installed"
+
 # Step 3 — VideoLAN's own build: clones libvlc master at the pinned hash (TESTEDHASH in the script),
 # applies the 17 patches, builds host tools under extras/tools, the contribs, libvlc, then the framework.
 # -v verbose, -f device + simulator + xcframework, -t tvOS, -r Release.

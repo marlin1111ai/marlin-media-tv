@@ -1,0 +1,225 @@
+# Pass 1e rerun 2 — patch 0019 (candidate B + corrected Max latency expectation): VLC's dpb_test and the pass 1e simulation (2026-09-14)
+
+Tree: ~/vlckit-build/VLCKit/libvlc/vlc, localBranch, commit 1c3c6161dd (0019) on a2b09c9741 (0018).
+Harness: the patched tree's dpb_test.c + dpb.c + dpb.h, plus date_Init/date_Increment verbatim from src/misc/mtime.c; xcrun clang (Xcode 27.0) -std=gnu17 -O0 -g -DHAVE_CONFIG_H -DDPB_DEBUG -I<build-appletvsimulator-arm64/build> -I<libvlc>/include.
+
+## Unmodified test program on the patched tree
+compile: 0 output lines, warnings 0
+exit: 0
+```
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 4 flush 0 dpb sz 1 ndsz 1
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 3 ndsz 3
+output 0, 0 was expected
+output 2, 2 was expected
+output 4, 4 was expected
+no output, no output was expected
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+no output, no output was expected
+enqueing foc 6 flush 0 dpb sz 3 ndsz 3
+no output, no output was expected
+enqueing foc 4 flush 0 dpb sz 4 ndsz 4
+output 0, 0 was expected
+no output, no output was expected
+enqueing foc 10 flush 0 dpb sz 4 ndsz 4
+output 2, 2 was expected
+output 4, 4 was expected
+output 6, 6 was expected
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 2 ndsz 2
+output 8, 8 was expected
+output 10, 10 was expected
+no output, no output was expected
+drain
+output 0, 0 was expected
+no output, no output was expected
+enqueing foc 4 flush 0 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 1 ndsz 1
+no output, no output was expected
+enqueing foc 8 flush 0 dpb sz 2 ndsz 2
+no output, no output was expected
+enqueing foc 6 flush 0 dpb sz 3 ndsz 3
+output 2, 2 was expected
+no output, no output was expected
+drain
+output 4, 4 was expected
+output 6, 6 was expected
+output 8, 8 was expected
+no output, no output was expected
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+no output, no output was expected
+enqueing foc 26 flush 0 dpb sz 3 ndsz 2
+no output, no output was expected
+enqueing foc 28 flush 0 dpb sz 4 ndsz 3
+output 20, 20 was expected
+no output, no output was expected
+drain
+output 22, 22 was expected
+output 24, 24 was expected
+output 26, 26 was expected
+output 28, 28 was expected
+no output, no output was expected
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+output 20, 20 was expected
+output 22, 22 was expected
+output 24, 24 was expected
+no output, no output was expected
+drain
+output 0, 0 was expected
+no output, no output was expected
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+output 20, 20 was expected
+output 24, 24 was expected
+no output, no output was expected
+drain
+output 0, 0 was expected
+no output, no output was expected
+enqueing foc 10 flush 0 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+no output, no output was expected
+enqueing foc 6 flush 0 dpb sz 2 ndsz 2
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 3 ndsz 3
+no output, no output was expected
+drain
+output 2, 2 was expected
+output 6, 6 was expected
+output 8, 8 was expected
+output 10, 10 was expected
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+enqueing foc 1 flush 0 dpb sz 2 ndsz 0
+output 0, 0 was expected
+no output, no output was expected
+drain
+output 1, 1 was expected
+output 2, 2 was expected
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+enqueing foc 1 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+drain
+output 0, 0 was expected
+output 1, 1 was expected
+output 2, 2 was expected
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+no output, no output was expected
+drain
+output 0, 0 was expected
+output 2, 2 was expected
+output 3, 3 was expected
+no output, no output was expected
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+no output, no output was expected
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+no output, no output was expected
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+no output, no output was expected
+drain
+output 0, 0 was expected
+output 2, 2 was expected
+output 3, 3 was expected
+no output, no output was expected
+```
+
+## Diagnostic copy (every check logged: expected vs actual)
+checks 53, mismatches 0, soft asserts 0
+```
+CHECK 1 expected [] actual [] ok
+CHECK 2 expected [] actual [] ok
+CHECK 3 expected [] actual [] ok
+CHECK 4 expected [0 2 4 ] actual [0 2 4 ] ok
+CHECK 5 expected [] actual [] ok
+CHECK 6 expected [] actual [] ok
+CHECK 7 expected [] actual [] ok
+CHECK 8 expected [0 ] actual [0 ] ok
+CHECK 9 expected [2 4 6 ] actual [2 4 6 ] ok
+CHECK 10 expected [8 10 ] actual [8 10 ] ok
+CHECK 11 expected [0 ] actual [0 ] ok
+CHECK 12 expected [] actual [] ok
+CHECK 13 expected [] actual [] ok
+CHECK 14 expected [] actual [] ok
+CHECK 15 expected [2 ] actual [2 ] ok
+CHECK 16 expected [4 6 8 ] actual [4 6 8 ] ok
+CHECK 17 expected [] actual [] ok
+CHECK 18 expected [] actual [] ok
+CHECK 19 expected [] actual [] ok
+CHECK 20 expected [] actual [] ok
+CHECK 21 expected [20 ] actual [20 ] ok
+CHECK 22 expected [22 24 26 28 ] actual [22 24 26 28 ] ok
+CHECK 23 expected [] actual [] ok
+CHECK 24 expected [] actual [] ok
+CHECK 25 expected [] actual [] ok
+CHECK 26 expected [20 22 24 ] actual [20 22 24 ] ok
+CHECK 27 expected [0 ] actual [0 ] ok
+CHECK 28 expected [] actual [] ok
+CHECK 29 expected [] actual [] ok
+CHECK 30 expected [] actual [] ok
+CHECK 31 expected [20 24 ] actual [20 24 ] ok
+CHECK 32 expected [0 ] actual [0 ] ok
+CHECK 33 expected [] actual [] ok
+CHECK 34 expected [] actual [] ok
+CHECK 35 expected [] actual [] ok
+CHECK 36 expected [] actual [] ok
+CHECK 37 expected [2 6 8 10 ] actual [2 6 8 10 ] ok
+CHECK 38 expected [] actual [] ok
+CHECK 39 expected [] actual [] ok
+CHECK 40 expected [0 ] actual [0 ] ok
+CHECK 41 expected [1 2 ] actual [1 2 ] ok
+CHECK 42 expected [] actual [] ok
+CHECK 43 expected [] actual [] ok
+CHECK 44 expected [] actual [] ok
+CHECK 45 expected [0 1 2 ] actual [0 1 2 ] ok
+CHECK 46 expected [] actual [] ok
+CHECK 47 expected [] actual [] ok
+CHECK 48 expected [] actual [] ok
+CHECK 49 expected [0 2 3 ] actual [0 2 3 ] ok
+CHECK 50 expected [] actual [] ok
+CHECK 51 expected [] actual [] ok
+CHECK 52 expected [] actual [] ok
+CHECK 53 expected [0 2 3 ] actual [0 2 3 ] ok
+```
+
+## Pass 1e simulation (p1e-candidates.py), candidate B vs VLC as built
+```
+file | mode | backward releases / pictures released | most pictures held after a step
+Wonder Woman | vlc | 869 / 5995 | 4
+Wonder Woman | B | 0 / 5995 | 4
+Divergent | vlc | 0 / 5995 | 3
+Divergent | B | 0 / 5995 | 3
+```
