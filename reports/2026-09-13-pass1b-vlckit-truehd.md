@@ -309,3 +309,105 @@ Disk: `~/vlckit-build` 3.7G; `Frameworks/` 0 B.
   consumer seen so far; VLC's README warns against it without saying why).
 - Whether more contribs fail after the meson ones; make stopped at the first two.
 - The full build's duration: 7½ minutes reached the contrib stage with 24 cores; the rest is unmeasured.
+
+---
+
+# Rerun 3, python.org Python 3.14.7 installed — 2026-09-13 — STOPPED at step 3 (make jobserver)
+
+**Result: stopped, nothing built.** Python fixed the meson stage: the meson-based contribs
+(dav1d, fribidi, freetype2, glslang, rnnoise, librist, libnoidea and more) now build. The run then
+lost five contribs — vpx, twolame, speex, modplug, libtasn1 — to GNU make's job pipe, not to any
+compiler error (the log has none): Xcode's make 3.81 aborted six times with
+`read jobs pipe: Resource temporarily unavailable`, and the jobserver-aware ninja that VLC's tools
+stage installs failed twenty times with `Could not initialize jobserver: Invalid file descriptors`.
+`build.sh` printed `ERROR: Building contribs failed`, exit 1, 48 s after the start. Per the pass
+rules: no retry, no workaround, no change to VideoLAN's scripts. Steps 0 and 1 are done; 4–7 not reached.
+
+Committed locally (this record). **Not pushed.**
+
+## Step 0 — Python
+
+```
+/Library/Frameworks/Python.framework/Versions/: 3.14, Current -> 3.14
+/Library/Frameworks/Python.framework/Versions/3.14/bin/python3 --version: Python 3.14.7
+compileAndBuildVLCKit.sh 549: PYTHON3_PATH=$(echo /Library/Frameworks/Python.framework/Versions/3.*/bin | awk '{print $1;}')
+  → resolves to /Library/Frameworks/Python.framework/Versions/3.14/bin, placed first on PATH at line 568
+```
+
+## Step 1 — patch check
+
+`git apply --check` of the edited 0007 against the base commit's index: OK (worktree at patch 17, clean).
+
+## Step 3 — the run
+
+`~/vlckit-build/build.log`, head, the stage markers and the failure:
+```
+build start: 2026-09-13 23:03:55
+[info] Preparing build dirs
+[info] Building tools                                   (all present from rerun 2; nothing rebuilt)
+[info] Compiling aarch64 with SDK version 26.5, platform appletvos
+Building contribs for arm64
+make: *** read jobs pipe: Resource temporarily unavailable.  Stop.      (line 1152, during 'env cmake --build png/vlc_build')
+ninja: warning: Jobserver 'pipe' mode detected, a pool that implements 'fifo' mode would be more reliable!
+ninja: error: Could not initialize jobserver: Invalid file descriptors    (20 times, under cmake --build / meson compile)
+make: *** [.vpx] Error 2
+make: *** [.twolame] Error 2
+make: *** [.speex] Error 2
+make: *** [.modplug] Error 2
+make: *** [.libtasn1] Error 2
+ERROR: Building contribs failed
+build exit=1 end: 2026-09-13 23:04:43
+```
+The patch step succeeded (checked at 23:04:03, before ffmpeg configured): libvlc head at patch 17
+on 5dd4aebda; `contrib/src/ffmpeg/rules.mak` lines 43–48 hold only `--disable-securetransport`;
+no `--disable-*=mlp`. ffmpeg's configure still did not run (make stopped first).
+Compiler errors in the log: 0. Contribs completed before the stop (stamps): dav1d, dvbpsi,
+freetype2, fribidi, glslang, gpg-error, gsm, jpeg, lame, libebur128, libnoidea, librist, libxml2,
+markupsafe, mpg123, mysofa, nfs, ogg, openapv, openjpeg, opus, png, rnnoise, smb2, speexdsp,
+taglib, upnp, utfcpp, vulkan-headers, zlib.
+
+Why. The build's PATH holds only Xcode's `/usr/bin/make` (GNU Make 3.81), and both scripts run
+it with `-j24`/`-j25` (`compileAndBuildVLCKit.sh` lines 29–31, 219; `build.sh` lines 89–90, 574),
+so make hands a jobserver pipe to every sub-build. VLC's tools bootstrap knows this pairing is
+fragile: `extras/tools/bootstrap` lines 217–245 say "with GNU make 4.4 we should use ninja 1.13.x
+and above, otherwise we must use the patched version from kitware", and on make 3.81 it built
+that patched ninja (`ninja --version` → `1.13.2.git.kitware.jobserver-pipe-1`). In this run the
+pairing failed: ninja could not use the pipe, and make's own reads on it returned EAGAIN. The
+failures began only once meson/ninja builds were running alongside the autotools ones (first
+`meson compile` at log line 1014, first pipe error at 1152), which is why rerun 2 — where every
+meson build died at setup — never reached this. VideoLAN's CI does not build on Xcode's make:
+`.gitlab-ci.yml` line 6 sets `VLC_PATH: /Users/videolanci/sandbox/bin`, a directory of extra host
+tools that `compileAndBuildVLCKit.sh` line 568 puts on the build PATH ahead of `/usr/bin`.
+`extras/tools` does not build GNU make itself, and no GNU make 4.x exists on this Mac
+(`/opt/homebrew/bin/gmake` absent).
+
+Disk: `~/vlckit-build` 4.3G; `Frameworks/` 0 B.
+
+## Files touched, by step (rerun 3)
+
+| Step | Files / actions |
+|---|---|
+| 0, 1 | checks only |
+| 3 | `~/vlckit-build/build.log` (kept); previous logs `build.log.stopped-2236`, `-2242`, `-2247` |
+| 4–6 | not reached |
+| 7 | this section; `COLD-START.md` (paragraph updated). D012/D013 still not added |
+
+## Open questions for the owner
+
+1. **A GNU make 4.4+ for the build.** VideoLAN's own hook is `VLC_PATH`: a directory of extra
+   tools placed on the build PATH. Options: (a) build GNU make 4.4.x from ftp.gnu.org into
+   `~/vlckit-build/tools/bin` (a local build inside the build directory, nothing on the system) and
+   run with `VLC_PATH=~/vlckit-build/tools/bin`; (b) `brew install make` and point `VLC_PATH` at
+   Homebrew's gnubin (an install). Either is outside this pass's rules, so neither was done.
+   With make 4.4+ the tools bootstrap switches to the standard ninja path (bootstrap lines
+   230–232); whether it accepts the Kitware ninja already built, or rebuilds, was not traced.
+2. Alternatively run the script with `MAKEFLAGS=-j1` (no jobserver at all): serial contribs, an
+   unknown but long build time, and a change to the exact command. Not recommended over 1(a).
+3. D013 as before (record `~/vlckit-build`).
+
+## Least sure of
+
+- That GNU make 4.4+ alone clears the jobserver failures; VLC's own comment implies it, and
+  ninja's warning names the fifo jobserver that 4.4 introduced, but it was not tried.
+- Whether further contribs fail after these five; make stopped at the first batch.
+- The full build's duration.

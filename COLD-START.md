@@ -85,11 +85,13 @@ picker, and VLCKit playback of the four MKVs and a Magicians episode with the ov
 pause, frame step, audio and subtitle panels. Committed locally on `main`; **not pushed** — the
 owner tests first.
 
-**Pass 1b (2026-09-13) is stopped, three times**: the repo path's spaces (build now at
-`~/vlckit-build`), two GNU tool tarballs missing from mirrors (now pre-fetched by the recipe), and
-finally meson refusing Xcode's Python 3.9.6 — VideoLAN's script only sees a python.org install or
-`/usr/bin/python3`. See `reports/2026-09-13-pass1b-vlckit-truehd.md`. The recipe is
-`tools/vlckit-truehd/build.sh`; the app still uses the Swift package; `Frameworks/` is empty and ignored.
+**Pass 1b (2026-09-13) is stopped, four times**: the repo path's spaces (build now at
+`~/vlckit-build`), two GNU tool tarballs missing from mirrors (pre-fetched by the recipe), meson
+refusing Xcode's Python 3.9.6 (python.org 3.14.7 now installed), and last the make jobserver —
+Xcode's GNU make 3.81 with `-j24` cannot share its job pipe with the ninja VLC's tools build; the
+fix VideoLAN's CI uses is a newer GNU make on `VLC_PATH`. See
+`reports/2026-09-13-pass1b-vlckit-truehd.md`. The recipe is `tools/vlckit-truehd/build.sh`; the
+app still uses the Swift package; `Frameworks/` is empty and ignored.
 
 Two findings wait on the owner (open questions 1 and 2 of the report): **VLCKit 4.0.0-a24
 cannot decode TrueHD** (Wonder Woman plays on its AC-3 core), and **the D008 seek-based frame
