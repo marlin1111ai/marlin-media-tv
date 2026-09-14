@@ -1,0 +1,372 @@
+8:15:31.672 AM [player] request The Magicians — S1 E1 · Unauthorized Magic — http://192.168.1.250:8093/stream/8
+8:15:31.672 AM [player] file TV/The Magicians (2015)/Season 1/The Magicians (2015) - 1x01 - Unauthorized Magic.mp4 1920x1080 hdr=false video=h264 High audio=aac stereo
+[DBG] Creating an input for playback'8'
+8:15:31.678 AM [player] play() called
+[DBG] using timeshift granularity of 50 MiB
+[DBG] using default timeshift path
+[DBG] `http://192.168.1.250:8093/stream/8' gives access `http' demux `any' path `192.168.1.250:8093/stream/8'
+[DBG] creating access: http://192.168.1.250:8093/stream/8
+[DBG] looking for access module matching "http": 2 candidates
+[DBG] looking for keystore module matching "any": 1 candidates
+[DBG] using keystore module "keychain"
+[DBG] Lookup keychain entry for server 192.168.1.250
+[WARN] lookup failed (-25300: 'Item not found')
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/8 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+Range: bytes=0-
+
+
+8:15:31.686 AM [player] state Opening at 0 ms
+8:15:31.686 AM [player] buffering 0.0
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 3180161687
+Content-Range: bytes 0-3180161686/3180161687
+Content-Type: video/mp4
+Last-Modified: Fri, 18 Apr 2025 14:27:12 GMT
+Date: Mon, 14 Sep 2026 12:15:31 GMT
+
+
+[DBG] removing "keystore" module "keychain"
+[DBG] using access module "http"
+[DBG] looking for stream_filter module matching "prefetch,cache": 2 candidates
+[DBG] using 16777216 bytes buffer
+[DBG] using stream_filter module "prefetch"
+[DBG] looking for stream_filter module matching "any": 4 candidates
+[DBG] no stream_filter modules matched with name any
+[DBG] looking for stream_directory module matching "any": 0 candidates
+[DBG] no stream_directory modules matched with name any
+[DBG] attachment of directory-extractor failed for http://192.168.1.250:8093/stream/8
+[DBG] looking for stream_filter module matching "record": 1 candidates
+[DBG] using stream_filter module "record"
+[DBG] creating demux "any", URL: http://192.168.1.250:8093/stream/8, path: (null)
+[DBG] looking for demux module matching "any": 58 candidates
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/8 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Fri, 18 Apr 2025 14:27:12 GMT
+Range: bytes=3176848131-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 3313556
+Content-Range: bytes 3176848131-3180161686/3180161687
+Content-Type: video/mp4
+Last-Modified: Fri, 18 Apr 2025 14:27:12 GMT
+Date: Mon, 14 Sep 2026 12:15:31 GMT
+
+
+[DBG] connection failed
+[DBG] end of stream
+[DBG] dumping root Box "root"
+[DBG] |   + ftyp size 32 offset 0
+[DBG] |   + free size 8 offset 32
+[DBG] |   + mdat size 3176848091 offset 40
+[DBG] |   + moov size 3313556 offset 3176848131
+[DBG] |   |   + mvhd size 108 offset 3176848139
+[DBG] |   |   + trak size 1146792 offset 3176848247
+[DBG] |   |   |   + tkhd size 92 offset 3176848255
+[DBG] |   |   |   + edts size 48 offset 3176848347
+[DBG] |   |   |   |   + elst size 40 offset 3176848355
+[DBG] |   |   |   + mdia size 1146644 offset 3176848395
+[DBG] |   |   |   |   + mdhd size 32 offset 3176848403
+[DBG] |   |   |   |   + hdlr size 45 offset 3176848435
+[DBG] |   |   |   |   + minf size 1146559 offset 3176848480
+[DBG] |   |   |   |   |   + vmhd size 20 offset 3176848488
+[DBG] |   |   |   |   |   + dinf size 36 offset 3176848508
+[DBG] |   |   |   |   |   |   + dref size 28 offset 3176848516
+[DBG] |   |   |   |   |   |   |   + url  size 12 offset 3176848532
+[DBG] |   |   |   |   |   + stbl size 1146495 offset 3176848544
+[DBG] |   |   |   |   |   |   + stsd size 203 offset 3176848552
+[DBG] |   |   |   |   |   |   |   + avc1 size 187 offset 3176848568
+[DBG] |   |   |   |   |   |   |   |   + avcC size 65 offset 3176848654
+[DBG] |   |   |   |   |   |   |   |   + pasp size 16 offset 3176848719
+[DBG] |   |   |   |   |   |   |   |   + btrt size 20 offset 3176848735
+[DBG] |   |   |   |   |   |   + stts size 24 offset 3176848755
+[DBG] |   |   |   |   |   |   + stss size 6268 offset 3176848779
+[DBG] |   |   |   |   |   |   + ctts size 389832 offset 3176855047
+[DBG] |   |   |   |   |   |   + stsc size 28 offset 3177244879
+[DBG] |   |   |   |   |   |   + stsz size 375068 offset 3177244907
+[DBG] |   |   |   |   |   |   + stco size 375064 offset 3177619975
+[DBG] |   |   + trak size 2166550 offset 3177995039
+[DBG] |   |   |   + tkhd size 92 offset 3177995047
+[DBG] |   |   |   + edts size 36 offset 3177995139
+[DBG] |   |   |   |   + elst size 28 offset 3177995147
+[DBG] |   |   |   + mdia size 2166414 offset 3177995175
+[DBG] |   |   |   |   + mdhd size 32 offset 3177995183
+[DBG] |   |   |   |   + hdlr size 45 offset 3177995215
+[DBG] |   |   |   |   + minf size 2166329 offset 3177995260
+[DBG] |   |   |   |   |   + smhd size 16 offset 3177995268
+[DBG] |   |   |   |   |   + dinf size 36 offset 3177995284
+[DBG] |   |   |   |   |   |   + dref size 28 offset 3177995292
+[DBG] |   |   |   |   |   |   |   + url  size 12 offset 3177995308
+[DBG] |   |   |   |   |   + stbl size 2166269 offset 3177995320
+[DBG] |   |   |   |   |   |   + stsd size 123 offset 3177995328
+[DBG] |   |   |   |   |   |   |   + mp4a size 107 offset 3177995344
+[DBG] |   |   |   |   |   |   |   |   + esds size 51 offset 3177995380
+[DBG] |   |   |   |   |   |   |   |   + btrt size 20 offset 3177995431
+[DBG] |   |   |   |   |   |   + stts size 268720 offset 3177995451
+[DBG] |   |   |   |   |   |   + stsc size 983344 offset 3178264171
+[DBG] |   |   |   |   |   |   + stsz size 538956 offset 3179247515
+[DBG] |   |   |   |   |   |   + stco size 375064 offset 3179786471
+[DBG] |   |   |   |   |   |   + sgpd size 26 offset 3180161535
+[DBG] |   |   |   |   |   |   + sbgp size 28 offset 3180161561
+[DBG] |   |   + udta size 98 offset 3180161589
+[DBG] |   |   |   + meta size 90 offset 3180161597
+[DBG] |   |   |   |   + hdlr size 33 offset 3180161609
+[DBG] |   |   |   |   + ilst size 45 offset 3180161642
+[DBG] |   |   |   |   |   + ctoo size 37 offset 3180161650
+[DBG] |   |   |   |   |   |   + data size 29 offset 3180161658
+[DBG] ISO Media (isom) version 512.
+[DBG] found 2 tracks
+[WARN] elst box found
+[DBG]    - [0] duration=36ms media time=-1ms) rate=1.0
+[DBG]    - [1] duration=3128526ms media time=33ms) rate=1.0
+[DBG] track[Id 0x1] read 93762 chunk
+[WARN] STTS table of 1 entries
+[WARN] CTTS table of 48727 entries
+[DBG] track[Id 0x1] read 93762 samples length:3128s
+[DBG] selecting program id=0
+[DBG] ES track added: 'video/1' (fourcc: 'h264')
+[DBG] adding track[Id 0x1] video (enable) language undef
+[WARN] elst box found
+8:15:31.871 AM [player] track added video/1 type=1
+[DBG]    - [0] duration=3128518ms media time=0ms) rate=1.0
+[DBG] track[Id 0x2] read 93762 chunk
+[WARN] STTS table of 33588 entries
+[DBG] track[Id 0x2] read 134734 samples length:3128s
+[DBG] ES track added: 'audio/2' (fourcc: 'mp4a')
+[DBG] adding track[Id 0x2] audio (enable) language undef
+8:15:31.874 AM [player] track added audio/2 type=0
+[DBG] using demux module "mp4"
+[DBG] looking for video decoder module matching "any": 14 candidates
+8:15:31.877 AM [player] length 3128562 ms
+[DBG] vout: none found
+[DBG] vout change: decoder size
+[DBG] vout change: visible size
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] 32x32 (32x32) chroma: YUVA colorspace: Undefined -> 16x16 (16x16) chroma: RGBA colorspace: Undefined with scaling using Bicubic (good quality)
+[DBG] using video converter module "swscale"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] YUVP to YUVA converter
+[DBG] using video converter module "yuvp"
+[DBG] Deinterlacing available
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] looking for vout window module matching "any": 2 candidates
+[DBG] resized to 1920x1080
+[DBG] using vout window module "uiview_window"
+[DBG] looking for inhibit module matching "any": 1 candidates
+[DBG] using inhibit module "uikit_inhibit"
+[DBG] looking for decoder device module matching "any": 1 candidates
+[DBG] using decoder device module "videotoolbox"
+[DBG] new SPS parsed: 0
+[DBG] new PPS parsed: 0
+[WARN] forcing output chroma (kCVPixelFormatType): 420v
+[INF] Using Video Toolbox to decode 'h264'
+[DBG] using video decoder module "videotoolbox"
+[DBG] ES track selected: 'video/1' (fourcc: 'h264')
+[DBG] looking for audio decoder module matching "any": 15 candidates
+8:15:31.891 AM [player] track selected type=1 selected=video/1 unselected=
+[DBG] using Lavc63.1.100
+[DBG] CPU flags: 0x00062360
+[DBG] codec (aac) started
+[DBG] using audio decoder module "avcodec"
+[DBG] ES track selected: 'audio/2' (fourcc: 'mp4a')
+[DBG] looking for meta reader module matching "any": 1 candidates
+[DBG] no meta reader modules matched with name any
+8:15:31.894 AM [player] track selected type=0 selected=audio/2 unselected=
+[DBG] `http://192.168.1.250:8093/stream/8' successfully opened
+[WARN] elst old=0 new=1
+8:15:31.894 AM [player] state Playing at 0 ms
+[DBG] elst (0) gives 0ms (movie)-> 0ms (track)
+[DBG] track[Id 0x2] preroll offset: -1 samples
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/8 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Fri, 18 Apr 2025 14:27:12 GMT
+Range: bytes=48-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 3180161639
+Content-Range: bytes 48-3180161686/3180161687
+Content-Type: video/mp4
+Last-Modified: Fri, 18 Apr 2025 14:27:12 GMT
+Date: Mon, 14 Sep 2026 12:15:31 GMT
+
+
+[DBG] program(0): using clock source: 'audio'
+[DBG] Buffering 0%
+8:15:31.906 AM [player] buffering 0.0
+[DBG] new PPS parsed: 0
+[DBG] Buffering 2%
+[DBG] reusing audio output
+[DBG] Buffering 4%
+[DBG] Buffering 6%
+[DBG] Buffering 11%
+[DBG] Buffering 13%
+[DBG] Buffering 18%
+[DBG] Buffering 20%
+[DBG] Buffering 25%
+[DBG] Buffering 27%
+[DBG] Buffering 32%
+[DBG] Buffering 34%
+[DBG] Buffering 37%
+[DBG] Buffering 41%
+[DBG] Buffering 44%
+[DBG] Buffering 48%
+[DBG] session accepted first frame 69367
+[DBG] Buffering 51%
+[DBG] Buffering 55%
+[DBG] Buffering 58%
+[DBG] Buffering 60%
+[DBG] Buffering 65%
+[DBG] Buffering 67%
+[DBG] Buffering 71%
+[DBG] Buffering 74%
+[DBG] Buffering 78%
+[DBG] Buffering 81%
+[DBG] Buffering 85%
+[DBG] Buffering 88%
+[DBG] Buffering 90%
+[DBG] Buffering 95%
+[DBG] Buffering 97%
+8:15:31.913 AM [player] buffering 1.0
+[DBG] Stream buffering done (1021 ms in 6 ms)
+[DBG] output chroma (kCVPixelFormatType): 420v
+[DBG] vout change: decoder size
+[DBG] vout change: chroma
+[DBG] requested window size: 1920x1080
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] Opening vout display wrapper
+[DBG] looking for vout display module matching "any": 3 candidates
+[DBG] using vout display module "samplebufferdisplay"
+[DBG] original format sz 1920x1088, of (0,0), vsz 1920x1080, 4cc CVPN, sar 1:1, orient: normal
+[DBG] removing "text renderer" module "freetype"
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] requested window size: 1920x1080
+[DBG] resetting projection_mode to 0
+[DBG] setting projection_mode to 0
+[DBG] Received first picture
+[DBG] resized to 3840x2160
+[DBG] Output on HDMI, channel count: 2
+[DBG] output 'f32l' 44100 Hz Stereo frame=1 samples/8 bytes
+[DBG] looking for audio volume module matching "any": 2 candidates
+[DBG] using audio volume module "float_mixer"
+[DBG] input 'f32l' 44100 Hz Stereo frame=1 samples/8 bytes
+[DBG] looking for audio filter module matching "scaletempo": 1 candidates
+[DBG] format: 44100 rate, 2 nch, 4 bps, fl32
+[DBG] params: 30 stride, 0.200 overlap, 14 search
+[DBG] 1.000 scale, 1323.000 stride_in, 1323 stride_out, 1059 standing, 264 overlap, 617 search, 2204 queue, fl32 mode
+[DBG] using audio filter module "scaletempo"
+[DBG] conversion: 'f32l'->'f32l' 44100 Hz->44100 Hz Stereo->Stereo
+[DBG] conversion pipeline complete
+[DBG] conversion: 'f32l'->'f32l' 44100 Hz->44100 Hz Stereo->Stereo
+[DBG] conversion pipeline complete
+[DBG] looking for audio resampler module matching "soxr": 2 candidates
+[DBG] Using SoX Resampler with 'cr32s' engine and 'Medium 16-bit with medium roll-off' quality to convert f32l/44100Hz to f32l/44100Hz.
+[DBG] using audio resampler module "soxr"
+[DBG] Decoder wait done in 42 ms
+[DBG] deferring start (404677 us)
+[DBG] deferring start (377988 us)
+[DBG] deferring start (354601 us)
+[DBG] deferring start (331271 us)
+[DBG] deferring start (307951 us)
+[DBG] deferring start (284622 us)
+[DBG] deferring start (261251 us)
+[DBG] deferring start (237773 us)
+[DBG] deferring start (214270 us)
+[DBG] deferring start (190866 us)
+[DBG] deferring start (167508 us)
+[DBG] deferring start (144134 us)
+[DBG] deferring start (120758 us)
+[DBG] deferring start (97392 us)
+[DBG] deferring start (74024 us)
+[DBG] deferring start (50619 us)
+[DBG] deferring start (50297 us)
+[DBG] deferring start (50071 us)
+[DBG] deferring start (49825 us)
+[DBG] deferring start (49649 us)
+[DBG] deferring start (49495 us)
+[DBG] deferring start (49346 us)
+[DBG] deferring start (49141 us)
+[DBG] deferring start (48923 us)
+[DBG] deferring start (71846 us)
+[DBG] deferring start (48494 us)
+[DBG] deferring start (48344 us)
+[DBG] deferring start (48186 us)
+[DBG] deferring start (48043 us)
+[DBG] deferring start (47890 us)
+[DBG] deferring start (47674 us)
+[DBG] deferring start (47487 us)
+[DBG] deferring start (47235 us)
+[DBG] deferring start (47088 us)
+[DBG] deferring start (46946 us)
+[DBG] deferring start (46809 us)
+[DBG] deferring start (46692 us)
+[DBG] deferring start (46548 us)
+[DBG] deferring start (46404 us)
+[DBG] deferring start (46264 us)
+[DBG] deferring start (46106 us)
+[DBG] deferring start (45967 us)
+[DBG] deferring start (45829 us)
+[DBG] deferring start (45693 us)
+[DBG] deferring start (45553 us)
+[DBG] deferring start (45416 us)
+[DBG] deferring start (45274 us)
+[DBG] deferring start (45121 us)
+[DBG] deferring start (44972 us)
+[DBG] deferring start (44810 us)
+[DBG] deferring start (44657 us)
+[DBG] deferring start (44504 us)
+[DBG] deferring start (44357 us)
+[DBG] deferring start (44206 us)
+[DBG] deferring start (44055 us)
+[DBG] started
+8:23:48.584 AM [player] dismiss at 495655 ms, state Playing
+8:23:48.585 AM [player] state Stopping at 496344 ms
+[DBG] killing decoder fourcc `h264'
+[DBG] removing "video decoder" module "videotoolbox"
+[DBG] saving a free vout
+[DBG] ES track unselected: 'video/1' (fourcc: 'h264')
+8:23:48.609 AM [player] track selected type=1 selected= unselected=video/1
+[DBG] killing decoder fourcc `mp4a'
+[DBG] removing "audio decoder" module "avcodec"
+[DBG] removing "audio resampler" module "soxr"
+[DBG] removing "audio filter" module "scaletempo"
+[DBG] removing "audio volume" module "float_mixer"
+[DBG] keeping audio output
+[DBG] ES track unselected: 'audio/2' (fourcc: 'mp4a')
+8:23:48.675 AM [player] track selected type=0 selected= unselected=audio/2
+[DBG] removing "demux" module "mp4"
+[DBG] freeing all memory
+[DBG] ES track deleted: 'video/1' (fourcc: 'h264')
+[DBG] ES track deleted: 'audio/2' (fourcc: 'mp4a')
+[DBG] Program doesn't contain anymore ES
+[DBG] removing "stream_filter" module "record"
+[DBG] removing "stream_filter" module "prefetch"
+[DBG] removing "access" module "http"
+[DBG] connection failed
+[DBG] stop free vout
+8:23:48.677 AM [player] state Stopped at 496344 ms
