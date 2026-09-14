@@ -1,0 +1,2464 @@
+11:35:38.886 AM [player] request Wonder Woman — Wonder Woman (2017).mkv · 4K HDR · TrueHD 7.1 — http://192.168.1.250:8093/stream/4
+11:35:38.886 AM [player] file Movies/Wonder Woman/Wonder Woman (2017).mkv 3840x2160 hdr=true video=hevc Main 10 audio=truehd 7.1, ac3 5.1(side), ac3 5.1(side)
+[DBG] Creating an input for playback'4'
+11:35:38.897 AM [player] play() called
+[DBG] using timeshift granularity of 50 MiB
+[DBG] using default timeshift path
+[DBG] `http://192.168.1.250:8093/stream/4' gives access `http' demux `mkv_trusted' path `192.168.1.250:8093/stream/4'
+[DBG] creating access: http://192.168.1.250:8093/stream/4
+[DBG] looking for access module matching "http": 2 candidates
+[DBG] looking for keystore module matching "any": 1 candidates
+[DBG] using keystore module "keychain"
+[DBG] Lookup keychain entry for server 192.168.1.250
+[WARN] lookup failed (-25300: 'Item not found')
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+Range: bytes=0-
+
+
+11:35:38.908 AM [player] state Opening at 0 ms
+11:35:38.908 AM [player] buffering 0.0
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58483322537
+Content-Range: bytes 0-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 15:35:38 GMT
+
+
+[DBG] removing "keystore" module "keychain"
+[DBG] using access module "http"
+[DBG] looking for stream_filter module matching "prefetch,cache": 2 candidates
+[DBG] using 16777216 bytes buffer
+[DBG] using stream_filter module "prefetch"
+[DBG] looking for stream_filter module matching "any": 4 candidates
+[DBG] no stream_filter modules matched with name any
+[DBG] looking for stream_directory module matching "any": 0 candidates
+[DBG] no stream_directory modules matched with name any
+[DBG] attachment of directory-extractor failed for http://192.168.1.250:8093/stream/4
+[DBG] looking for stream_filter module matching "record": 1 candidates
+[DBG] using stream_filter module "record"
+[DBG] creating demux "mkv_trusted", URL: http://192.168.1.250:8093/stream/4, path: (null)
+[DBG] looking for demux module matching "mkv_trusted": 1 candidates
+[DBG] |   + Seek head
+[DBG] |   - info at 1207
+[DBG] |   + Information
+[DBG] |   |   + TimecodeScale=1000000
+[DBG] |   |   + Muxing Application=libmakemkv v1.18.4 (1.3.10/1.5.2) darwin(arm64-release)
+[DBG] |   |   + Writing Application=MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   |   + Duration=8476217
+[DBG] |   |   + Title=Wonder Woman
+[DBG] |   |   + Date=Sat Jul 18 02:53:09 2026
+[DBG] |   |   + UID=eeb254af3d3f42f7
+[DBG] |   - tracks at 1370
+[DBG] |   + Tracks
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=1
+[DBG] |   |   |   + Track UID=1
+[DBG] |   |   |   + Track Type=video
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track MinCache=1
+[DBG] |   |   |   + Track CodecId=V_MPEGH/ISO/HEVC
+[DBG] |   |   |   + Track CodecPrivate size=140
+[DBG] |   |   |   + Track Default Duration=41708
+[DBG] |   |   |   + Track Video
+[DBG] |   |   |   |   + width=3840
+[DBG] |   |   |   |   + height=2160
+[DBG] |   |   |   |   + display width=3840
+[DBG] |   |   |   |   + display height=2160
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=2
+[DBG] |   |   |   + Track UID=2
+[DBG] |   |   |   + Track Type=audio
+[DBG] |   |   |   + Track Default=1
+[DBG] |   |   |   + Track Lacing=1
+[DBG] |   |   |   + Track CodecId=A_TRUEHD
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   |   |   + Track Default Duration=833
+[DBG] |   |   |   + Track Name=Surround 7.1
+[DBG] |   |   |   + Track Audio
+[DBG] |   |   |   |   + afreq=48000
+[DBG] |   |   |   |   + achan=8
+[DBG] |   |   |   |   + abits=24
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=3
+[DBG] |   |   |   + Track UID=3
+[DBG] |   |   |   + Track Type=audio
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=1
+[DBG] |   |   |   + Track CodecId=A_AC3
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   |   |   + Track Default Duration=32000
+[DBG] |   |   |   + Track Name=Surround 5.1
+[DBG] |   |   |   + Track Audio
+[DBG] |   |   |   |   + afreq=48000
+[DBG] |   |   |   |   + achan=6
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=4
+[DBG] |   |   |   + Track UID=4
+[DBG] |   |   |   + Track Type=audio
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=1
+[DBG] |   |   |   + Track CodecId=A_AC3
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   |   |   + Track Default Duration=32000
+[DBG] |   |   |   + Track Name=Surround 5.1
+[DBG] |   |   |   + Track Audio
+[DBG] |   |   |   |   + afreq=48000
+[DBG] |   |   |   |   + achan=6
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=5
+[DBG] |   |   |   + Track UID=5
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_HDMV/PGS
+[DBG] |   |   |   + Track Language=`eng'
+[DBG] |   - cues at 58483154136
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=58483154136-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 168401
+Content-Range: bytes 58483154136-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 15:35:38 GMT
+
+
+[DBG] connection failed
+[DBG] |   + Cues
+[DBG] end of stream
+[DBG] |   - loading cues done.
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=123-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58483322414
+Content-Range: bytes 123-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 15:35:39 GMT
+
+
+[DBG] |   - chapters at 1867
+[DBG] |   + Chapters
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=51a2015c4c6a68bf
+[DBG] |   |   |   |   + ChapterTimeStart=0
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=626876250
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 01
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=c4fa5d8dea3aa499
+[DBG] |   |   |   |   + ChapterTimeStart=626876250
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=1392182458
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 02
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=c7b4812d013bd5f5
+[DBG] |   |   |   |   + ChapterTimeStart=1392182458
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=1990488500
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 03
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=e8e45c9bd8dc3ec3
+[DBG] |   |   |   |   + ChapterTimeStart=1990488500
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=2635132500
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 04
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=3403ecb3e4626f89
+[DBG] |   |   |   |   + ChapterTimeStart=2635132500
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=3265553958
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 05
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=41cdff1db36ec6c8
+[DBG] |   |   |   |   + ChapterTimeStart=3265553958
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=4057928875
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 06
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=f3c45d12ce17a665
+[DBG] |   |   |   |   + ChapterTimeStart=4057928875
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=4949903291
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 07
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=13535fb7c0c22a51
+[DBG] |   |   |   |   + ChapterTimeStart=4949903291
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=5642845541
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 08
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=dd56efa8c1a99720
+[DBG] |   |   |   |   + ChapterTimeStart=5642845541
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=6337873208
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 09
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=d8355c87bf2c7226
+[DBG] |   |   |   |   + ChapterTimeStart=6337873208
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=7063556500
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 10
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=b9e58f4978c89894
+[DBG] |   |   |   |   + ChapterTimeStart=7063556500
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=7841416916
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 11
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=7ec30063235a7997
+[DBG] |   |   |   |   + ChapterTimeStart=7841416916
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterTimeEnd=8476217750
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=Chapter 12
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   - tags at 58483320462
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=58483320462-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 2075
+Content-Range: bytes 58483320462-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 15:35:39 GMT
+
+
+[DBG] connection failed
+[DBG] end of stream
+[DBG] |   + Tags
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 1
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 49979184
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.217750000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 203226
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 52954301233
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001011
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 2
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 4278858
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.217500000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 10171461
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 4533566668
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001100
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 3
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 448000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.224000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 264882
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 474668544
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001100
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 4
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 448000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:21:16.224000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 264882
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 474668544
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 001101
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TrackUID: 5
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 29579
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:20:19.890645833
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 3654
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 31131628
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta SOURCE_ID: 0012A0
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: MakeMKV v1.18.4 darwin(arm64-release)
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 2026-07-18 02:53:09
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[DBG] loading tags done.
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/4 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Sat, 18 Jul 2026 03:52:34 GMT
+Range: bytes=183-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 58483322354
+Content-Range: bytes 183-58483322536/58483322537
+Content-Type: video/x-matroska
+Last-Modified: Sat, 18 Jul 2026 03:52:34 GMT
+Date: Mon, 14 Sep 2026 15:35:39 GMT
+
+
+[DBG] |   + Void
+[DBG] |   + Information
+[DBG] |   + Tracks
+[DBG] |   + Chapters
+[DBG] |   + Void
+[DBG] |   + Cluster
+[DBG] Virtual chapter  Chapter 01 from 0 to 626876250 - 
+[DBG] Virtual chapter  Chapter 02 from 626876250 to 1392182458 - 
+[DBG] Virtual chapter  Chapter 03 from 1392182458 to 1990488500 - 
+[DBG] Virtual chapter  Chapter 04 from 1990488500 to 2635132500 - 
+[DBG] Virtual chapter  Chapter 05 from 2635132500 to 3265553958 - 
+[DBG] Virtual chapter  Chapter 06 from 3265553958 to 4057928875 - 
+[DBG] Virtual chapter  Chapter 07 from 4057928875 to 4949903291 - 
+[DBG] Virtual chapter  Chapter 08 from 4949903291 to 5642845541 - 
+[DBG] Virtual chapter  Chapter 09 from 5642845541 to 6337873208 - 
+[DBG] Virtual chapter  Chapter 10 from 6337873208 to 7063556500 - 
+[DBG] Virtual chapter  Chapter 11 from 7063556500 to 7841416916 - 
+[DBG] Virtual chapter  Chapter 12 from 7841416916 to 8476217750 - 
+[DBG] Virtual chapter  from 0 to -1 - 
+[DBG] NEW START CHAPTER uid=5882265559229950143
+[DBG] found 5 es
+[DBG] selecting program id=0
+[DBG] ES track added: 'video/1' (fourcc: 'hevc')
+[DBG] ES track added: 'audio/2' (fourcc: 'mlpa')
+[DBG] ES track added: 'audio/3' (fourcc: 'a52 ')
+11:35:39.048 AM [player] track added video/1 type=1
+[DBG] ES track added: 'audio/4' (fourcc: 'a52 ')
+[DBG] ES track added: 'spu/5' (fourcc: 'bdpg')
+[DBG] seek: preroll{ track: 1, pts: 0, fpos: 3592 skip: 3592} 
+[DBG] seek: preroll{ req: 1, start-pts: 1, start-fpos: 3592} 
+[DBG] using demux module "mkv"
+11:35:39.049 AM [player] track added audio/2 type=0
+[DBG] looking for video decoder module matching "any": 14 candidates
+11:35:39.049 AM [player] track added audio/3 type=0
+11:35:39.049 AM [player] track added audio/4 type=0
+11:35:39.049 AM [player] track added spu/5 type=2
+11:35:39.049 AM [player] length 8476217 ms
+[DBG] vout: none found
+[DBG] vout change: decoder size
+[DBG] vout change: visible size
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] 32x32 (32x32) chroma: YUVA colorspace: Undefined -> 16x16 (16x16) chroma: RGBA colorspace: Undefined with scaling using Bicubic (good quality)
+[DBG] using video converter module "swscale"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] YUVP to YUVA converter
+[DBG] using video converter module "yuvp"
+[DBG] Deinterlacing available
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] looking for vout window module matching "any": 2 candidates
+[DBG] resized to 1920x1080
+[DBG] using vout window module "uiview_window"
+[DBG] looking for inhibit module matching "any": 1 candidates
+[DBG] using inhibit module "uikit_inhibit"
+[DBG] looking for decoder device module matching "any": 1 candidates
+[DBG] using decoder device module "videotoolbox"
+[DBG] new VPS parsed: 0
+[DBG] new SPS parsed: 0
+[DBG] new PPS parsed: 0
+[WARN] forcing output chroma (kCVPixelFormatType): x420
+[INF] Using Video Toolbox to decode 'hevc'
+[DBG] using video decoder module "videotoolbox"
+[DBG] ES track selected: 'video/1' (fourcc: 'hevc')
+[DBG] looking for audio packetizer module matching "any": 11 candidates
+[DBG] using audio packetizer module "mlp"
+[DBG] looking for audio decoder module matching "any": 15 candidates
+11:35:39.072 AM [player] track selected type=1 selected=video/1 unselected=
+[DBG] reusing audio output
+[ERR] too low audio sample frequency (0)
+[DBG] keeping audio output
+[DBG] using Lavc63.1.100
+[DBG] CPU flags: 0x00062360
+[DBG] codec (truehd) started
+[DBG] using audio decoder module "avcodec"
+[DBG] ES track selected: 'audio/2' (fourcc: 'mlpa')
+[DBG] looking for meta reader module matching "any": 1 candidates
+[DBG] no meta reader modules matched with name any
+11:35:39.073 AM [player] track selected type=0 selected=audio/2 unselected=
+[DBG] `http://192.168.1.250:8093/stream/4' successfully opened
+11:35:39.073 AM [player] state Playing at 0 ms
+[DBG] program(0): using clock source: 'audio'
+[DBG] Buffering 0%
+11:35:39.073 AM [player] buffering 0.0
+[INF] MLP channels: 8 samplerate: 48000
+[DBG] restarting module due to input format change
+[DBG] 'decoder in/packetizer out' i_rate 0 / 48000
+[DBG] 'decoder in/packetizer out' i_channels 0 / 8
+[DBG] removing "audio decoder" module "avcodec"
+[DBG] looking for audio decoder module matching "any": 15 candidates
+[DBG] reusing audio output
+[WARN] failed to start passthrough audio output, failing back to linear format
+[DBG] keeping audio output
+[DBG] using Lavc63.1.100
+[DBG] CPU flags: 0x00062360
+[DBG] codec (truehd) started
+[DBG] using audio decoder module "avcodec"
+[DBG] reusing audio output
+[DBG] Buffering 4%
+[DBG] Buffering 9%
+[DBG] Buffering 16%
+[DBG] Buffering 20%
+[DBG] Buffering 29%
+[DBG] session accepted first frame 1
+[DBG] Buffering 37%
+[DBG] Buffering 41%
+[DBG] Buffering 49%
+[DBG] Buffering 58%
+[DBG] Buffering 62%
+[DBG] Buffering 69%
+[DBG] Buffering 79%
+[DBG] Buffering 83%
+[DBG] output chroma (kCVPixelFormatType): x420
+[DBG] vout change: chroma
+[DBG] requested window size: 3840x2160
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] Opening vout display wrapper
+[DBG] looking for vout display module matching "any": 3 candidates
+[DBG] Buffering 89%
+[DBG] using vout display module "samplebufferdisplay"
+[DBG] original format sz 3840x2160, of (0,0), vsz 3840x2160, 4cc CVPP, sar 1:1, orient: normal
+[DBG] removing "text renderer" module "freetype"
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] requested window size: 3840x2160
+[DBG] resetting projection_mode to 0
+[DBG] setting projection_mode to 0
+11:35:39.089 AM [player] buffering 1.0
+[DBG] Stream buffering done (1000 ms in 16 ms)
+[DBG] Received first picture
+[DBG] resized to 3840x2160
+[DBG] Output on HDMI, channel count: 8
+[DBG] swapping Surround and RearSurround channels for 7.1 Rear Surround
+[DBG] VLC keeping the same input layout
+[DBG] output 'f32l' 48000 Hz 3F2M2R/LFE frame=1 samples/32 bytes
+[DBG] looking for audio volume module matching "any": 2 candidates
+[DBG] using audio volume module "float_mixer"
+[DBG] input 's32l' 48000 Hz 3F2M2R/LFE frame=1 samples/32 bytes
+[DBG] looking for audio filter module matching "scaletempo": 1 candidates
+[DBG] format: 48000 rate, 8 nch, 4 bps, fl32
+[DBG] params: 30 stride, 0.200 overlap, 14 search
+[DBG] 1.000 scale, 1440.000 stride_in, 1440 stride_out, 1152 standing, 288 overlap, 672 search, 2400 queue, fl32 mode
+[DBG] using audio filter module "scaletempo"
+[DBG] conversion: 's32l'->'f32l' 48000 Hz->48000 Hz 3F2M2R/LFE->3F2M2R/LFE
+[DBG] looking for audio converter module matching "any": 8 candidates
+[DBG] s32l->f32l, bits per sample: 32->32
+[DBG] using audio converter module "audio_format"
+[DBG] conversion pipeline complete
+[DBG] conversion: 'f32l'->'f32l' 48000 Hz->48000 Hz 3F2M2R/LFE->3F2M2R/LFE
+[DBG] conversion pipeline complete
+[DBG] looking for audio resampler module matching "soxr": 2 candidates
+[DBG] Using SoX Resampler with 'cr32s' engine and 'Medium 16-bit with medium roll-off' quality to convert f32l/48000Hz to f32l/48000Hz.
+[DBG] using audio resampler module "soxr"
+[DBG] Decoder wait done in 88 ms
+[DBG] deferring start (82105 us)
+[DBG] deferring start (77180 us)
+[DBG] deferring start (76145 us)
+[DBG] deferring start (75085 us)
+[DBG] deferring start (74107 us)
+[DBG] deferring start (73871 us)
+[DBG] deferring start (78654 us)
+[DBG] deferring start (77681 us)
+[DBG] deferring start (76727 us)
+[DBG] deferring start (75760 us)
+[DBG] deferring start (74815 us)
+[DBG] deferring start (73866 us)
+[DBG] deferring start (72901 us)
+[DBG] deferring start (72759 us)
+[DBG] deferring start (73440 us)
+[DBG] deferring start (72530 us)
+[DBG] deferring start (72436 us)
+[DBG] deferring start (72339 us)
+[DBG] deferring start (72192 us)
+[DBG] deferring start (72052 us)
+[DBG] deferring start (71950 us)
+[DBG] deferring start (71825 us)
+[DBG] deferring start (71696 us)
+[DBG] deferring start (71573 us)
+[DBG] deferring start (88797 us)
+[DBG] deferring start (87883 us)
+[DBG] deferring start (86955 us)
+[DBG] deferring start (85937 us)
+[DBG] deferring start (84997 us)
+[DBG] deferring start (84075 us)
+[DBG] deferring start (83078 us)
+[DBG] deferring start (82109 us)
+[DBG] deferring start (80740 us)
+[DBG] deferring start (79507 us)
+[DBG] deferring start (78487 us)
+[DBG] deferring start (77492 us)
+[DBG] deferring start (76554 us)
+[DBG] deferring start (75527 us)
+[DBG] deferring start (74568 us)
+[DBG] deferring start (73614 us)
+[DBG] deferring start (72664 us)
+[DBG] deferring start (71710 us)
+[DBG] deferring start (70762 us)
+[DBG] deferring start (69772 us)
+[DBG] deferring start (68704 us)
+[DBG] deferring start (67576 us)
+[DBG] deferring start (70719 us)
+[DBG] deferring start (69750 us)
+[DBG] deferring start (68633 us)
+[DBG] deferring start (67683 us)
+[DBG] deferring start (66749 us)
+[DBG] deferring start (69914 us)
+[DBG] deferring start (68996 us)
+[DBG] deferring start (68058 us)
+[DBG] deferring start (67137 us)
+[DBG] deferring start (66211 us)
+[DBG] deferring start (66907 us)
+[DBG] deferring start (65922 us)
+[DBG] deferring start (70780 us)
+[DBG] deferring start (69746 us)
+[DBG] deferring start (68778 us)
+[DBG] deferring start (67840 us)
+[DBG] deferring start (66915 us)
+[DBG] deferring start (66011 us)
+[DBG] deferring start (65081 us)
+[DBG] deferring start (69917 us)
+[DBG] deferring start (69001 us)
+[DBG] deferring start (68068 us)
+[DBG] deferring start (67152 us)
+[DBG] deferring start (66235 us)
+[DBG] deferring start (65326 us)
+[DBG] deferring start (64406 us)
+[DBG] deferring start (65117 us)
+[DBG] deferring start (64180 us)
+[DBG] deferring start (67368 us)
+[DBG] deferring start (66370 us)
+[DBG] deferring start (65431 us)
+[DBG] deferring start (64484 us)
+[DBG] deferring start (63565 us)
+[DBG] deferring start (63411 us)
+[DBG] deferring start (65755 us)
+[DBG] deferring start (64805 us)
+[DBG] deferring start (63871 us)
+[DBG] deferring start (62811 us)
+[DBG] deferring start (63487 us)
+[DBG] deferring start (62559 us)
+[DBG] deferring start (63242 us)
+[DBG] deferring start (62327 us)
+[DBG] deferring start (62168 us)
+[DBG] deferring start (62841 us)
+[DBG] deferring start (61879 us)
+[DBG] deferring start (61729 us)
+[DBG] deferring start (61582 us)
+[DBG] deferring start (63103 us)
+[DBG] deferring start (62189 us)
+[DBG] deferring start (61281 us)
+[DBG] deferring start (61090 us)
+[DBG] deferring start (62608 us)
+[DBG] deferring start (61579 us)
+[DBG] deferring start (60425 us)
+[DBG] deferring start (73338 us)
+[DBG] deferring start (72399 us)
+[DBG] deferring start (71484 us)
+[DBG] deferring start (70507 us)
+[DBG] deferring start (69556 us)
+[DBG] deferring start (68639 us)
+[DBG] deferring start (67726 us)
+[DBG] deferring start (66745 us)
+[DBG] deferring start (65719 us)
+[DBG] deferring start (64768 us)
+[DBG] deferring start (63817 us)
+[DBG] deferring start (62838 us)
+[DBG] deferring start (61886 us)
+[DBG] deferring start (60942 us)
+[DBG] deferring start (60013 us)
+[DBG] deferring start (59090 us)
+[DBG] deferring start (58171 us)
+[DBG] deferring start (61202 us)
+[DBG] deferring start (60279 us)
+[DBG] deferring start (59376 us)
+[DBG] deferring start (58472 us)
+[DBG] deferring start (57520 us)
+[DBG] deferring start (61498 us)
+[DBG] deferring start (60558 us)
+[DBG] deferring start (59622 us)
+[DBG] deferring start (58695 us)
+[DBG] deferring start (57755 us)
+[DBG] deferring start (56827 us)
+[DBG] deferring start (57461 us)
+[DBG] deferring start (56521 us)
+[DBG] deferring start (57167 us)
+[DBG] deferring start (56211 us)
+[DBG] deferring start (56067 us)
+[DBG] deferring start (58432 us)
+[DBG] deferring start (57504 us)
+[DBG] deferring start (56578 us)
+[DBG] deferring start (55667 us)
+[DBG] deferring start (55557 us)
+[DBG] deferring start (56975 us)
+[DBG] deferring start (56032 us)
+[DBG] deferring start (55122 us)
+[DBG] deferring start (55015 us)
+[DBG] deferring start (54906 us)
+[DBG] deferring start (54804 us)
+[DBG] deferring start (54717 us)
+[DBG] deferring start (54628 us)
+[DBG] deferring start (56176 us)
+[DBG] deferring start (55265 us)
+[DBG] deferring start (54357 us)
+[DBG] deferring start (54266 us)
+[DBG] deferring start (54176 us)
+[DBG] deferring start (54081 us)
+[DBG] deferring start (53977 us)
+[DBG] deferring start (53894 us)
+[DBG] deferring start (53809 us)
+[DBG] deferring start (53720 us)
+[DBG] deferring start (53628 us)
+[DBG] deferring start (53541 us)
+[DBG] deferring start (53451 us)
+[DBG] deferring start (53362 us)
+[DBG] deferring start (53274 us)
+[DBG] deferring start (53185 us)
+[DBG] deferring start (53096 us)
+[DBG] deferring start (53009 us)
+[DBG] deferring start (52916 us)
+[DBG] deferring start (52831 us)
+[DBG] deferring start (52747 us)
+[DBG] deferring start (52662 us)
+[DBG] deferring start (52572 us)
+[DBG] deferring start (52486 us)
+[DBG] deferring start (52393 us)
+[DBG] deferring start (52308 us)
+[DBG] deferring start (52222 us)
+[DBG] deferring start (52141 us)
+[DBG] deferring start (52062 us)
+[DBG] deferring start (51979 us)
+[DBG] deferring start (51895 us)
+[DBG] deferring start (51807 us)
+[DBG] deferring start (51720 us)
+[DBG] deferring start (51630 us)
+[DBG] deferring start (51540 us)
+[DBG] deferring start (51451 us)
+[DBG] deferring start (51351 us)
+[DBG] deferring start (51199 us)
+[DBG] deferring start (51099 us)
+[DBG] deferring start (51012 us)
+[DBG] deferring start (50923 us)
+[DBG] deferring start (50833 us)
+[DBG] deferring start (50742 us)
+[DBG] deferring start (50655 us)
+[DBG] deferring start (50568 us)
+[DBG] deferring start (50479 us)
+[DBG] deferring start (50392 us)
+[DBG] deferring start (50311 us)
+[DBG] deferring start (50222 us)
+[DBG] deferring start (50134 us)
+[DBG] deferring start (50047 us)
+[DBG] deferring start (49959 us)
+[DBG] deferring start (49877 us)
+[DBG] deferring start (49794 us)
+[DBG] deferring start (49703 us)
+[DBG] deferring start (49613 us)
+[DBG] deferring start (49527 us)
+[DBG] deferring start (49438 us)
+[DBG] deferring start (49351 us)
+[DBG] deferring start (49263 us)
+[DBG] deferring start (49173 us)
+[DBG] deferring start (49082 us)
+[DBG] deferring start (48990 us)
+[DBG] deferring start (48883 us)
+[DBG] deferring start (48726 us)
+[DBG] deferring start (48636 us)
+[DBG] deferring start (48553 us)
+[DBG] deferring start (48461 us)
+[DBG] deferring start (48382 us)
+[DBG] deferring start (48292 us)
+[DBG] deferring start (48198 us)
+[DBG] deferring start (48113 us)
+[DBG] deferring start (48027 us)
+[DBG] deferring start (47942 us)
+[DBG] deferring start (47856 us)
+[DBG] deferring start (47773 us)
+[DBG] deferring start (47690 us)
+[DBG] deferring start (47610 us)
+[DBG] deferring start (47522 us)
+[DBG] deferring start (47416 us)
+[DBG] deferring start (47335 us)
+[DBG] deferring start (47243 us)
+[DBG] deferring start (47161 us)
+[DBG] deferring start (47077 us)
+[DBG] deferring start (46986 us)
+[DBG] deferring start (46892 us)
+[DBG] deferring start (46807 us)
+[DBG] deferring start (46695 us)
+[DBG] deferring start (46604 us)
+[DBG] deferring start (46522 us)
+[DBG] deferring start (46440 us)
+[DBG] deferring start (46353 us)
+[DBG] deferring start (46267 us)
+[DBG] deferring start (46186 us)
+[DBG] deferring start (46101 us)
+[DBG] deferring start (46015 us)
+[DBG] deferring start (45928 us)
+[DBG] deferring start (45852 us)
+[DBG] deferring start (45775 us)
+[DBG] deferring start (45679 us)
+[DBG] deferring start (45594 us)
+[DBG] deferring start (45517 us)
+[DBG] deferring start (45425 us)
+[DBG] deferring start (45340 us)
+[DBG] deferring start (45248 us)
+[DBG] deferring start (45164 us)
+[DBG] deferring start (45084 us)
+[DBG] deferring start (45000 us)
+[DBG] deferring start (44921 us)
+[DBG] deferring start (44842 us)
+[DBG] deferring start (44760 us)
+[DBG] deferring start (44682 us)
+[DBG] deferring start (44603 us)
+[DBG] deferring start (44526 us)
+[DBG] deferring start (44436 us)
+[DBG] deferring start (44350 us)
+[DBG] deferring start (44263 us)
+[DBG] deferring start (44166 us)
+[DBG] deferring start (44073 us)
+[DBG] deferring start (51372 us)
+[DBG] deferring start (50448 us)
+[DBG] deferring start (49523 us)
+[DBG] deferring start (48598 us)
+[DBG] deferring start (47684 us)
+[DBG] deferring start (46761 us)
+[DBG] deferring start (45837 us)
+[DBG] deferring start (44937 us)
+[DBG] deferring start (44016 us)
+[DBG] deferring start (43102 us)
+[DBG] deferring start (43817 us)
+[DBG] deferring start (42885 us)
+[DBG] deferring start (46084 us)
+[DBG] deferring start (45159 us)
+[DBG] deferring start (44251 us)
+[DBG] deferring start (43335 us)
+[DBG] deferring start (42421 us)
+[DBG] deferring start (42263 us)
+[DBG] deferring start (42956 us)
+[DBG] deferring start (42032 us)
+[DBG] deferring start (43570 us)
+[DBG] deferring start (42645 us)
+[DBG] deferring start (41731 us)
+[DBG] deferring start (41651 us)
+[DBG] deferring start (41538 us)
+[DBG] deferring start (41415 us)
+[DBG] deferring start (41322 us)
+[DBG] deferring start (43718 us)
+[DBG] deferring start (42817 us)
+[DBG] deferring start (41897 us)
+[DBG] deferring start (40996 us)
+[DBG] deferring start (40915 us)
+[DBG] deferring start (40801 us)
+[DBG] deferring start (40698 us)
+[DBG] deferring start (40612 us)
+[DBG] deferring start (40522 us)
+[DBG] deferring start (40438 us)
+[DBG] deferring start (40355 us)
+[DBG] deferring start (40278 us)
+[DBG] deferring start (40197 us)
+[DBG] deferring start (40110 us)
+[DBG] deferring start (40007 us)
+[DBG] deferring start (39923 us)
+[DBG] deferring start (39843 us)
+[DBG] deferring start (39766 us)
+[DBG] deferring start (39680 us)
+[DBG] deferring start (39594 us)
+[DBG] deferring start (39495 us)
+[DBG] deferring start (41045 us)
+[DBG] deferring start (40136 us)
+[DBG] deferring start (39229 us)
+[DBG] deferring start (39149 us)
+[DBG] deferring start (39063 us)
+[DBG] deferring start (38982 us)
+[DBG] deferring start (38906 us)
+[DBG] deferring start (38825 us)
+[DBG] deferring start (38740 us)
+[DBG] deferring start (38657 us)
+[DBG] deferring start (38572 us)
+[DBG] deferring start (38486 us)
+[DBG] deferring start (39232 us)
+[DBG] deferring start (38324 us)
+[DBG] deferring start (39053 us)
+[DBG] deferring start (38139 us)
+[DBG] deferring start (38058 us)
+[DBG] deferring start (37973 us)
+[DBG] deferring start (37895 us)
+[DBG] deferring start (37814 us)
+[DBG] deferring start (37737 us)
+[DBG] deferring start (37659 us)
+[DBG] deferring start (37582 us)
+[DBG] deferring start (37498 us)
+[DBG] deferring start (37414 us)
+[DBG] deferring start (37327 us)
+[DBG] deferring start (37242 us)
+[DBG] deferring start (37990 us)
+[DBG] deferring start (37075 us)
+[DBG] deferring start (36992 us)
+[DBG] deferring start (36910 us)
+[DBG] deferring start (36811 us)
+[DBG] deferring start (37549 us)
+[DBG] deferring start (36643 us)
+[DBG] deferring start (36565 us)
+[DBG] deferring start (36488 us)
+[DBG] deferring start (36412 us)
+[DBG] deferring start (37163 us)
+[DBG] deferring start (36256 us)
+[DBG] deferring start (36179 us)
+[DBG] deferring start (36085 us)
+[DBG] deferring start (36833 us)
+[DBG] deferring start (35926 us)
+[DBG] deferring start (35848 us)
+[DBG] deferring start (35762 us)
+[DBG] deferring start (35671 us)
+[DBG] deferring start (36344 us)
+[DBG] deferring start (35426 us)
+[DBG] deferring start (35348 us)
+[DBG] deferring start (35259 us)
+[DBG] deferring start (35174 us)
+[DBG] deferring start (35086 us)
+[DBG] deferring start (34996 us)
+[DBG] deferring start (34916 us)
+[DBG] deferring start (34838 us)
+[DBG] deferring start (34748 us)
+[DBG] deferring start (34658 us)
+[DBG] deferring start (34577 us)
+[DBG] deferring start (34494 us)
+[DBG] deferring start (34415 us)
+[DBG] deferring start (34331 us)
+[DBG] deferring start (34247 us)
+[DBG] deferring start (34167 us)
+[DBG] deferring start (34843 us)
+[DBG] deferring start (33929 us)
+[DBG] deferring start (33846 us)
+[DBG] deferring start (33752 us)
+[DBG] deferring start (33668 us)
+[DBG] deferring start (33583 us)
+[DBG] deferring start (33495 us)
+[DBG] deferring start (33414 us)
+[DBG] deferring start (33325 us)
+[DBG] deferring start (33236 us)
+[DBG] deferring start (33150 us)
+[DBG] deferring start (33069 us)
+[DBG] deferring start (32986 us)
+[DBG] deferring start (32900 us)
+[DBG] deferring start (32811 us)
+[DBG] deferring start (32708 us)
+[DBG] deferring start (32615 us)
+[DBG] deferring start (32532 us)
+[DBG] deferring start (32431 us)
+[DBG] deferring start (32347 us)
+[DBG] deferring start (32258 us)
+[DBG] deferring start (32169 us)
+[DBG] deferring start (32078 us)
+[DBG] deferring start (31988 us)
+[DBG] deferring start (31910 us)
+[DBG] deferring start (31822 us)
+[DBG] deferring start (31734 us)
+[DBG] deferring start (31651 us)
+[DBG] deferring start (31555 us)
+[DBG] deferring start (31466 us)
+[DBG] deferring start (31375 us)
+[DBG] deferring start (31288 us)
+[DBG] deferring start (31202 us)
+[DBG] deferring start (31107 us)
+[DBG] deferring start (31018 us)
+[DBG] deferring start (30936 us)
+[DBG] deferring start (30847 us)
+[DBG] deferring start (30757 us)
+[DBG] deferring start (30669 us)
+[DBG] deferring start (30580 us)
+[DBG] deferring start (30491 us)
+[DBG] deferring start (30403 us)
+[DBG] deferring start (30316 us)
+[DBG] deferring start (30226 us)
+[DBG] deferring start (30137 us)
+[DBG] deferring start (30048 us)
+[DBG] deferring start (29958 us)
+[DBG] deferring start (29869 us)
+[DBG] deferring start (29782 us)
+[DBG] deferring start (29694 us)
+[DBG] deferring start (29606 us)
+[DBG] deferring start (29515 us)
+[DBG] deferring start (29420 us)
+[DBG] deferring start (29324 us)
+[DBG] deferring start (29238 us)
+[DBG] deferring start (29146 us)
+[DBG] deferring start (29057 us)
+[DBG] deferring start (28975 us)
+[DBG] deferring start (28888 us)
+[DBG] deferring start (28797 us)
+[DBG] deferring start (28712 us)
+[DBG] deferring start (28631 us)
+[DBG] deferring start (28497 us)
+[DBG] deferring start (28409 us)
+[DBG] deferring start (28314 us)
+[DBG] deferring start (28233 us)
+[DBG] deferring start (28144 us)
+[DBG] deferring start (28063 us)
+[DBG] deferring start (27975 us)
+[DBG] deferring start (27888 us)
+[DBG] deferring start (27799 us)
+[DBG] deferring start (28536 us)
+[DBG] deferring start (27630 us)
+[DBG] deferring start (27550 us)
+[DBG] deferring start (28264 us)
+[DBG] deferring start (27324 us)
+[DBG] deferring start (27115 us)
+[DBG] deferring start (26992 us)
+[DBG] deferring start (26900 us)
+[DBG] deferring start (26807 us)
+[DBG] deferring start (27507 us)
+[DBG] deferring start (26581 us)
+[DBG] deferring start (26449 us)
+[DBG] deferring start (26365 us)
+[DBG] deferring start (26276 us)
+[DBG] deferring start (26160 us)
+[DBG] deferring start (26081 us)
+[DBG] deferring start (25992 us)
+[DBG] deferring start (25909 us)
+[DBG] deferring start (34071 us)
+[DBG] deferring start (33153 us)
+[DBG] deferring start (32250 us)
+[DBG] deferring start (31344 us)
+[DBG] deferring start (30443 us)
+[DBG] deferring start (29536 us)
+[DBG] deferring start (28626 us)
+[DBG] deferring start (27714 us)
+[DBG] deferring start (26803 us)
+[DBG] deferring start (25899 us)
+[DBG] deferring start (24993 us)
+[DBG] deferring start (24898 us)
+[DBG] deferring start (24809 us)
+[DBG] deferring start (24733 us)
+[DBG] deferring start (24650 us)
+[DBG] deferring start (24566 us)
+[DBG] deferring start (24476 us)
+[DBG] deferring start (25188 us)
+[DBG] deferring start (24279 us)
+[DBG] deferring start (24200 us)
+[DBG] deferring start (24110 us)
+[DBG] deferring start (24019 us)
+[DBG] deferring start (23931 us)
+[DBG] deferring start (23843 us)
+[DBG] deferring start (23755 us)
+[DBG] deferring start (23668 us)
+[DBG] deferring start (23579 us)
+[DBG] deferring start (23492 us)
+[DBG] deferring start (23404 us)
+[DBG] deferring start (23316 us)
+[DBG] deferring start (23219 us)
+[DBG] deferring start (23138 us)
+[DBG] deferring start (23055 us)
+[DBG] deferring start (22961 us)
+[DBG] deferring start (25332 us)
+[DBG] deferring start (24423 us)
+[DBG] deferring start (23516 us)
+[DBG] deferring start (22605 us)
+[DBG] deferring start (22522 us)
+[DBG] deferring start (22434 us)
+[DBG] deferring start (22346 us)
+[DBG] deferring start (22261 us)
+[DBG] deferring start (22174 us)
+[DBG] deferring start (22086 us)
+[DBG] deferring start (21997 us)
+[DBG] deferring start (21908 us)
+[DBG] deferring start (21818 us)
+[DBG] deferring start (21734 us)
+[DBG] deferring start (21646 us)
+[DBG] deferring start (21559 us)
+[DBG] deferring start (21471 us)
+[DBG] deferring start (21382 us)
+[DBG] deferring start (21294 us)
+[DBG] deferring start (21158 us)
+[DBG] deferring start (23504 us)
+[DBG] deferring start (22600 us)
+[DBG] deferring start (21694 us)
+[DBG] deferring start (20787 us)
+[DBG] deferring start (20704 us)
+[DBG] deferring start (20618 us)
+[DBG] deferring start (20535 us)
+[DBG] deferring start (20446 us)
+[DBG] deferring start (20357 us)
+[DBG] deferring start (20273 us)
+[DBG] deferring start (20185 us)
+[DBG] deferring start (20096 us)
+[DBG] deferring start (20016 us)
+[DBG] deferring start (19926 us)
+[DBG] deferring start (19832 us)
+[DBG] deferring start (22212 us)
+[DBG] deferring start (21305 us)
+[DBG] deferring start (20390 us)
+[DBG] deferring start (19481 us)
+[DBG] deferring start (19388 us)
+[DBG] deferring start (19298 us)
+[DBG] deferring start (19210 us)
+[DBG] deferring start (19130 us)
+[DBG] deferring start (19040 us)
+[DBG] deferring start (18956 us)
+[DBG] deferring start (18869 us)
+[DBG] deferring start (18795 us)
+[DBG] deferring start (18711 us)
+[DBG] deferring start (18623 us)
+[DBG] deferring start (18536 us)
+[DBG] deferring start (18447 us)
+[DBG] deferring start (18360 us)
+[DBG] deferring start (18270 us)
+[DBG] deferring start (18180 us)
+[DBG] deferring start (18092 us)
+[DBG] deferring start (18001 us)
+[DBG] deferring start (17912 us)
+[DBG] deferring start (17824 us)
+[DBG] deferring start (17736 us)
+[DBG] deferring start (17633 us)
+[DBG] deferring start (17546 us)
+[DBG] deferring start (17463 us)
+[DBG] deferring start (17374 us)
+[DBG] deferring start (17288 us)
+[DBG] deferring start (17200 us)
+[DBG] deferring start (17115 us)
+[DBG] deferring start (17028 us)
+[DBG] deferring start (16937 us)
+[DBG] deferring start (16854 us)
+[DBG] deferring start (16766 us)
+[DBG] deferring start (16681 us)
+[DBG] deferring start (16595 us)
+[DBG] deferring start (16508 us)
+[DBG] deferring start (16420 us)
+[DBG] deferring start (16340 us)
+[DBG] deferring start (16256 us)
+[DBG] deferring start (16169 us)
+[DBG] deferring start (16081 us)
+[DBG] deferring start (15993 us)
+[DBG] deferring start (15907 us)
+[DBG] deferring start (15816 us)
+[DBG] deferring start (15733 us)
+[DBG] deferring start (15649 us)
+[DBG] deferring start (18009 us)
+[DBG] deferring start (17100 us)
+[DBG] deferring start (16189 us)
+[DBG] deferring start (15281 us)
+[DBG] deferring start (15200 us)
+[DBG] deferring start (15119 us)
+[DBG] deferring start (15028 us)
+[DBG] deferring start (14948 us)
+[DBG] deferring start (14863 us)
+[DBG] deferring start (14775 us)
+[DBG] deferring start (14687 us)
+[DBG] deferring start (14599 us)
+[DBG] deferring start (14506 us)
+[DBG] deferring start (14418 us)
+[DBG] deferring start (14327 us)
+[DBG] deferring start (14246 us)
+[DBG] deferring start (14124 us)
+[DBG] deferring start (14041 us)
+[DBG] deferring start (13953 us)
+[DBG] deferring start (13870 us)
+[DBG] deferring start (15426 us)
+[DBG] deferring start (14499 us)
+[DBG] deferring start (13576 us)
+[DBG] deferring start (13493 us)
+[DBG] deferring start (13405 us)
+[DBG] deferring start (13331 us)
+[DBG] deferring start (13248 us)
+[DBG] deferring start (13168 us)
+[DBG] deferring start (13079 us)
+[DBG] deferring start (13003 us)
+[DBG] deferring start (12925 us)
+[DBG] deferring start (12842 us)
+[DBG] deferring start (12755 us)
+[DBG] deferring start (12670 us)
+[DBG] deferring start (12586 us)
+[DBG] deferring start (12503 us)
+[DBG] deferring start (12422 us)
+[DBG] deferring start (12338 us)
+[DBG] deferring start (12257 us)
+[DBG] deferring start (12180 us)
+[DBG] deferring start (12095 us)
+[DBG] deferring start (12019 us)
+[DBG] deferring start (11934 us)
+[DBG] deferring start (11854 us)
+[DBG] deferring start (11777 us)
+[DBG] deferring start (11690 us)
+[DBG] deferring start (11615 us)
+[DBG] deferring start (11528 us)
+[DBG] deferring start (11442 us)
+[DBG] deferring start (11364 us)
+[DBG] deferring start (12101 us)
+[DBG] deferring start (11198 us)
+[DBG] deferring start (11117 us)
+[DBG] deferring start (11017 us)
+[DBG] deferring start (10936 us)
+[DBG] deferring start (10850 us)
+[DBG] deferring start (15708 us)
+[DBG] deferring start (14790 us)
+[DBG] deferring start (13880 us)
+[DBG] deferring start (12974 us)
+[DBG] deferring start (12053 us)
+[DBG] deferring start (11156 us)
+[DBG] deferring start (10248 us)
+[DBG] deferring start (10167 us)
+[DBG] deferring start (10072 us)
+[DBG] deferring start (10794 us)
+[DBG] deferring start (9871 us)
+[DBG] deferring start (9786 us)
+[DBG] deferring start (9696 us)
+[DBG] deferring start (9610 us)
+[DBG] deferring start (10310 us)
+[DBG] deferring start (9384 us)
+[DBG] deferring start (11766 us)
+[DBG] deferring start (10848 us)
+[DBG] deferring start (9920 us)
+[DBG] deferring start (9005 us)
+[DBG] deferring start (10545 us)
+[DBG] deferring start (9643 us)
+[DBG] deferring start (8723 us)
+[DBG] deferring start (13554 us)
+[DBG] deferring start (12628 us)
+[DBG] deferring start (11719 us)
+[DBG] deferring start (10808 us)
+[DBG] deferring start (9899 us)
+[DBG] deferring start (8967 us)
+[DBG] deferring start (8063 us)
+[DBG] deferring start (7985 us)
+[DBG] deferring start (7906 us)
+[DBG] deferring start (7826 us)
+[DBG] deferring start (7726 us)
+[DBG] deferring start (7647 us)
+[DBG] deferring start (7554 us)
+[DBG] deferring start (7471 us)
+[DBG] deferring start (7385 us)
+[DBG] deferring start (7309 us)
+[DBG] deferring start (7228 us)
+[DBG] deferring start (7134 us)
+[DBG] deferring start (7059 us)
+[DBG] deferring start (6971 us)
+[DBG] deferring start (6883 us)
+[DBG] deferring start (7602 us)
+[DBG] deferring start (6691 us)
+[DBG] deferring start (6603 us)
+[DBG] deferring start (7355 us)
+[DBG] deferring start (6447 us)
+[DBG] deferring start (6369 us)
+[DBG] deferring start (6291 us)
+[DBG] deferring start (6201 us)
+[DBG] deferring start (6126 us)
+[DBG] deferring start (6044 us)
+[DBG] deferring start (5963 us)
+[DBG] deferring start (5885 us)
+[DBG] deferring start (5791 us)
+[DBG] deferring start (5699 us)
+[DBG] deferring start (5609 us)
+[DBG] deferring start (5520 us)
+[DBG] deferring start (5439 us)
+[DBG] deferring start (5358 us)
+[DBG] deferring start (5281 us)
+[DBG] deferring start (5202 us)
+[DBG] deferring start (8397 us)
+[DBG] deferring start (7498 us)
+[DBG] deferring start (6600 us)
+[DBG] deferring start (5690 us)
+[DBG] deferring start (4783 us)
+[DBG] deferring start (4700 us)
+[DBG] deferring start (4623 us)
+[DBG] deferring start (4538 us)
+[DBG] deferring start (4449 us)
+[DBG] deferring start (4365 us)
+[DBG] deferring start (4281 us)
+[DBG] deferring start (4201 us)
+[DBG] deferring start (4124 us)
+[DBG] deferring start (4047 us)
+[DBG] deferring start (3959 us)
+[DBG] deferring start (3844 us)
+[DBG] deferring start (3766 us)
+[DBG] deferring start (3687 us)
+[DBG] deferring start (3609 us)
+[DBG] deferring start (3525 us)
+[DBG] deferring start (3438 us)
+[DBG] deferring start (3360 us)
+[DBG] deferring start (3281 us)
+[DBG] deferring start (3168 us)
+[DBG] deferring start (3088 us)
+[DBG] deferring start (2999 us)
+[DBG] deferring start (2904 us)
+[DBG] deferring start (2812 us)
+[DBG] deferring start (2725 us)
+[DBG] deferring start (2631 us)
+[DBG] deferring start (2548 us)
+[DBG] deferring start (4075 us)
+[DBG] deferring start (3166 us)
+[DBG] deferring start (2258 us)
+[DBG] deferring start (2179 us)
+[DBG] deferring start (2090 us)
+[DBG] deferring start (2001 us)
+[DBG] deferring start (1919 us)
+[DBG] deferring start (1838 us)
+[DBG] deferring start (1751 us)
+[DBG] deferring start (1667 us)
+[DBG] deferring start (1576 us)
+[DBG] deferring start (1493 us)
+[DBG] deferring start (1406 us)
+[DBG] deferring start (1324 us)
+[DBG] deferring start (1233 us)
+[DBG] deferring start (1160 us)
+[DBG] deferring start (1075 us)
+[DBG] deferring start (4276 us)
+[DBG] deferring start (3367 us)
+[DBG] deferring start (2453 us)
+[DBG] deferring start (1543 us)
+[DBG] deferring start (639 us)
+[DBG] deferring start (548 us)
+[DBG] deferring start (460 us)
+[DBG] deferring start (362 us)
+[DBG] deferring start (280 us)
+[DBG] deferring start (197 us)
+[DBG] deferring start (111 us)
+[DBG] deferring start (23 us)
+[DBG] starting late (-66 us)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 44 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 44 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+11:36:44.751 AM [subtitles] panel opened: spu/5 English BD PGS subtitles 
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+11:36:46.439 AM [subtitles] off (deselectAllTextTracks)
+11:36:46.439 AM [player] panel closed
+11:36:46.743 AM [subtitles] now selected: audio=["audio/2"] text=[]
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 52 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 52 ms)
+[WARN] picture is too late to be displayed (missing 52 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+11:37:43.669 AM [subtitles] panel opened: spu/5 English BD PGS subtitles 
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+11:37:45.364 AM [subtitles] off (deselectAllTextTracks)
+11:37:45.364 AM [player] panel closed
+[WARN] picture is too late to be displayed (missing 48 ms)
+11:37:45.691 AM [subtitles] now selected: audio=["audio/2"] text=[]
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 52 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+11:38:42.613 AM [subtitles] panel opened: spu/5 English BD PGS subtitles 
+[WARN] picture is too late to be displayed (missing 54 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+11:38:44.317 AM [subtitles] off (deselectAllTextTracks)
+11:38:44.317 AM [player] panel closed
+[WARN] picture is too late to be displayed (missing 51 ms)
+11:38:44.641 AM [subtitles] now selected: audio=["audio/2"] text=[]
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 58 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 44 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 44 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 44 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+11:39:41.550 AM [subtitles] panel opened: spu/5 English BD PGS subtitles 
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+11:39:43.261 AM [subtitles] off (deselectAllTextTracks)
+11:39:43.261 AM [player] panel closed
+[WARN] picture is too late to be displayed (missing 50 ms)
+11:39:43.570 AM [subtitles] now selected: audio=["audio/2"] text=[]
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 45 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+11:40:40.452 AM [subtitles] panel opened: spu/5 English BD PGS subtitles 
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+11:40:42.133 AM [subtitles] off (deselectAllTextTracks)
+11:40:42.133 AM [player] panel closed
+[WARN] picture is too late to be displayed (missing 50 ms)
+11:40:42.443 AM [subtitles] now selected: audio=["audio/2"] text=[]
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 48 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 49 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 46 ms)
+[WARN] picture is too late to be displayed (missing 51 ms)
+[WARN] picture is too late to be displayed (missing 50 ms)
+[WARN] picture is too late to be displayed (missing 47 ms)
+11:40:44.666 AM [player] dismiss at 304633 ms, state Playing
+11:40:44.668 AM [player] state Stopping at 305224 ms
+[DBG] killing decoder fourcc `hevc'
+[DBG] removing "video decoder" module "videotoolbox"
+[DBG] saving a free vout
+[DBG] ES track unselected: 'video/1' (fourcc: 'hevc')
+11:40:44.677 AM [player] track selected type=1 selected= unselected=video/1
+[DBG] killing decoder fourcc `mlpa'
+[DBG] removing "audio decoder" module "avcodec"
+[DBG] removing "audio packetizer" module "mlp"
+[DBG] removing "audio resampler" module "soxr"
+[DBG] removing "audio converter" module "audio_format"
+[DBG] removing "audio filter" module "scaletempo"
+[DBG] removing "audio volume" module "float_mixer"
+[DBG] keeping audio output
+[DBG] ES track unselected: 'audio/2' (fourcc: 'mlpa')
+11:40:44.827 AM [player] track selected type=0 selected= unselected=audio/2
+[DBG] removing "demux" module "mkv"
+[DBG] ES track deleted: 'video/1' (fourcc: 'hevc')
+[DBG] ES track deleted: 'audio/2' (fourcc: 'mlpa')
+[DBG] ES track deleted: 'audio/3' (fourcc: 'a52 ')
+[DBG] ES track deleted: 'audio/4' (fourcc: 'a52 ')
+[DBG] ES track deleted: 'spu/5' (fourcc: 'bdpg')
+[DBG] Program doesn't contain anymore ES
+[DBG] removing "stream_filter" module "record"
+[DBG] removing "stream_filter" module "prefetch"
+[DBG] removing "access" module "http"
+[DBG] connection failed
+[DBG] stop free vout
+11:40:44.828 AM [player] state Stopped at 305224 ms
