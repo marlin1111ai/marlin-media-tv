@@ -9,6 +9,7 @@ set -e
 BUILD_DIR="${BUILD_DIR:-$HOME/vlckit-build}"
 REPO="${REPO:-$HOME/Xcode/Marlin Media TV}"
 case "$BUILD_DIR" in *" "*) echo "BUILD_DIR must not contain spaces: $BUILD_DIR" >&2; exit 1;; esac
+ls -d /Library/Frameworks/Python.framework/Versions/3.[1-9][0-9]/bin >/dev/null 2>&1 || { echo "needs python.org Python 3.10+ installed at /Library/Frameworks/Python.framework (VideoLAN's script looks only there; meson refuses Xcode's 3.9.6)" >&2; exit 1; }
 
 # Step 1/2 — VLCKit source at the tag the app used as a Swift package.
 mkdir -p "$BUILD_DIR" "$REPO/Frameworks"
