@@ -141,6 +141,12 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate {
             EvidenceLog.line("[player] \(errorText!)")
             return
         }
+        // D014: over HTTP the access is not fast-seekable, so VLC's default mkv demuxer treats the file's
+        // Cues as untrusted and prerolls every seek from the last keyframe it has read. The trusted-cues
+        // submodule seeks to the cue before the target instead. MKV only; every other container is untouched.
+        if request.file.path.lowercased().hasSuffix(".mkv") {
+            media.addOption(":demux=mkv_trusted")
+        }
         player.media = media
         player.play()
         EvidenceLog.line("[player] play() called")

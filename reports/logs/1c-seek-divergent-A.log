@@ -1,0 +1,2941 @@
+9:42:21.297 AM [player] request Divergent — Divergent (2014).mkv · 4K HDR · DTS 7.1 — http://192.168.1.250:8093/stream/1
+9:42:21.297 AM [player] file Movies/Divergent/Divergent (2014).mkv 3840x1600 hdr=true video=hevc Main 10 audio=dts 7.1
+[DBG] Creating an input for playback'1'
+9:42:21.309 AM [player] play() called
+[DBG] using timeshift granularity of 50 MiB
+[DBG] using default timeshift path
+[DBG] `http://192.168.1.250:8093/stream/1' gives access `http' demux `mkv_trusted' path `192.168.1.250:8093/stream/1'
+[DBG] creating access: http://192.168.1.250:8093/stream/1
+[DBG] looking for access module matching "http": 2 candidates
+[DBG] looking for keystore module matching "any": 1 candidates
+[DBG] using keystore module "keychain"
+[DBG] Lookup keychain entry for server 192.168.1.250
+[WARN] lookup failed (-25300: 'Item not found')
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+Range: bytes=0-
+
+
+9:42:21.322 AM [player] state Opening at 0 ms
+9:42:21.322 AM [player] buffering 0.0
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 13214700163
+Content-Range: bytes 0-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:21 GMT
+
+
+[DBG] removing "keystore" module "keychain"
+[DBG] using access module "http"
+[DBG] looking for stream_filter module matching "prefetch,cache": 2 candidates
+[DBG] using 16777216 bytes buffer
+[DBG] using stream_filter module "prefetch"
+[DBG] looking for stream_filter module matching "any": 4 candidates
+[DBG] no stream_filter modules matched with name any
+[DBG] looking for stream_directory module matching "any": 0 candidates
+[DBG] no stream_directory modules matched with name any
+[DBG] attachment of directory-extractor failed for http://192.168.1.250:8093/stream/1
+[DBG] looking for stream_filter module matching "record": 1 candidates
+[DBG] using stream_filter module "record"
+[DBG] creating demux "mkv_trusted", URL: http://192.168.1.250:8093/stream/1, path: (null)
+[DBG] looking for demux module matching "mkv_trusted": 1 candidates
+[DBG] |   + Seek head
+[DBG] |   - info at 4151
+[DBG] |   + Information
+[DBG] |   |   + TimecodeScale=1000000
+[DBG] |   |   + Muxing Application=no_variable_data
+[DBG] |   |   + Writing Application=no_variable_data
+[DBG] |   |   + Duration=8379371
+[DBG] |   |   + Date=Thu Jan 01 00:00:00 1970
+[DBG] |   |   + UID=0
+[DBG] |   - tracks at 4238
+[DBG] |   + Tracks
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=1
+[DBG] |   |   |   + Track UID=1
+[DBG] |   |   |   + Track Type=video
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=V_MPEGH/ISO/HEVC
+[DBG] |   |   |   + Track Language=`und'
+[DBG] |   |   |   + Track Video
+[DBG] |   |   |   |   + width=3840
+[DBG] |   |   |   |   + height=1600
+[DBG] |   |   |   |   + display width=3840
+[DBG] |   |   |   |   + display height=1600
+[DBG] |   |   |   + Track CodecPrivate size=2253
+[DBG] |   |   |   + Track Default Duration=41708
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=2
+[DBG] |   |   |   + Track UID=2
+[DBG] |   |   |   + Track Type=audio
+[DBG] |   |   |   + Track CodecId=A_DTS
+[DBG] |   |   |   + Track Default Duration=10666
+[DBG] |   |   |   + Track Audio
+[DBG] |   |   |   |   + afreq=48000
+[DBG] |   |   |   |   + achan=8
+[DBG] |   |   |   |   + abits=24
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=3
+[DBG] |   |   |   + Track UID=3
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_TEXT/UTF8
+[DBG] |   |   |   + Track Name=Stripped SRT
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=4
+[DBG] |   |   |   + Track UID=4
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_TEXT/UTF8
+[DBG] |   |   |   + Track Name=SDH SRT
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=5
+[DBG] |   |   |   + Track UID=5
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_HDMV/PGS
+[DBG] |   |   |   + Track Name=SDH (White)
+[DBG] |   |   |   + Content Encodings
+[DBG] |   |   |   |   + Content Encoding
+[DBG] |   |   |   |   |   + Content Compression
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=6
+[DBG] |   |   |   + Track UID=6
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_HDMV/PGS
+[DBG] |   |   |   + Track Name=SDH (Grey)
+[DBG] |   |   |   + Content Encodings
+[DBG] |   |   |   |   + Content Encoding
+[DBG] |   |   |   |   |   + Content Compression
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=7
+[DBG] |   |   |   + Track UID=7
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_HDMV/PGS
+[DBG] |   |   |   + Track Language=`spa'
+[DBG] |   |   |   + Track Name=White
+[DBG] |   |   |   + Content Encodings
+[DBG] |   |   |   |   + Content Encoding
+[DBG] |   |   |   |   |   + Content Compression
+[DBG] |   |   + Track Entry
+[DBG] |   |   |   + Track Number=8
+[DBG] |   |   |   + Track UID=8
+[DBG] |   |   |   + Track Type=subtitle
+[DBG] |   |   |   + Track Default=0
+[DBG] |   |   |   + Track Lacing=0
+[DBG] |   |   |   + Track CodecId=S_HDMV/PGS
+[DBG] |   |   |   + Track Language=`spa'
+[DBG] |   |   |   + Track Name=Grey
+[DBG] |   |   |   + Content Encodings
+[DBG] |   |   |   |   + Content Encoding
+[DBG] |   |   |   |   |   + Content Compression
+[DBG] |   - cues at 13214293211
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=13214293211-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 406952
+Content-Range: bytes 13214293211-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:21 GMT
+
+
+[DBG] connection failed
+[DBG] |   + Cues
+[DBG] end of stream
+[DBG] |   - loading cues done.
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=108-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 13214700055
+Content-Range: bytes 108-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:21 GMT
+
+
+[DBG] |   - tags at 13214697117
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=13214697117-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 3046
+Content-Range: bytes 13214697117-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:21 GMT
+
+
+[DBG] connection failed
+[DBG] end of stream
+[DBG] |   + Tags
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 1
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 8069705
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:19:39.371000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 200904
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 8452381613
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 2
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 4510921
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:19:39.328000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 785562
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 4724811044
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 3
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 38
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:09:12.996000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 1377
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 36901
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 4
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 43
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:09:31.014000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 1635
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 42543
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 5
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 28993
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:09:31.013000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 3270
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 28163980
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 6
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 28993
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:09:31.013000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 3270
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 28163980
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 7
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 23192
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:09:13.037000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 2446
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 22476857
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] + Tag
+[DBG] |   + Targets
+[DBG] |   |   + TargetTypeValue: 50
+[DBG] |   |   + TrackUID: 8
+[DBG] |   |   + TargetType: MOVIE
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta BPS: 23192
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta DURATION: 02:09:13.037000000
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_FRAMES: 2446
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta NUMBER_OF_BYTES: 22476857
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_APP: no_variable_data
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_WRITING_DATE_UTC: 1970-01-01 00:00:00
+[DBG] |   + Simple Tag 
+[DBG] |   |   + Meta _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[DBG] loading tags done.
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=126-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 13214700037
+Content-Range: bytes 126-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:21 GMT
+
+
+[DBG] |   - chapters at 7938
+[DBG] |   + Chapters
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=1
+[DBG] |   |   |   |   + ChapterTimeStart=0
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:00:00.000
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=2
+[DBG] |   |   |   |   + ChapterTimeStart=477477000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:07:57.477
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=3
+[DBG] |   |   |   |   + ChapterTimeStart=929595000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:15:29.595
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=4
+[DBG] |   |   |   |   + ChapterTimeStart=1411035000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:23:31.035
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=5
+[DBG] |   |   |   |   + ChapterTimeStart=2036618000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:33:56.618
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=6
+[DBG] |   |   |   |   + ChapterTimeStart=2332664000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:38:52.664
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=7
+[DBG] |   |   |   |   + ChapterTimeStart=2664036000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:44:24.036
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=8
+[DBG] |   |   |   |   + ChapterTimeStart=3217214000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=00:53:37.214
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=9
+[DBG] |   |   |   |   + ChapterTimeStart=3602390000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:00:02.390
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=a
+[DBG] |   |   |   |   + ChapterTimeStart=3991779000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:06:31.779
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=b
+[DBG] |   |   |   |   + ChapterTimeStart=4399312000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:13:19.312
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=c
+[DBG] |   |   |   |   + ChapterTimeStart=4807845000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:20:07.845
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=d
+[DBG] |   |   |   |   + ChapterTimeStart=5321149000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:28:41.149
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=e
+[DBG] |   |   |   |   + ChapterTimeStart=5754666000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:35:54.666
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=f
+[DBG] |   |   |   |   + ChapterTimeStart=6379081000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:46:19.081
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   |   |   + ChapterAtom (level=0)
+[DBG] |   |   |   |   + ChapterUID=10
+[DBG] |   |   |   |   + ChapterTimeStart=7074401000
+[DBG] |   |   |   |   + ChapterFlagHidden=no
+[DBG] |   |   |   |   + ChapterDisplay
+[DBG] |   |   |   |   |   + ChapterString=01:57:54.401
+[DBG] |   |   |   |   |   + ChapterLanguage=eng
+[DBG] |   + Void
+[DBG] |   + Information
+[DBG] |   + Tracks
+[DBG] |   + Void
+[DBG] |   + Chapters
+[DBG] |   + Void
+[DBG] |   + Cluster
+[DBG] Virtual chapter  00:00:00.000 from 0 to -1 - 
+[DBG] Virtual chapter  00:07:57.477 from 477477000 to -1 - 
+[DBG] Virtual chapter  00:15:29.595 from 929595000 to -1 - 
+[DBG] Virtual chapter  00:23:31.035 from 1411035000 to -1 - 
+[DBG] Virtual chapter  00:33:56.618 from 2036618000 to -1 - 
+[DBG] Virtual chapter  00:38:52.664 from 2332664000 to -1 - 
+[DBG] Virtual chapter  00:44:24.036 from 2664036000 to -1 - 
+[DBG] Virtual chapter  00:53:37.214 from 3217214000 to -1 - 
+[DBG] Virtual chapter  01:00:02.390 from 3602390000 to -1 - 
+[DBG] Virtual chapter  01:06:31.779 from 3991779000 to -1 - 
+[DBG] Virtual chapter  01:13:19.312 from 4399312000 to -1 - 
+[DBG] Virtual chapter  01:20:07.845 from 4807845000 to -1 - 
+[DBG] Virtual chapter  01:28:41.149 from 5321149000 to -1 - 
+[DBG] Virtual chapter  01:35:54.666 from 5754666000 to -1 - 
+[DBG] Virtual chapter  01:46:19.081 from 6379081000 to -1 - 
+[DBG] Virtual chapter  01:57:54.401 from 7074401000 to -1 - 
+[DBG] Virtual chapter  from 0 to -1 - 
+[DBG] NEW START CHAPTER uid=1
+[DBG] found 8 es
+[DBG] selecting program id=0
+[DBG] ES track added: 'video/1' (fourcc: 'hevc')
+[DBG] ES track added: 'audio/2' (fourcc: 'dts ')
+[DBG] ES track added: 'spu/3' (fourcc: 'subt')
+9:42:21.491 AM [player] track added video/1 type=1
+[DBG] ES track added: 'spu/4' (fourcc: 'subt')
+[DBG] ES track added: 'spu/5' (fourcc: 'bdpg')
+[DBG] ES track added: 'spu/6' (fourcc: 'bdpg')
+[DBG] ES track added: 'spu/7' (fourcc: 'bdpg')
+[DBG] ES track added: 'spu/8' (fourcc: 'bdpg')
+[DBG] seek: preroll{ track: 1, pts: 0, fpos: 8744 skip: 8744} 
+9:42:21.492 AM [player] track added audio/2 type=0
+[DBG] seek: preroll{ req: 1, start-pts: 1, start-fpos: 8744} 
+[DBG] using demux module "mkv"
+9:42:21.492 AM [player] track added spu/3 type=2
+[DBG] looking for video decoder module matching "any": 14 candidates
+9:42:21.492 AM [player] track added spu/4 type=2
+9:42:21.492 AM [player] track added spu/5 type=2
+9:42:21.492 AM [player] track added spu/6 type=2
+9:42:21.492 AM [player] track added spu/7 type=2
+9:42:21.492 AM [player] track added spu/8 type=2
+9:42:21.492 AM [player] length 8379371 ms
+[DBG] vout: none found
+[DBG] vout change: decoder size
+[DBG] vout change: visible size
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] 32x32 (32x32) chroma: YUVA colorspace: Undefined -> 16x16 (16x16) chroma: RGBA colorspace: Undefined with scaling using Bicubic (good quality)
+[DBG] using video converter module "swscale"
+[DBG] looking for video converter module matching "any": 13 candidates
+[DBG] YUVP to YUVA converter
+[DBG] using video converter module "yuvp"
+[DBG] Deinterlacing available
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] looking for vout window module matching "any": 2 candidates
+[DBG] resized to 1920x1080
+[DBG] using vout window module "uiview_window"
+[DBG] looking for inhibit module matching "any": 1 candidates
+[DBG] using inhibit module "uikit_inhibit"
+[DBG] looking for decoder device module matching "any": 1 candidates
+[DBG] using decoder device module "videotoolbox"
+[DBG] new VPS parsed: 0
+[DBG] new SPS parsed: 0
+[DBG] new PPS parsed: 0
+[WARN] forcing output chroma (kCVPixelFormatType): x420
+[INF] Using Video Toolbox to decode 'hevc'
+[DBG] using video decoder module "videotoolbox"
+[DBG] ES track selected: 'video/1' (fourcc: 'hevc')
+[DBG] looking for audio packetizer module matching "any": 11 candidates
+[DBG] using audio packetizer module "dts"
+[DBG] looking for audio decoder module matching "any": 15 candidates
+[DBG] reusing audio output
+[WARN] failed to start passthrough audio output, failing back to linear format
+9:42:21.509 AM [player] track selected type=1 selected=video/1 unselected=
+[DBG] keeping audio output
+[DBG] using Lavc63.1.100
+[DBG] CPU flags: 0x00062360
+[DBG] codec (dca) started
+[DBG] using audio decoder module "avcodec"
+[DBG] ES track selected: 'audio/2' (fourcc: 'dts ')
+[DBG] looking for meta reader module matching "any": 1 candidates
+[DBG] no meta reader modules matched with name any
+9:42:21.510 AM [player] track selected type=0 selected=audio/2 unselected=
+[DBG] `http://192.168.1.250:8093/stream/1' successfully opened
+9:42:21.510 AM [player] state Playing at 0 ms
+[DBG] program(0): using clock source: 'audio'
+[DBG] Buffering 0%
+9:42:21.510 AM [player] buffering 0.0
+[DBG] new PPS parsed: 0
+[DBG] DTS samplerate:48000 bitrate:1536000
+[DBG] restarting module due to input format change
+[DBG] 'decoder in/packetizer out' i_channels 8 / 6
+[DBG] 'decoder in/packetizer out' i_physical_channels 0 / 4199
+[DBG] 'decoder in/packetizer out' profile -1 / 1
+[DBG] removing "audio decoder" module "avcodec"
+[DBG] looking for audio decoder module matching "any": 15 candidates
+[DBG] reusing audio output
+[WARN] failed to start passthrough audio output, failing back to linear format
+[DBG] keeping audio output
+[DBG] using Lavc63.1.100
+[DBG] CPU flags: 0x00062360
+[DBG] codec (dca) started
+[DBG] using audio decoder module "avcodec"
+[DBG] Buffering 4%
+[DBG] Buffering 12%
+[DBG] reusing audio output
+[DBG] Buffering 16%
+[DBG] Buffering 33%
+[DBG] Buffering 37%
+[DBG] Buffering 54%
+[DBG] Buffering 58%
+[DBG] Buffering 70%
+[DBG] Buffering 75%
+[DBG] Buffering 87%
+[DBG] session accepted first frame 1
+[DBG] output chroma (kCVPixelFormatType): x420
+[DBG] vout change: chroma
+[DBG] requested window size: 3840x1600
+[DBG] deinterlace -1, mode auto, is_needed 0
+[DBG] Opening vout display wrapper
+[DBG] looking for vout display module matching "any": 3 candidates
+[DBG] using vout display module "samplebufferdisplay"
+[DBG] original format sz 3840x1600, of (0,0), vsz 3840x1600, 4cc CVPP, sar 1:1, orient: normal
+[DBG] removing "text renderer" module "freetype"
+[DBG] looking for text renderer module matching "freetype": 2 candidates
+[DBG] using text renderer module "freetype"
+[DBG] requested window size: 3840x1600
+[DBG] resetting projection_mode to 0
+[DBG] setting projection_mode to 0
+[DBG] Buffering 99%
+[DBG] Stream buffering done (1001 ms in 20 ms)
+9:42:21.530 AM [player] buffering 1.0
+[DBG] Received first picture
+[DBG] resized to 3840x2160
+[DBG] Output on HDMI, channel count: 8
+[DBG] swapping Surround and RearSurround channels for 7.1 Rear Surround
+[DBG] VLC keeping the same input layout
+[DBG] output 'f32l' 48000 Hz 3F2M2R/LFE frame=1 samples/32 bytes
+[DBG] looking for audio volume module matching "any": 2 candidates
+[DBG] using audio volume module "float_mixer"
+[DBG] input 's32l' 48000 Hz 3F2M2R/LFE frame=1 samples/32 bytes
+[DBG] looking for audio filter module matching "scaletempo": 1 candidates
+[DBG] format: 48000 rate, 8 nch, 4 bps, fl32
+[DBG] params: 30 stride, 0.200 overlap, 14 search
+[DBG] 1.000 scale, 1440.000 stride_in, 1440 stride_out, 1152 standing, 288 overlap, 672 search, 2400 queue, fl32 mode
+[DBG] using audio filter module "scaletempo"
+[DBG] conversion: 's32l'->'f32l' 48000 Hz->48000 Hz 3F2M2R/LFE->3F2M2R/LFE
+[DBG] looking for audio converter module matching "any": 8 candidates
+[DBG] s32l->f32l, bits per sample: 32->32
+[DBG] using audio converter module "audio_format"
+[DBG] conversion pipeline complete
+[DBG] conversion: 'f32l'->'f32l' 48000 Hz->48000 Hz 3F2M2R/LFE->3F2M2R/LFE
+[DBG] conversion pipeline complete
+[DBG] looking for audio resampler module matching "soxr": 2 candidates
+[DBG] Using SoX Resampler with 'cr32s' engine and 'Medium 16-bit with medium roll-off' quality to convert f32l/48000Hz to f32l/48000Hz.
+[DBG] using audio resampler module "soxr"
+[DBG] Decoder wait done in 32 ms
+[DBG] deferring start (90321 us)
+[DBG] deferring start (75766 us)
+[DBG] deferring start (64890 us)
+[DBG] deferring start (64675 us)
+[DBG] deferring start (64477 us)
+[DBG] deferring start (64277 us)
+[DBG] deferring start (64076 us)
+[DBG] deferring start (63856 us)
+[DBG] deferring start (63661 us)
+[DBG] deferring start (63473 us)
+[DBG] deferring start (63223 us)
+[DBG] deferring start (62852 us)
+[DBG] deferring start (62635 us)
+[DBG] deferring start (62478 us)
+[DBG] deferring start (62286 us)
+[DBG] deferring start (62090 us)
+[DBG] deferring start (61889 us)
+[DBG] deferring start (61978 us)
+[DBG] deferring start (61749 us)
+[DBG] deferring start (61483 us)
+[DBG] deferring start (61316 us)
+[DBG] deferring start (61194 us)
+[DBG] deferring start (61067 us)
+[DBG] deferring start (60946 us)
+[DBG] deferring start (60825 us)
+[DBG] deferring start (60701 us)
+[DBG] deferring start (60582 us)
+[DBG] deferring start (60463 us)
+[DBG] deferring start (60343 us)
+[DBG] deferring start (60227 us)
+[DBG] deferring start (60080 us)
+[DBG] deferring start (59911 us)
+[DBG] deferring start (59718 us)
+[DBG] deferring start (59489 us)
+[DBG] deferring start (59342 us)
+[DBG] deferring start (59160 us)
+[DBG] deferring start (58998 us)
+[DBG] deferring start (58833 us)
+[DBG] deferring start (58696 us)
+[DBG] deferring start (58556 us)
+[DBG] deferring start (58385 us)
+[DBG] deferring start (58274 us)
+[DBG] deferring start (58170 us)
+[DBG] deferring start (58067 us)
+[DBG] deferring start (57953 us)
+[DBG] deferring start (57833 us)
+[DBG] deferring start (57722 us)
+[DBG] deferring start (57554 us)
+[DBG] deferring start (57443 us)
+[DBG] deferring start (57336 us)
+[DBG] deferring start (57235 us)
+[DBG] deferring start (57140 us)
+[DBG] deferring start (57037 us)
+[DBG] deferring start (56935 us)
+[DBG] deferring start (56819 us)
+[DBG] deferring start (56720 us)
+[DBG] deferring start (56618 us)
+[DBG] deferring start (56518 us)
+[DBG] deferring start (56416 us)
+[DBG] deferring start (56313 us)
+[DBG] deferring start (56195 us)
+[DBG] deferring start (56015 us)
+[DBG] deferring start (66453 us)
+[DBG] deferring start (55639 us)
+[DBG] deferring start (55527 us)
+[DBG] deferring start (55429 us)
+[DBG] deferring start (55332 us)
+[DBG] deferring start (55232 us)
+[DBG] deferring start (55134 us)
+[DBG] deferring start (55038 us)
+[DBG] deferring start (54942 us)
+[DBG] deferring start (54841 us)
+[DBG] deferring start (54740 us)
+[DBG] deferring start (54636 us)
+[DBG] deferring start (54534 us)
+[DBG] deferring start (54424 us)
+[DBG] deferring start (54287 us)
+[DBG] deferring start (54192 us)
+[DBG] deferring start (54078 us)
+[DBG] deferring start (53969 us)
+[DBG] deferring start (53844 us)
+[DBG] deferring start (53712 us)
+[DBG] deferring start (53602 us)
+[DBG] deferring start (53484 us)
+[DBG] deferring start (53394 us)
+[DBG] deferring start (53302 us)
+[DBG] deferring start (53191 us)
+[DBG] deferring start (53094 us)
+[DBG] deferring start (52999 us)
+[DBG] deferring start (52907 us)
+[DBG] deferring start (52812 us)
+[DBG] deferring start (52700 us)
+[DBG] deferring start (52575 us)
+[DBG] deferring start (52468 us)
+[DBG] deferring start (52373 us)
+[DBG] deferring start (52208 us)
+[DBG] deferring start (52045 us)
+[DBG] deferring start (62499 us)
+[DBG] deferring start (51740 us)
+[DBG] deferring start (51636 us)
+[DBG] deferring start (51542 us)
+[DBG] deferring start (51448 us)
+[DBG] deferring start (51352 us)
+[DBG] deferring start (51257 us)
+[DBG] deferring start (51159 us)
+[DBG] deferring start (51046 us)
+[DBG] deferring start (50948 us)
+[DBG] deferring start (50835 us)
+[DBG] deferring start (50729 us)
+[DBG] deferring start (50645 us)
+[DBG] deferring start (50546 us)
+[DBG] deferring start (50393 us)
+[DBG] deferring start (50294 us)
+[DBG] deferring start (50215 us)
+[DBG] deferring start (50126 us)
+[DBG] started
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] ES_OUT_RESET_PCR called
+9:42:52.820 AM [skip] +30 s (click) before=30654 ms target=60654 ms
+9:42:52.830 AM [player] buffering 0.0
+[DBG] SET_TIME to 60654000
+[DBG] seek request to i_pos = 60654000
+[DBG] seek: preroll{ track: 1, pts: 54763000, fpos: 43978329 skip: 43978329} 
+[DBG] seek: preroll{ req: 60654001, start-pts: 54763001, start-fpos: 43978329} 
+[DBG] Buffering 0%
+9:42:52.947 AM [player] buffering 0.0
+[DBG] Buffering 1%
+[DBG] Buffering 2%
+[DBG] Buffering 4%
+[DBG] Buffering 6%
+[DBG] Buffering 7%
+[DBG] Buffering 9%
+[DBG] Buffering 12%
+[DBG] Buffering 14%
+[DBG] Buffering 15%
+[DBG] Buffering 17%
+[DBG] Buffering 18%
+[DBG] Buffering 19%
+[DBG] Buffering 20%
+[DBG] Buffering 22%
+[DBG] Buffering 23%
+[DBG] Buffering 24%
+[DBG] Buffering 25%
+[DBG] Buffering 27%
+[DBG] Buffering 29%
+[DBG] Buffering 30%
+[DBG] Buffering 32%
+[DBG] Buffering 33%
+[DBG] Buffering 35%
+[DBG] Buffering 36%
+[DBG] Buffering 37%
+[DBG] Buffering 38%
+[DBG] Buffering 39%
+[DBG] Buffering 41%
+[DBG] Buffering 42%
+[DBG] Buffering 44%
+[DBG] Buffering 46%
+[DBG] Buffering 47%
+[DBG] Buffering 49%
+[DBG] Buffering 51%
+[DBG] Buffering 52%
+[DBG] Buffering 53%
+[DBG] Buffering 54%
+[DBG] Buffering 56%
+[DBG] Buffering 58%
+[DBG] Buffering 59%
+[DBG] Buffering 61%
+[DBG] Buffering 63%
+[DBG] Buffering 64%
+[DBG] Buffering 65%
+[DBG] Buffering 66%
+[DBG] Buffering 68%
+[DBG] Buffering 70%
+[DBG] Buffering 71%
+[DBG] Buffering 73%
+[DBG] Buffering 75%
+[DBG] Buffering 76%
+[DBG] Buffering 78%
+[DBG] Buffering 80%
+[DBG] Buffering 81%
+[DBG] Buffering 82%
+[DBG] end of audio preroll
+[DBG] Buffering 83%
+[DBG] Buffering 85%
+9:42:53.360 AM [skip] after=60654 ms
+[DBG] Buffering 87%
+[DBG] Buffering 88%
+[DBG] Buffering 90%
+[DBG] Buffering 92%
+[DBG] Buffering 93%
+[DBG] Buffering 95%
+[DBG] Buffering 97%
+[DBG] Buffering 98%
+[DBG] Buffering 99%
+[DBG] Stream buffering done (6923 ms in 497 ms)
+9:42:53.445 AM [player] buffering 1.0
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Decoder wait done in 74 ms
+[DBG] deferring start (78507 us)
+[DBG] deferring start (58026 us)
+[DBG] deferring start (57256 us)
+[DBG] deferring start (77133 us)
+[DBG] deferring start (66038 us)
+[DBG] deferring start (54862 us)
+[DBG] deferring start (54263 us)
+[DBG] deferring start (53532 us)
+[DBG] deferring start (52568 us)
+[DBG] deferring start (52286 us)
+[DBG] deferring start (51975 us)
+[DBG] deferring start (51670 us)
+[DBG] deferring start (51387 us)
+[DBG] deferring start (51096 us)
+[DBG] deferring start (50820 us)
+[DBG] deferring start (50528 us)
+[DBG] deferring start (50110 us)
+[DBG] deferring start (49137 us)
+[DBG] deferring start (77024 us)
+[DBG] deferring start (66068 us)
+[DBG] deferring start (55102 us)
+[DBG] deferring start (44229 us)
+[DBG] deferring start (44015 us)
+[DBG] deferring start (43771 us)
+[DBG] deferring start (43510 us)
+[DBG] deferring start (43266 us)
+[DBG] deferring start (43023 us)
+[DBG] deferring start (42769 us)
+[DBG] deferring start (42485 us)
+[DBG] deferring start (42088 us)
+[DBG] deferring start (41797 us)
+[DBG] deferring start (41556 us)
+[DBG] deferring start (41238 us)
+[DBG] deferring start (40852 us)
+[DBG] deferring start (40577 us)
+[DBG] deferring start (40236 us)
+[DBG] deferring start (39939 us)
+[DBG] deferring start (39594 us)
+[DBG] deferring start (39274 us)
+[DBG] deferring start (38928 us)
+[DBG] deferring start (38590 us)
+[DBG] deferring start (38282 us)
+[DBG] deferring start (37915 us)
+[DBG] deferring start (37615 us)
+[DBG] deferring start (37308 us)
+[DBG] deferring start (36973 us)
+[DBG] deferring start (36668 us)
+[DBG] deferring start (36366 us)
+[DBG] deferring start (35987 us)
+[DBG] deferring start (35682 us)
+[DBG] deferring start (35379 us)
+[DBG] deferring start (35031 us)
+[DBG] deferring start (34710 us)
+[DBG] deferring start (34304 us)
+[DBG] deferring start (34002 us)
+[DBG] deferring start (33673 us)
+[DBG] deferring start (33341 us)
+[DBG] deferring start (33073 us)
+[DBG] deferring start (32806 us)
+[DBG] deferring start (32503 us)
+[DBG] deferring start (32187 us)
+[DBG] deferring start (31927 us)
+[DBG] deferring start (31632 us)
+[DBG] deferring start (31372 us)
+[DBG] deferring start (31061 us)
+[DBG] deferring start (30789 us)
+[DBG] deferring start (30542 us)
+[DBG] deferring start (30252 us)
+[DBG] deferring start (29857 us)
+[DBG] deferring start (29675 us)
+[DBG] deferring start (29410 us)
+[DBG] deferring start (29092 us)
+[DBG] deferring start (28832 us)
+[DBG] deferring start (28493 us)
+[DBG] deferring start (28270 us)
+[DBG] deferring start (28001 us)
+[DBG] deferring start (27696 us)
+[DBG] deferring start (27445 us)
+[DBG] deferring start (27174 us)
+[DBG] deferring start (26824 us)
+[DBG] deferring start (26575 us)
+[DBG] deferring start (26298 us)
+[DBG] deferring start (26020 us)
+[DBG] deferring start (25739 us)
+[DBG] deferring start (25463 us)
+[DBG] deferring start (25068 us)
+[DBG] deferring start (24875 us)
+[DBG] deferring start (24641 us)
+[DBG] deferring start (24403 us)
+[DBG] deferring start (24148 us)
+[DBG] deferring start (23862 us)
+[DBG] deferring start (23630 us)
+[DBG] deferring start (23369 us)
+[DBG] deferring start (23135 us)
+[DBG] deferring start (22830 us)
+[DBG] deferring start (22636 us)
+[DBG] deferring start (22294 us)
+[DBG] deferring start (22130 us)
+[DBG] deferring start (21862 us)
+[DBG] deferring start (21619 us)
+[DBG] deferring start (21384 us)
+[DBG] deferring start (21117 us)
+[DBG] deferring start (20867 us)
+[DBG] deferring start (20612 us)
+[DBG] deferring start (20388 us)
+[DBG] deferring start (20116 us)
+[DBG] deferring start (19902 us)
+[DBG] deferring start (19606 us)
+[DBG] deferring start (19397 us)
+[DBG] deferring start (19161 us)
+[DBG] deferring start (18916 us)
+[DBG] deferring start (18626 us)
+[DBG] deferring start (18422 us)
+[DBG] deferring start (18186 us)
+[DBG] deferring start (17947 us)
+[DBG] deferring start (17665 us)
+[DBG] deferring start (17508 us)
+[DBG] deferring start (17313 us)
+[DBG] deferring start (9370 us)
+[DBG] deferring start (9150 us)
+[DBG] deferring start (8914 us)
+[DBG] deferring start (8610 us)
+[DBG] deferring start (8391 us)
+[DBG] deferring start (8138 us)
+[DBG] deferring start (7911 us)
+[DBG] deferring start (7685 us)
+[DBG] deferring start (7496 us)
+[DBG] deferring start (7288 us)
+[DBG] deferring start (7062 us)
+[DBG] deferring start (6860 us)
+[DBG] deferring start (6663 us)
+[DBG] deferring start (6422 us)
+[DBG] deferring start (6249 us)
+[DBG] deferring start (6047 us)
+[DBG] started
+[DBG] picture displayed late (missing 8 ms)
+[DBG] ES_OUT_RESET_PCR called
+9:42:54.061 AM [skip] +30 s (click) before=60654 ms target=90654 ms
+9:42:54.065 AM [player] buffering 0.0
+[DBG] SET_TIME to 90654000
+[DBG] seek request to i_pos = 90654000
+[DBG] seek: preroll{ track: 1, pts: 84793000, fpos: 97414085 skip: 97414085} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=97414085-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 13117286078
+Content-Range: bytes 97414085-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:54 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 90654001, start-pts: 84793001, start-fpos: 97414085} 
+[DBG] Buffering 0%
+9:42:54.228 AM [player] buffering 0.0
+[DBG] Buffering 1%
+[DBG] Buffering 3%
+[DBG] Buffering 4%
+[DBG] Buffering 6%
+[DBG] Buffering 8%
+[DBG] Buffering 9%
+[DBG] Buffering 10%
+[DBG] Buffering 11%
+[DBG] Buffering 13%
+[DBG] Buffering 15%
+[DBG] Buffering 16%
+[DBG] Buffering 18%
+[DBG] Buffering 20%
+[DBG] Buffering 21%
+[DBG] Buffering 23%
+[DBG] Buffering 25%
+[DBG] Buffering 26%
+[DBG] Buffering 27%
+[DBG] Buffering 28%
+[DBG] Buffering 30%
+[DBG] Buffering 31%
+[DBG] Buffering 32%
+[DBG] Buffering 33%
+[DBG] Buffering 35%
+[DBG] Buffering 37%
+[DBG] Buffering 38%
+[DBG] Buffering 40%
+[DBG] Buffering 42%
+[DBG] Buffering 43%
+[DBG] Buffering 44%
+[DBG] Buffering 45%
+[DBG] Buffering 47%
+[DBG] Buffering 48%
+[DBG] Buffering 49%
+[DBG] Buffering 50%
+[DBG] Buffering 52%
+[DBG] Buffering 54%
+[DBG] Buffering 55%
+[DBG] Buffering 56%
+[DBG] Buffering 57%
+[DBG] Buffering 58%
+[DBG] Buffering 59%
+[DBG] Buffering 60%
+[DBG] Buffering 62%
+9:42:54.596 AM [skip] after=90654 ms
+[DBG] Buffering 64%
+[DBG] Buffering 65%
+[DBG] Buffering 66%
+[DBG] Buffering 67%
+[DBG] Buffering 69%
+[DBG] Buffering 71%
+[DBG] Buffering 72%
+[DBG] Buffering 74%
+[DBG] Buffering 76%
+[DBG] Buffering 77%
+[DBG] Buffering 79%
+[DBG] Buffering 80%
+[DBG] end of audio preroll
+[DBG] Buffering 81%
+[DBG] Buffering 83%
+[DBG] Buffering 84%
+[DBG] Buffering 86%
+[DBG] Buffering 88%
+[DBG] Buffering 89%
+[DBG] Buffering 91%
+[DBG] Buffering 93%
+[DBG] Buffering 95%
+[DBG] Buffering 97%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 99%
+[DBG] Stream buffering done (6881 ms in 610 ms)
+9:42:54.839 AM [player] buffering 1.0
+[DBG] Decoder wait done in 0 ms
+[DBG] deferring start (79846 us)
+[DBG] deferring start (61108 us)
+[DBG] deferring start (60468 us)
+[DBG] deferring start (59823 us)
+[DBG] deferring start (59249 us)
+[DBG] deferring start (58860 us)
+[DBG] deferring start (58537 us)
+[DBG] deferring start (58232 us)
+[DBG] deferring start (57928 us)
+[DBG] deferring start (57411 us)
+[DBG] deferring start (56972 us)
+[DBG] deferring start (56627 us)
+[DBG] deferring start (56310 us)
+[DBG] deferring start (56028 us)
+[DBG] deferring start (55625 us)
+[DBG] deferring start (55283 us)
+[DBG] deferring start (55042 us)
+[DBG] deferring start (54736 us)
+[DBG] deferring start (54415 us)
+[DBG] deferring start (54113 us)
+[DBG] deferring start (53599 us)
+[DBG] deferring start (53262 us)
+[DBG] deferring start (52441 us)
+[DBG] deferring start (51032 us)
+[DBG] deferring start (50505 us)
+[DBG] deferring start (50175 us)
+[DBG] deferring start (49674 us)
+[DBG] deferring start (49444 us)
+[DBG] deferring start (48314 us)
+[DBG] deferring start (47735 us)
+[DBG] deferring start (47491 us)
+[DBG] deferring start (47117 us)
+[DBG] deferring start (46706 us)
+[DBG] deferring start (46443 us)
+[DBG] deferring start (46091 us)
+[DBG] deferring start (45746 us)
+[DBG] deferring start (45353 us)
+[DBG] deferring start (45067 us)
+[DBG] deferring start (44658 us)
+[DBG] deferring start (44348 us)
+[DBG] deferring start (43997 us)
+[DBG] deferring start (43614 us)
+[DBG] deferring start (43304 us)
+[DBG] deferring start (42963 us)
+[DBG] deferring start (42587 us)
+[DBG] deferring start (42269 us)
+[DBG] deferring start (41946 us)
+[DBG] deferring start (41587 us)
+[DBG] deferring start (41267 us)
+[DBG] deferring start (40922 us)
+[DBG] deferring start (40580 us)
+[DBG] deferring start (40256 us)
+[DBG] deferring start (39912 us)
+[DBG] deferring start (39478 us)
+[DBG] deferring start (39216 us)
+[DBG] deferring start (38929 us)
+[DBG] deferring start (38619 us)
+[DBG] deferring start (38345 us)
+[DBG] deferring start (38044 us)
+[DBG] deferring start (37756 us)
+[DBG] deferring start (37486 us)
+[DBG] deferring start (37187 us)
+[DBG] deferring start (36917 us)
+[DBG] deferring start (36635 us)
+[DBG] deferring start (36274 us)
+[DBG] deferring start (36096 us)
+[DBG] deferring start (35814 us)
+[DBG] deferring start (35519 us)
+[DBG] deferring start (35248 us)
+[DBG] deferring start (34971 us)
+[DBG] deferring start (34674 us)
+[DBG] deferring start (34359 us)
+[DBG] deferring start (34089 us)
+[DBG] deferring start (33841 us)
+[DBG] deferring start (33415 us)
+[DBG] deferring start (33222 us)
+[DBG] deferring start (32945 us)
+[DBG] deferring start (32637 us)
+[DBG] deferring start (32318 us)
+[DBG] deferring start (32046 us)
+[DBG] deferring start (31789 us)
+[DBG] deferring start (31486 us)
+[DBG] deferring start (31151 us)
+[DBG] deferring start (30933 us)
+[DBG] deferring start (30665 us)
+[DBG] deferring start (30401 us)
+[DBG] deferring start (30146 us)
+[DBG] deferring start (29922 us)
+[DBG] deferring start (29651 us)
+[DBG] deferring start (29407 us)
+[DBG] deferring start (29174 us)
+[DBG] deferring start (28869 us)
+[DBG] deferring start (28630 us)
+[DBG] deferring start (28381 us)
+[DBG] deferring start (28134 us)
+[DBG] deferring start (27851 us)
+[DBG] deferring start (27536 us)
+[DBG] deferring start (27368 us)
+[DBG] deferring start (27125 us)
+[DBG] deferring start (26883 us)
+[DBG] deferring start (26634 us)
+[DBG] deferring start (26357 us)
+[DBG] deferring start (26038 us)
+[DBG] deferring start (25883 us)
+[DBG] deferring start (25616 us)
+[DBG] deferring start (25381 us)
+[DBG] deferring start (25124 us)
+[DBG] deferring start (24887 us)
+[DBG] deferring start (24639 us)
+[DBG] deferring start (24330 us)
+[DBG] deferring start (24124 us)
+[DBG] deferring start (23867 us)
+[DBG] deferring start (23658 us)
+[DBG] deferring start (23405 us)
+[DBG] deferring start (23197 us)
+[DBG] deferring start (22897 us)
+[DBG] deferring start (22680 us)
+[DBG] deferring start (22464 us)
+[DBG] deferring start (22259 us)
+[DBG] deferring start (21984 us)
+[DBG] deferring start (21818 us)
+[DBG] deferring start (21526 us)
+[DBG] deferring start (21382 us)
+[DBG] deferring start (21170 us)
+[DBG] deferring start (20936 us)
+[DBG] deferring start (20746 us)
+[DBG] deferring start (20517 us)
+[DBG] deferring start (20309 us)
+[DBG] deferring start (20091 us)
+[DBG] deferring start (19858 us)
+[DBG] deferring start (19659 us)
+[DBG] deferring start (19453 us)
+[DBG] deferring start (19234 us)
+[DBG] started
+[DBG] picture displayed late (missing 9 ms)
+[DBG] ES_OUT_RESET_PCR called
+9:42:55.288 AM [skip] +30 s (click) before=90654 ms target=120654 ms
+9:42:55.293 AM [player] buffering 0.0
+[DBG] SET_TIME to 120654000
+[DBG] seek request to i_pos = 120654000
+[DBG] seek: preroll{ track: 1, pts: 120537000, fpos: 185172437 skip: 185172437} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=185172437-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 13029527726
+Content-Range: bytes 185172437-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:55 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 120654001, start-pts: 120537001, start-fpos: 185172437} 
+[DBG] Buffering 0%
+9:42:55.536 AM [player] buffering 0.0
+[DBG] end of audio preroll
+[DBG] Buffering 3%
+[DBG] Buffering 11%
+[DBG] Buffering 14%
+[DBG] Buffering 29%
+[DBG] Buffering 33%
+[DBG] Buffering 44%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 48%
+[DBG] Buffering 59%
+[DBG] Buffering 63%
+[DBG] Buffering 74%
+[DBG] Buffering 78%
+[DBG] Buffering 93%
+[DBG] Buffering 97%
+[DBG] Stream buffering done (1210 ms in 86 ms)
+[DBG] Decoder wait done in 0 ms
+9:42:55.622 AM [player] buffering 1.0
+[DBG] deferring start (88553 us)
+[DBG] deferring start (69318 us)
+[DBG] deferring start (57875 us)
+[DBG] deferring start (56930 us)
+[DBG] deferring start (56073 us)
+[DBG] deferring start (55499 us)
+[DBG] deferring start (55319 us)
+[DBG] deferring start (55062 us)
+[DBG] deferring start (54751 us)
+[DBG] deferring start (54470 us)
+[DBG] deferring start (54194 us)
+[DBG] deferring start (53896 us)
+[DBG] deferring start (53524 us)
+[DBG] deferring start (53067 us)
+[DBG] deferring start (52708 us)
+[DBG] deferring start (52379 us)
+[DBG] deferring start (52097 us)
+[DBG] deferring start (51779 us)
+[DBG] deferring start (51475 us)
+[DBG] deferring start (51109 us)
+[DBG] deferring start (50686 us)
+[DBG] deferring start (50147 us)
+[DBG] deferring start (49615 us)
+[DBG] deferring start (48803 us)
+[DBG] deferring start (48273 us)
+[DBG] deferring start (48034 us)
+[DBG] deferring start (47562 us)
+[DBG] deferring start (47324 us)
+[DBG] deferring start (47066 us)
+[DBG] deferring start (46824 us)
+[DBG] deferring start (46543 us)
+[DBG] deferring start (46263 us)
+[DBG] deferring start (45976 us)
+[DBG] deferring start (45624 us)
+[DBG] deferring start (45242 us)
+[DBG] deferring start (45024 us)
+[DBG] deferring start (44589 us)
+[DBG] deferring start (44253 us)
+[DBG] deferring start (43950 us)
+[DBG] deferring start (43594 us)
+[DBG] deferring start (43255 us)
+[DBG] deferring start (42889 us)
+[DBG] deferring start (42565 us)
+[DBG] deferring start (42144 us)
+[DBG] deferring start (41792 us)
+[DBG] deferring start (41498 us)
+[DBG] deferring start (41159 us)
+[DBG] deferring start (40795 us)
+[DBG] deferring start (40449 us)
+[DBG] deferring start (40116 us)
+[DBG] deferring start (39708 us)
+[DBG] deferring start (39430 us)
+[DBG] deferring start (39091 us)
+[DBG] deferring start (38734 us)
+[DBG] deferring start (38394 us)
+[DBG] deferring start (38058 us)
+[DBG] deferring start (37593 us)
+[DBG] deferring start (37326 us)
+[DBG] deferring start (36982 us)
+[DBG] deferring start (36697 us)
+[DBG] deferring start (36404 us)
+[DBG] deferring start (36083 us)
+[DBG] deferring start (35817 us)
+[DBG] deferring start (35526 us)
+[DBG] deferring start (35232 us)
+[DBG] deferring start (34919 us)
+[DBG] deferring start (34656 us)
+[DBG] deferring start (34372 us)
+[DBG] deferring start (33990 us)
+[DBG] deferring start (33818 us)
+[DBG] deferring start (33518 us)
+[DBG] deferring start (33280 us)
+[DBG] deferring start (32900 us)
+[DBG] deferring start (32697 us)
+[DBG] deferring start (32412 us)
+[DBG] deferring start (32136 us)
+[DBG] deferring start (31840 us)
+[DBG] deferring start (31559 us)
+[DBG] deferring start (31292 us)
+[DBG] deferring start (30967 us)
+[DBG] deferring start (30775 us)
+[DBG] deferring start (30416 us)
+[DBG] deferring start (30161 us)
+[DBG] deferring start (29931 us)
+[DBG] deferring start (29667 us)
+[DBG] deferring start (29330 us)
+[DBG] deferring start (29077 us)
+[DBG] deferring start (28867 us)
+[DBG] deferring start (28604 us)
+[DBG] deferring start (28409 us)
+[DBG] deferring start (28105 us)
+[DBG] deferring start (27913 us)
+[DBG] deferring start (27684 us)
+[DBG] deferring start (27406 us)
+[DBG] deferring start (27184 us)
+[DBG] deferring start (26940 us)
+[DBG] deferring start (26602 us)
+[DBG] deferring start (26417 us)
+[DBG] deferring start (26194 us)
+[DBG] deferring start (25939 us)
+[DBG] deferring start (25703 us)
+[DBG] deferring start (25398 us)
+[DBG] deferring start (25214 us)
+[DBG] deferring start (24870 us)
+[DBG] deferring start (24717 us)
+[DBG] deferring start (24462 us)
+[DBG] deferring start (24221 us)
+[DBG] deferring start (23924 us)
+[DBG] deferring start (23722 us)
+[DBG] deferring start (23481 us)
+[DBG] deferring start (23262 us)
+[DBG] deferring start (23015 us)
+[DBG] deferring start (22781 us)
+[DBG] deferring start (22532 us)
+[DBG] deferring start (22293 us)
+[DBG] deferring start (22066 us)
+[DBG] deferring start (21813 us)
+[DBG] deferring start (21579 us)
+[DBG] deferring start (21345 us)
+[DBG] deferring start (21097 us)
+[DBG] deferring start (20844 us)
+[DBG] deferring start (20606 us)
+[DBG] deferring start (20390 us)
+[DBG] deferring start (20192 us)
+[DBG] deferring start (19983 us)
+[DBG] deferring start (19744 us)
+[DBG] deferring start (19553 us)
+[DBG] deferring start (19312 us)
+[DBG] deferring start (19130 us)
+[DBG] deferring start (18924 us)
+[DBG] deferring start (18730 us)
+[DBG] started
+9:42:55.826 AM [skip] after=120654 ms
+[DBG] ES_OUT_RESET_PCR called
+9:42:56.529 AM [skip] +30 s (click) before=120654 ms target=150654 ms
+9:42:56.536 AM [player] buffering 0.0
+[DBG] SET_TIME to 150654000
+[DBG] seek request to i_pos = 150654000
+[DBG] seek: preroll{ track: 1, pts: 145020000, fpos: 233860590 skip: 233860590} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=233860590-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 12980839573
+Content-Range: bytes 233860590-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:56 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 150654001, start-pts: 145020001, start-fpos: 233860590} 
+[DBG] Buffering 0%
+9:42:56.696 AM [player] buffering 0.0
+[DBG] Buffering 1%
+[DBG] Buffering 3%
+[DBG] Buffering 5%
+[DBG] Buffering 6%
+[DBG] Buffering 8%
+[DBG] Buffering 10%
+[DBG] Buffering 12%
+[DBG] Buffering 13%
+[DBG] Buffering 15%
+[DBG] Buffering 16%
+[DBG] Buffering 18%
+[DBG] Buffering 20%
+[DBG] Buffering 21%
+[DBG] Buffering 23%
+[DBG] Buffering 25%
+[DBG] Buffering 26%
+[DBG] Buffering 28%
+[DBG] Buffering 30%
+[DBG] Buffering 31%
+[DBG] Buffering 33%
+[DBG] Buffering 35%
+[DBG] Buffering 36%
+[DBG] Buffering 38%
+[DBG] Buffering 40%
+[DBG] Buffering 41%
+[DBG] Buffering 43%
+[DBG] Buffering 44%
+[DBG] Buffering 45%
+[DBG] Buffering 46%
+[DBG] Buffering 48%
+[DBG] Buffering 49%
+[DBG] Buffering 50%
+[DBG] Buffering 51%
+[DBG] Buffering 53%
+[DBG] Buffering 54%
+[DBG] Buffering 55%
+[DBG] Buffering 56%
+[DBG] Buffering 58%
+[DBG] Buffering 60%
+[DBG] Buffering 62%
+[DBG] Buffering 64%
+[DBG] Buffering 66%
+[DBG] Buffering 68%
+[DBG] Buffering 69%
+[DBG] Buffering 71%
+[DBG] Buffering 73%
+[DBG] Buffering 74%
+[DBG] Buffering 76%
+[DBG] Buffering 78%
+9:42:57.053 AM [skip] after=150654 ms
+[DBG] Buffering 79%
+[DBG] Buffering 81%
+[DBG] Buffering 83%
+[DBG] end of audio preroll
+[DBG] Buffering 85%
+[DBG] Buffering 86%
+[DBG] Buffering 88%
+[DBG] Buffering 90%
+[DBG] Buffering 91%
+[DBG] Buffering 93%
+[DBG] Buffering 95%
+[DBG] Buffering 96%
+[DBG] Buffering 98%
+[DBG] Stream buffering done (6673 ms in 419 ms)
+9:42:57.116 AM [player] buffering 1.0
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Decoder wait done in 140 ms
+[DBG] deferring start (89057 us)
+[DBG] deferring start (69598 us)
+[DBG] deferring start (57494 us)
+[DBG] deferring start (56983 us)
+[DBG] deferring start (56380 us)
+[DBG] deferring start (55590 us)
+[DBG] deferring start (55285 us)
+[DBG] deferring start (54870 us)
+[DBG] deferring start (54541 us)
+[DBG] deferring start (54244 us)
+[DBG] deferring start (53715 us)
+[DBG] deferring start (53008 us)
+[DBG] deferring start (52705 us)
+[DBG] deferring start (52358 us)
+[DBG] deferring start (52074 us)
+[DBG] deferring start (51599 us)
+[DBG] deferring start (51113 us)
+[DBG] deferring start (50833 us)
+[DBG] deferring start (50541 us)
+[DBG] deferring start (50162 us)
+[DBG] deferring start (49520 us)
+[DBG] deferring start (49134 us)
+[DBG] deferring start (48844 us)
+[DBG] deferring start (48271 us)
+[DBG] deferring start (47784 us)
+[DBG] deferring start (47584 us)
+[DBG] deferring start (47309 us)
+[DBG] deferring start (46996 us)
+[DBG] deferring start (46731 us)
+[DBG] deferring start (46455 us)
+[DBG] deferring start (45868 us)
+[DBG] deferring start (45103 us)
+[DBG] deferring start (44850 us)
+[DBG] deferring start (44557 us)
+[DBG] deferring start (44282 us)
+[DBG] deferring start (43890 us)
+[DBG] deferring start (43613 us)
+[DBG] deferring start (43304 us)
+[DBG] deferring start (42974 us)
+[DBG] deferring start (42630 us)
+[DBG] deferring start (42312 us)
+[DBG] deferring start (41913 us)
+[DBG] deferring start (41557 us)
+[DBG] deferring start (41213 us)
+[DBG] deferring start (40909 us)
+[DBG] deferring start (40521 us)
+[DBG] deferring start (40226 us)
+[DBG] deferring start (39871 us)
+[DBG] deferring start (39573 us)
+[DBG] deferring start (39228 us)
+[DBG] deferring start (38903 us)
+[DBG] deferring start (38559 us)
+[DBG] deferring start (38228 us)
+[DBG] deferring start (37871 us)
+[DBG] deferring start (37537 us)
+[DBG] deferring start (37144 us)
+[DBG] deferring start (36882 us)
+[DBG] deferring start (36516 us)
+[DBG] deferring start (36175 us)
+[DBG] deferring start (35914 us)
+[DBG] deferring start (35579 us)
+[DBG] deferring start (35320 us)
+[DBG] deferring start (35025 us)
+[DBG] deferring start (34696 us)
+[DBG] deferring start (34450 us)
+[DBG] deferring start (34173 us)
+[DBG] deferring start (33816 us)
+[DBG] deferring start (33557 us)
+[DBG] deferring start (33217 us)
+[DBG] deferring start (32973 us)
+[DBG] deferring start (32689 us)
+[DBG] deferring start (32372 us)
+[DBG] deferring start (32116 us)
+[DBG] deferring start (31862 us)
+[DBG] deferring start (31527 us)
+[DBG] deferring start (31253 us)
+[DBG] deferring start (31032 us)
+[DBG] deferring start (30716 us)
+[DBG] deferring start (30420 us)
+[DBG] deferring start (30159 us)
+[DBG] deferring start (29886 us)
+[DBG] deferring start (29494 us)
+[DBG] deferring start (29267 us)
+[DBG] deferring start (28961 us)
+[DBG] deferring start (28708 us)
+[DBG] deferring start (28337 us)
+[DBG] deferring start (28162 us)
+[DBG] deferring start (27943 us)
+[DBG] deferring start (27722 us)
+[DBG] deferring start (27415 us)
+[DBG] deferring start (27191 us)
+[DBG] deferring start (27001 us)
+[DBG] deferring start (26732 us)
+[DBG] deferring start (26519 us)
+[DBG] deferring start (26234 us)
+[DBG] deferring start (26030 us)
+[DBG] deferring start (25780 us)
+[DBG] deferring start (25489 us)
+[DBG] deferring start (25250 us)
+[DBG] deferring start (25022 us)
+[DBG] deferring start (24790 us)
+[DBG] deferring start (24483 us)
+[DBG] deferring start (24279 us)
+[DBG] deferring start (24022 us)
+[DBG] deferring start (23769 us)
+[DBG] deferring start (23522 us)
+[DBG] deferring start (23273 us)
+[DBG] deferring start (23027 us)
+[DBG] deferring start (22671 us)
+[DBG] deferring start (22488 us)
+[DBG] deferring start (22256 us)
+[DBG] deferring start (22014 us)
+[DBG] deferring start (21727 us)
+[DBG] deferring start (21522 us)
+[DBG] deferring start (21277 us)
+[DBG] deferring start (20936 us)
+[DBG] deferring start (20753 us)
+[DBG] deferring start (20530 us)
+[DBG] deferring start (20319 us)
+[DBG] deferring start (20002 us)
+[DBG] deferring start (19870 us)
+[DBG] deferring start (19636 us)
+[DBG] deferring start (19427 us)
+[DBG] started
+[DBG] ES_OUT_RESET_PCR called
+9:42:57.759 AM [skip] +30 s (click) before=150654 ms target=180654 ms
+9:42:57.768 AM [player] buffering 0.0
+[DBG] SET_TIME to 180654000
+[DBG] seek request to i_pos = 180654000
+[DBG] seek: preroll{ track: 1, pts: 179554000, fpos: 292983336 skip: 292983336} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=292983336-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 12921716827
+Content-Range: bytes 292983336-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:57 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 180654001, start-pts: 179554001, start-fpos: 292983336} 
+[DBG] Buffering 0%
+9:42:57.983 AM [player] buffering 0.0
+[DBG] Buffering 1%
+[DBG] Buffering 4%
+[DBG] Buffering 5%
+[DBG] Buffering 11%
+[DBG] Buffering 13%
+[DBG] Buffering 19%
+[DBG] Buffering 21%
+[DBG] Buffering 27%
+[DBG] Buffering 33%
+[DBG] Buffering 39%
+[DBG] Buffering 41%
+[DBG] Buffering 47%
+[DBG] end of audio preroll
+[DBG] Buffering 49%
+[DBG] Buffering 55%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 57%
+[DBG] Buffering 63%
+[DBG] Buffering 65%
+[DBG] Buffering 71%
+[DBG] Buffering 73%
+[DBG] Buffering 79%
+[DBG] Buffering 81%
+[DBG] Buffering 87%
+[DBG] Buffering 89%
+[DBG] Buffering 95%
+[DBG] Stream buffering done (2127 ms in 261 ms)
+9:42:58.244 AM [player] buffering 1.0
+[DBG] Decoder wait done in 0 ms
+[DBG] deferring start (98695 us)
+[DBG] deferring start (80091 us)
+[DBG] deferring start (69001 us)
+[DBG] deferring start (57995 us)
+[DBG] deferring start (57096 us)
+[DBG] deferring start (56079 us)
+[DBG] deferring start (55604 us)
+[DBG] deferring start (55220 us)
+[DBG] deferring start (54771 us)
+[DBG] deferring start (54162 us)
+[DBG] deferring start (53362 us)
+[DBG] deferring start (52109 us)
+[DBG] deferring start (51367 us)
+[DBG] deferring start (50538 us)
+[DBG] deferring start (49708 us)
+[DBG] deferring start (48758 us)
+[DBG] deferring start (47698 us)
+[DBG] deferring start (47401 us)
+[DBG] deferring start (47054 us)
+[DBG] deferring start (46783 us)
+[DBG] deferring start (46551 us)
+[DBG] deferring start (46322 us)
+[DBG] deferring start (45993 us)
+[DBG] deferring start (45723 us)
+[DBG] deferring start (45405 us)
+[DBG] deferring start (45160 us)
+[DBG] deferring start (44943 us)
+[DBG] deferring start (44668 us)
+[DBG] deferring start (54230 us)
+[DBG] deferring start (43335 us)
+[DBG] deferring start (43124 us)
+[DBG] deferring start (42774 us)
+[DBG] deferring start (42421 us)
+[DBG] deferring start (42088 us)
+[DBG] deferring start (41718 us)
+[DBG] deferring start (41229 us)
+[DBG] deferring start (40929 us)
+[DBG] deferring start (40579 us)
+[DBG] deferring start (40262 us)
+[DBG] deferring start (39938 us)
+[DBG] deferring start (39579 us)
+[DBG] deferring start (39238 us)
+[DBG] deferring start (38904 us)
+[DBG] deferring start (38562 us)
+[DBG] deferring start (38246 us)
+[DBG] deferring start (37859 us)
+[DBG] deferring start (37442 us)
+[DBG] deferring start (37181 us)
+[DBG] deferring start (36818 us)
+[DBG] deferring start (36451 us)
+[DBG] deferring start (36238 us)
+[DBG] deferring start (35963 us)
+[DBG] deferring start (35696 us)
+[DBG] deferring start (35393 us)
+[DBG] deferring start (35137 us)
+[DBG] deferring start (34842 us)
+[DBG] deferring start (34563 us)
+[DBG] deferring start (34260 us)
+[DBG] deferring start (33975 us)
+[DBG] deferring start (33689 us)
+[DBG] deferring start (33417 us)
+[DBG] deferring start (33135 us)
+[DBG] deferring start (32823 us)
+[DBG] deferring start (32583 us)
+[DBG] deferring start (32325 us)
+[DBG] deferring start (32014 us)
+[DBG] deferring start (31755 us)
+[DBG] deferring start (31489 us)
+[DBG] deferring start (31134 us)
+[DBG] deferring start (30914 us)
+[DBG] deferring start (30639 us)
+[DBG] deferring start (30345 us)
+[DBG] deferring start (30083 us)
+[DBG] deferring start (29788 us)
+[DBG] deferring start (29548 us)
+[DBG] deferring start (29233 us)
+[DBG] deferring start (28969 us)
+[DBG] deferring start (28722 us)
+[DBG] deferring start (28466 us)
+[DBG] deferring start (28083 us)
+[DBG] deferring start (27898 us)
+[DBG] deferring start (27619 us)
+[DBG] deferring start (27314 us)
+[DBG] deferring start (27087 us)
+[DBG] deferring start (26855 us)
+[DBG] deferring start (26626 us)
+[DBG] deferring start (26363 us)
+[DBG] deferring start (26137 us)
+[DBG] deferring start (25897 us)
+[DBG] deferring start (25658 us)
+[DBG] deferring start (25419 us)
+[DBG] deferring start (25157 us)
+[DBG] deferring start (24931 us)
+[DBG] deferring start (24686 us)
+[DBG] deferring start (24400 us)
+[DBG] deferring start (24218 us)
+[DBG] deferring start (23962 us)
+[DBG] deferring start (23748 us)
+[DBG] deferring start (23390 us)
+[DBG] deferring start (23238 us)
+[DBG] deferring start (22983 us)
+[DBG] deferring start (22761 us)
+[DBG] deferring start (22514 us)
+[DBG] deferring start (22222 us)
+[DBG] deferring start (22044 us)
+[DBG] deferring start (21745 us)
+[DBG] deferring start (21536 us)
+[DBG] deferring start (21311 us)
+[DBG] deferring start (21070 us)
+[DBG] deferring start (20823 us)
+[DBG] deferring start (20596 us)
+[DBG] deferring start (20377 us)
+[DBG] deferring start (20135 us)
+[DBG] deferring start (19814 us)
+[DBG] deferring start (19644 us)
+[DBG] deferring start (19425 us)
+[DBG] deferring start (19138 us)
+[DBG] deferring start (18958 us)
+[DBG] deferring start (18730 us)
+[DBG] deferring start (18462 us)
+[DBG] deferring start (18340 us)
+9:42:58.298 AM [skip] after=180654 ms
+[DBG] started
+[WARN] picture is too late to be displayed (missing 20 ms)
+[DBG] ES_OUT_RESET_PCR called
+9:42:58.996 AM [skip] +30 s (click) before=180654 ms target=210654 ms
+9:42:59.000 AM [player] buffering 0.0
+[DBG] SET_TIME to 210654000
+[DBG] seek request to i_pos = 210654000
+[DBG] seek: preroll{ track: 1, pts: 210001000, fpos: 359417945 skip: 359417945} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=359417945-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 12855282218
+Content-Range: bytes 359417945-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:42:59 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 210654001, start-pts: 210001001, start-fpos: 359417945} 
+[DBG] Buffering 0%
+9:42:59.172 AM [player] buffering 0.0
+[DBG] Buffering 2%
+[DBG] Buffering 7%
+[DBG] Buffering 10%
+[DBG] Buffering 17%
+[DBG] Buffering 20%
+[DBG] Buffering 27%
+[DBG] end of audio preroll
+[DBG] Buffering 30%
+[DBG] Buffering 37%
+[DBG] Buffering 40%
+[DBG] Buffering 50%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 53%
+[DBG] Buffering 63%
+[DBG] Buffering 65%
+[DBG] Buffering 73%
+[DBG] Buffering 75%
+[DBG] Buffering 85%
+[DBG] Buffering 88%
+[DBG] Buffering 98%
+[DBG] Stream buffering done (1668 ms in 136 ms)
+[DBG] Decoder wait done in 0 ms
+9:42:59.309 AM [player] buffering 1.0
+[DBG] deferring start (90553 us)
+[DBG] deferring start (73209 us)
+[DBG] deferring start (62155 us)
+[DBG] deferring start (61746 us)
+[DBG] deferring start (61024 us)
+[DBG] deferring start (60311 us)
+[DBG] deferring start (59549 us)
+[DBG] deferring start (59227 us)
+[DBG] deferring start (58966 us)
+[DBG] deferring start (58587 us)
+[DBG] deferring start (58045 us)
+[DBG] deferring start (57797 us)
+[DBG] deferring start (57444 us)
+[DBG] deferring start (56998 us)
+[DBG] deferring start (56518 us)
+[DBG] deferring start (56262 us)
+[DBG] deferring start (55884 us)
+[DBG] deferring start (55622 us)
+[DBG] deferring start (55315 us)
+[DBG] deferring start (55019 us)
+[DBG] deferring start (54701 us)
+[DBG] deferring start (54387 us)
+[DBG] deferring start (54069 us)
+[DBG] deferring start (53743 us)
+[DBG] deferring start (53345 us)
+[DBG] deferring start (52953 us)
+[DBG] deferring start (52708 us)
+[DBG] deferring start (52463 us)
+[DBG] deferring start (52236 us)
+[DBG] deferring start (51731 us)
+[DBG] deferring start (51515 us)
+[DBG] deferring start (51221 us)
+[DBG] deferring start (50768 us)
+[DBG] deferring start (50427 us)
+[DBG] deferring start (49960 us)
+[DBG] deferring start (49725 us)
+[DBG] deferring start (48921 us)
+[DBG] deferring start (48540 us)
+[DBG] deferring start (48183 us)
+[DBG] deferring start (47869 us)
+[DBG] deferring start (47391 us)
+[DBG] deferring start (47139 us)
+[DBG] deferring start (46782 us)
+[DBG] deferring start (46442 us)
+[DBG] deferring start (46137 us)
+[DBG] deferring start (45725 us)
+[DBG] deferring start (45434 us)
+[DBG] deferring start (45063 us)
+[DBG] deferring start (44723 us)
+[DBG] deferring start (44388 us)
+[DBG] deferring start (44104 us)
+[DBG] deferring start (43750 us)
+[DBG] deferring start (43417 us)
+[DBG] deferring start (43056 us)
+[DBG] deferring start (42725 us)
+[DBG] deferring start (42359 us)
+[DBG] deferring start (41954 us)
+[DBG] deferring start (41661 us)
+[DBG] deferring start (41340 us)
+[DBG] deferring start (41021 us)
+[DBG] deferring start (40735 us)
+[DBG] deferring start (40405 us)
+[DBG] deferring start (40179 us)
+[DBG] deferring start (39897 us)
+[DBG] deferring start (39619 us)
+[DBG] deferring start (39304 us)
+[DBG] deferring start (39061 us)
+[DBG] deferring start (38714 us)
+[DBG] deferring start (38478 us)
+[DBG] deferring start (38207 us)
+[DBG] deferring start (37891 us)
+[DBG] deferring start (37561 us)
+[DBG] deferring start (37288 us)
+[DBG] deferring start (36952 us)
+[DBG] deferring start (36738 us)
+[DBG] deferring start (36455 us)
+[DBG] deferring start (36188 us)
+[DBG] deferring start (35886 us)
+[DBG] deferring start (35603 us)
+[DBG] deferring start (35352 us)
+[DBG] deferring start (35076 us)
+[DBG] deferring start (34802 us)
+[DBG] deferring start (34541 us)
+[DBG] deferring start (34261 us)
+[DBG] deferring start (33982 us)
+[DBG] deferring start (33707 us)
+[DBG] deferring start (33403 us)
+[DBG] deferring start (33165 us)
+[DBG] deferring start (32933 us)
+[DBG] deferring start (32704 us)
+[DBG] deferring start (32442 us)
+[DBG] deferring start (32213 us)
+[DBG] deferring start (31962 us)
+[DBG] deferring start (31720 us)
+[DBG] deferring start (31476 us)
+[DBG] deferring start (31196 us)
+[DBG] deferring start (30996 us)
+[DBG] deferring start (30619 us)
+[DBG] deferring start (30447 us)
+[DBG] deferring start (30228 us)
+[DBG] deferring start (29974 us)
+[DBG] deferring start (29726 us)
+[DBG] deferring start (29493 us)
+[DBG] deferring start (29283 us)
+[DBG] deferring start (28956 us)
+[DBG] deferring start (28803 us)
+[DBG] deferring start (28551 us)
+[DBG] deferring start (28322 us)
+[DBG] deferring start (28036 us)
+[DBG] deferring start (27788 us)
+[DBG] deferring start (27508 us)
+[DBG] deferring start (27240 us)
+[DBG] deferring start (26965 us)
+[DBG] deferring start (26771 us)
+[DBG] deferring start (26589 us)
+[DBG] deferring start (26332 us)
+[DBG] deferring start (26159 us)
+[DBG] deferring start (25953 us)
+[DBG] deferring start (25725 us)
+[DBG] deferring start (25525 us)
+[DBG] deferring start (25327 us)
+[DBG] deferring start (25057 us)
+[DBG] deferring start (24880 us)
+[DBG] deferring start (24673 us)
+[DBG] deferring start (24461 us)
+[DBG] deferring start (24282 us)
+[DBG] deferring start (24069 us)
+[DBG] deferring start (23859 us)
+[DBG] deferring start (23607 us)
+[DBG] deferring start (23426 us)
+[DBG] deferring start (23156 us)
+[DBG] deferring start (22995 us)
+[DBG] started
+[DBG] picture displayed late (missing 11 ms)
+9:42:59.501 AM [skip] after=210654 ms
+[DBG] ES_OUT_RESET_PCR called
+9:43:00.226 AM [skip] +30 s (click) before=210654 ms target=240654 ms
+9:43:00.230 AM [player] buffering 0.0
+[DBG] SET_TIME to 240654000
+[DBG] seek request to i_pos = 240654000
+[DBG] seek: preroll{ track: 1, pts: 235402000, fpos: 400716196 skip: 400716196} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=400716196-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 12813983967
+Content-Range: bytes 400716196-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:43:00 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 240654001, start-pts: 235402001, start-fpos: 400716196} 
+[DBG] Buffering 0%
+9:43:00.391 AM [player] buffering 0.0
+[DBG] Buffering 1%
+[DBG] Buffering 2%
+[DBG] Buffering 4%
+[DBG] Buffering 5%
+[DBG] Buffering 7%
+[DBG] Buffering 8%
+[DBG] Buffering 9%
+[DBG] Buffering 10%
+[DBG] Buffering 12%
+[DBG] Buffering 13%
+[DBG] Buffering 15%
+[DBG] Buffering 16%
+[DBG] Buffering 18%
+[DBG] Buffering 20%
+[DBG] Buffering 21%
+[DBG] Buffering 23%
+[DBG] Buffering 24%
+[DBG] Buffering 26%
+[DBG] Buffering 28%
+[DBG] Buffering 29%
+[DBG] Buffering 31%
+[DBG] Buffering 32%
+[DBG] Buffering 34%
+[DBG] Buffering 36%
+[DBG] Buffering 37%
+[DBG] Buffering 39%
+[DBG] Buffering 40%
+[DBG] Buffering 42%
+[DBG] Buffering 44%
+[DBG] Buffering 45%
+[DBG] Buffering 47%
+[DBG] Buffering 48%
+[DBG] Buffering 50%
+[DBG] Buffering 52%
+[DBG] Buffering 53%
+[DBG] Buffering 55%
+[DBG] Buffering 56%
+[DBG] Buffering 58%
+[DBG] Buffering 60%
+[DBG] Buffering 61%
+[DBG] Buffering 63%
+[DBG] Buffering 64%
+[DBG] Buffering 66%
+[DBG] Buffering 68%
+[DBG] Buffering 69%
+[DBG] Buffering 71%
+[DBG] Buffering 72%
+[DBG] Buffering 74%
+[DBG] Buffering 76%
+[DBG] Buffering 77%
+[DBG] Buffering 79%
+[DBG] Buffering 80%
+[DBG] Buffering 82%
+[DBG] end of audio preroll
+[DBG] Buffering 84%
+[DBG] Buffering 85%
+[DBG] Buffering 87%
+[DBG] Buffering 88%
+9:43:00.756 AM [skip] after=240654 ms
+[DBG] Buffering 89%
+[DBG] Buffering 90%
+[DBG] Buffering 91%
+[DBG] Buffering 93%
+[DBG] Buffering 94%
+[DBG] Buffering 96%
+[DBG] Buffering 98%
+[DBG] Buffering 99%
+[DBG] Stream buffering done (6339 ms in 411 ms)
+9:43:00.803 AM [player] buffering 1.0
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Decoder wait done in 116 ms
+[DBG] deferring start (98767 us)
+[DBG] deferring start (80821 us)
+[DBG] deferring start (69750 us)
+[DBG] deferring start (58730 us)
+[DBG] deferring start (58218 us)
+[DBG] deferring start (56632 us)
+[DBG] deferring start (66492 us)
+[DBG] deferring start (55428 us)
+[DBG] deferring start (65410 us)
+[DBG] deferring start (54455 us)
+[DBG] deferring start (53863 us)
+[DBG] deferring start (63482 us)
+[DBG] deferring start (52335 us)
+[DBG] deferring start (52074 us)
+[DBG] deferring start (51719 us)
+[DBG] deferring start (51407 us)
+[DBG] deferring start (51072 us)
+[DBG] deferring start (50772 us)
+[DBG] deferring start (50445 us)
+[DBG] deferring start (50126 us)
+[DBG] deferring start (49798 us)
+[DBG] deferring start (49392 us)
+[DBG] deferring start (49038 us)
+[DBG] deferring start (48741 us)
+[DBG] deferring start (48445 us)
+[DBG] deferring start (48132 us)
+[DBG] deferring start (47852 us)
+[DBG] deferring start (47598 us)
+[DBG] deferring start (47372 us)
+[DBG] deferring start (47108 us)
+[DBG] deferring start (46814 us)
+[DBG] deferring start (46580 us)
+[DBG] deferring start (46337 us)
+[DBG] deferring start (46056 us)
+[DBG] deferring start (45761 us)
+[DBG] deferring start (45033 us)
+[DBG] deferring start (44795 us)
+[DBG] deferring start (44580 us)
+[DBG] deferring start (44364 us)
+[DBG] deferring start (44102 us)
+[DBG] deferring start (43778 us)
+[DBG] deferring start (43483 us)
+[DBG] deferring start (43165 us)
+[DBG] deferring start (42821 us)
+[DBG] deferring start (42479 us)
+[DBG] deferring start (42116 us)
+[DBG] deferring start (41790 us)
+[DBG] deferring start (41457 us)
+[DBG] deferring start (41095 us)
+[DBG] deferring start (40752 us)
+[DBG] deferring start (40417 us)
+[DBG] deferring start (40071 us)
+[DBG] deferring start (39653 us)
+[DBG] deferring start (39334 us)
+[DBG] deferring start (39045 us)
+[DBG] deferring start (38709 us)
+[DBG] deferring start (38341 us)
+[DBG] deferring start (38018 us)
+[DBG] deferring start (37711 us)
+[DBG] deferring start (37427 us)
+[DBG] deferring start (37133 us)
+[DBG] deferring start (36881 us)
+[DBG] deferring start (36581 us)
+[DBG] deferring start (36327 us)
+[DBG] deferring start (36030 us)
+[DBG] deferring start (35688 us)
+[DBG] deferring start (35476 us)
+[DBG] deferring start (35202 us)
+[DBG] deferring start (34965 us)
+[DBG] deferring start (34676 us)
+[DBG] deferring start (34374 us)
+[DBG] deferring start (34015 us)
+[DBG] deferring start (33657 us)
+[DBG] deferring start (33387 us)
+[DBG] deferring start (33086 us)
+[DBG] deferring start (32804 us)
+[DBG] deferring start (32549 us)
+[DBG] deferring start (32239 us)
+[DBG] deferring start (31993 us)
+[DBG] deferring start (31724 us)
+[DBG] deferring start (31443 us)
+[DBG] deferring start (31191 us)
+[DBG] deferring start (30871 us)
+[DBG] deferring start (30650 us)
+[DBG] deferring start (30352 us)
+[DBG] deferring start (30085 us)
+[DBG] deferring start (29746 us)
+[DBG] deferring start (29473 us)
+[DBG] deferring start (29186 us)
+[DBG] deferring start (28871 us)
+[DBG] deferring start (28623 us)
+[DBG] deferring start (28337 us)
+[DBG] deferring start (28004 us)
+[DBG] deferring start (27785 us)
+[DBG] deferring start (27574 us)
+[DBG] deferring start (27343 us)
+[DBG] deferring start (27095 us)
+[DBG] deferring start (26844 us)
+[DBG] deferring start (26587 us)
+[DBG] deferring start (26389 us)
+[DBG] deferring start (26159 us)
+[DBG] deferring start (25866 us)
+[DBG] deferring start (25657 us)
+[DBG] deferring start (25430 us)
+[DBG] deferring start (25216 us)
+[DBG] deferring start (24999 us)
+[DBG] deferring start (24752 us)
+[DBG] deferring start (24535 us)
+[DBG] deferring start (24299 us)
+[DBG] deferring start (24048 us)
+[DBG] deferring start (23780 us)
+[DBG] deferring start (23596 us)
+[DBG] deferring start (23354 us)
+[DBG] deferring start (23136 us)
+[DBG] deferring start (22922 us)
+[DBG] deferring start (22673 us)
+[DBG] deferring start (22454 us)
+[DBG] deferring start (22207 us)
+[DBG] deferring start (21999 us)
+[DBG] deferring start (21761 us)
+[DBG] deferring start (21565 us)
+[DBG] deferring start (21342 us)
+[DBG] deferring start (21146 us)
+[DBG] deferring start (20924 us)
+[DBG] deferring start (20712 us)
+[DBG] deferring start (20524 us)
+[DBG] started
+9:43:01.468 AM [skip] +30 s (click) before=240654 ms target=270654 ms
+[DBG] ES_OUT_RESET_PCR called
+9:43:01.471 AM [player] buffering 0.0
+[DBG] SET_TIME to 270654000
+[DBG] seek request to i_pos = 270654000
+[DBG] seek: preroll{ track: 1, pts: 264473000, fpos: 450967844 skip: 450967844} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=450967844-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 12763732319
+Content-Range: bytes 450967844-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:43:01 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 270654001, start-pts: 264473001, start-fpos: 450967844} 
+[DBG] Buffering 0%
+9:43:01.636 AM [player] buffering 0.0
+[DBG] Buffering 1%
+[DBG] Buffering 2%
+[DBG] Buffering 4%
+[DBG] Buffering 5%
+[DBG] Buffering 7%
+[DBG] Buffering 8%
+[DBG] Buffering 10%
+[DBG] Buffering 11%
+[DBG] Buffering 13%
+[DBG] Buffering 15%
+[DBG] Buffering 16%
+[DBG] Buffering 18%
+[DBG] Buffering 19%
+[DBG] Buffering 21%
+[DBG] Buffering 22%
+[DBG] Buffering 24%
+[DBG] Buffering 27%
+[DBG] Buffering 29%
+[DBG] Buffering 30%
+[DBG] Buffering 32%
+[DBG] Buffering 33%
+[DBG] Buffering 35%
+[DBG] Buffering 38%
+[DBG] Buffering 40%
+[DBG] Buffering 42%
+[DBG] Buffering 44%
+[DBG] Buffering 45%
+[DBG] Buffering 47%
+[DBG] Buffering 49%
+[DBG] Buffering 51%
+[DBG] Buffering 52%
+[DBG] Buffering 54%
+[DBG] Buffering 56%
+[DBG] Buffering 58%
+[DBG] Buffering 59%
+[DBG] Buffering 60%
+[DBG] Buffering 62%
+[DBG] Buffering 63%
+[DBG] Buffering 65%
+[DBG] Buffering 67%
+[DBG] Buffering 68%
+[DBG] Buffering 70%
+[DBG] Buffering 72%
+[DBG] Buffering 73%
+[DBG] Buffering 74%
+[DBG] Buffering 75%
+[DBG] Buffering 77%
+[DBG] Buffering 79%
+[DBG] Buffering 80%
+[DBG] Buffering 81%
+[DBG] Buffering 82%
+[DBG] Buffering 84%
+[DBG] end of audio preroll
+[DBG] Buffering 86%
+[DBG] Buffering 87%
+[DBG] Buffering 88%
+[DBG] Buffering 89%
+[DBG] Buffering 91%
+[DBG] Buffering 92%
+[DBG] Buffering 93%
+9:43:01.999 AM [skip] after=270654 ms
+[DBG] Buffering 94%
+[DBG] Buffering 95%
+[DBG] Buffering 96%
+[DBG] Buffering 98%
+[DBG] Buffering 99%
+[DBG] Stream buffering done (7257 ms in 410 ms)
+9:43:02.047 AM [player] buffering 1.0
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Decoder wait done in 199 ms
+[DBG] deferring start (89179 us)
+[DBG] deferring start (68261 us)
+[DBG] deferring start (56897 us)
+[DBG] deferring start (66322 us)
+[DBG] deferring start (55330 us)
+[DBG] deferring start (54295 us)
+[DBG] deferring start (63836 us)
+[DBG] deferring start (52472 us)
+[DBG] deferring start (52072 us)
+[DBG] deferring start (51552 us)
+[DBG] deferring start (51206 us)
+[DBG] deferring start (50471 us)
+[DBG] deferring start (70663 us)
+[DBG] deferring start (59653 us)
+[DBG] deferring start (48098 us)
+[DBG] deferring start (47711 us)
+[DBG] deferring start (47298 us)
+[DBG] deferring start (46963 us)
+[DBG] deferring start (46646 us)
+[DBG] deferring start (46311 us)
+[DBG] deferring start (45967 us)
+[DBG] deferring start (45657 us)
+[DBG] deferring start (45376 us)
+[DBG] deferring start (45124 us)
+[DBG] deferring start (44711 us)
+[DBG] deferring start (44376 us)
+[DBG] deferring start (44149 us)
+[DBG] deferring start (43921 us)
+[DBG] deferring start (43638 us)
+[DBG] deferring start (43392 us)
+[DBG] deferring start (43137 us)
+[DBG] deferring start (42900 us)
+[DBG] deferring start (42633 us)
+[DBG] deferring start (42402 us)
+[DBG] deferring start (42182 us)
+[DBG] deferring start (41950 us)
+[DBG] deferring start (41710 us)
+[DBG] deferring start (41382 us)
+[DBG] deferring start (40978 us)
+[DBG] deferring start (40617 us)
+[DBG] deferring start (40324 us)
+[DBG] deferring start (39970 us)
+[DBG] deferring start (39661 us)
+[DBG] deferring start (39352 us)
+[DBG] deferring start (38996 us)
+[DBG] deferring start (38640 us)
+[DBG] deferring start (38286 us)
+[DBG] deferring start (37968 us)
+[DBG] deferring start (37625 us)
+[DBG] deferring start (37268 us)
+[DBG] deferring start (36883 us)
+[DBG] deferring start (36591 us)
+[DBG] deferring start (36261 us)
+[DBG] deferring start (35908 us)
+[DBG] deferring start (35574 us)
+[DBG] deferring start (35235 us)
+[DBG] deferring start (34915 us)
+[DBG] deferring start (34579 us)
+[DBG] deferring start (34274 us)
+[DBG] deferring start (33933 us)
+[DBG] deferring start (33513 us)
+[DBG] deferring start (33330 us)
+[DBG] deferring start (33022 us)
+[DBG] deferring start (32750 us)
+[DBG] deferring start (32474 us)
+[DBG] deferring start (32193 us)
+[DBG] deferring start (31948 us)
+[DBG] deferring start (31648 us)
+[DBG] deferring start (31334 us)
+[DBG] deferring start (31069 us)
+[DBG] deferring start (30788 us)
+[DBG] deferring start (30491 us)
+[DBG] deferring start (30242 us)
+[DBG] deferring start (29972 us)
+[DBG] deferring start (29703 us)
+[DBG] deferring start (29424 us)
+[DBG] deferring start (29136 us)
+[DBG] deferring start (28814 us)
+[DBG] deferring start (28580 us)
+[DBG] deferring start (28285 us)
+[DBG] deferring start (28018 us)
+[DBG] deferring start (27719 us)
+[DBG] deferring start (27407 us)
+[DBG] deferring start (27099 us)
+[DBG] deferring start (26836 us)
+[DBG] deferring start (26563 us)
+[DBG] deferring start (26285 us)
+[DBG] deferring start (25958 us)
+[DBG] deferring start (25751 us)
+[DBG] deferring start (25523 us)
+[DBG] deferring start (25298 us)
+[DBG] deferring start (25013 us)
+[DBG] deferring start (24824 us)
+[DBG] deferring start (24572 us)
+[DBG] deferring start (24337 us)
+[DBG] deferring start (24051 us)
+[DBG] deferring start (23792 us)
+[DBG] deferring start (23614 us)
+[DBG] deferring start (23375 us)
+[DBG] deferring start (23140 us)
+[DBG] deferring start (22835 us)
+[DBG] deferring start (22646 us)
+[DBG] deferring start (22409 us)
+[DBG] deferring start (22164 us)
+[DBG] deferring start (21921 us)
+[DBG] deferring start (21693 us)
+[DBG] deferring start (21453 us)
+[DBG] deferring start (21165 us)
+[DBG] deferring start (20973 us)
+[DBG] deferring start (20728 us)
+[DBG] deferring start (20498 us)
+[DBG] deferring start (20209 us)
+[DBG] deferring start (20013 us)
+[DBG] deferring start (19761 us)
+[DBG] deferring start (19530 us)
+[DBG] deferring start (19308 us)
+[DBG] deferring start (19087 us)
+[DBG] deferring start (18840 us)
+[DBG] deferring start (18594 us)
+[DBG] deferring start (18343 us)
+[DBG] deferring start (18090 us)
+[DBG] deferring start (17896 us)
+[DBG] deferring start (17656 us)
+[DBG] deferring start (17413 us)
+[DBG] deferring start (17191 us)
+[DBG] deferring start (16988 us)
+[DBG] started
+[DBG] ES_OUT_RESET_PCR called
+9:43:02.700 AM [skip] +30 s (click) before=270654 ms target=300654 ms
+9:43:02.704 AM [player] buffering 0.0
+[DBG] SET_TIME to 300654000
+[DBG] seek request to i_pos = 300654000
+[DBG] seek: preroll{ track: 1, pts: 300300000, fpos: 530358349 skip: 530358349} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=530358349-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 12684341814
+Content-Range: bytes 530358349-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:43:02 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 300654001, start-pts: 300300001, start-fpos: 530358349} 
+9:43:02.897 AM [player] buffering 0.0
+[DBG] Buffering 0%
+[DBG] Buffering 3%
+[DBG] Buffering 6%
+[DBG] Buffering 9%
+[DBG] Buffering 18%
+[DBG] end of audio preroll
+[DBG] Buffering 21%
+[DBG] Buffering 30%
+[DBG] Buffering 33%
+[DBG] Buffering 43%
+[DBG] Buffering 46%
+[DBG] Buffering 55%
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Buffering 58%
+[DBG] Buffering 67%
+[DBG] Buffering 70%
+[DBG] Buffering 80%
+[DBG] Buffering 83%
+[DBG] Buffering 92%
+[DBG] Buffering 95%
+[DBG] Stream buffering done (1418 ms in 97 ms)
+[DBG] Decoder wait done in 0 ms
+9:43:02.994 AM [player] buffering 1.0
+[DBG] deferring start (89028 us)
+[DBG] deferring start (69897 us)
+[DBG] deferring start (58358 us)
+[DBG] deferring start (67760 us)
+[DBG] deferring start (56722 us)
+[DBG] deferring start (56057 us)
+[DBG] deferring start (55521 us)
+[DBG] deferring start (55060 us)
+[DBG] deferring start (54755 us)
+[DBG] deferring start (54476 us)
+[DBG] deferring start (54208 us)
+[DBG] deferring start (53945 us)
+[DBG] deferring start (53658 us)
+[DBG] deferring start (53156 us)
+[DBG] deferring start (52663 us)
+[DBG] deferring start (52317 us)
+[DBG] deferring start (52040 us)
+[DBG] deferring start (51758 us)
+[DBG] deferring start (51496 us)
+[DBG] deferring start (51200 us)
+[DBG] deferring start (50929 us)
+[DBG] deferring start (50659 us)
+[DBG] deferring start (50392 us)
+[DBG] deferring start (50101 us)
+[DBG] deferring start (49817 us)
+[DBG] deferring start (49316 us)
+[DBG] deferring start (48922 us)
+[DBG] deferring start (48226 us)
+[DBG] deferring start (47834 us)
+[DBG] deferring start (47639 us)
+[DBG] deferring start (47366 us)
+[DBG] deferring start (47130 us)
+[DBG] deferring start (46712 us)
+[DBG] deferring start (46509 us)
+[DBG] deferring start (46108 us)
+[DBG] deferring start (45735 us)
+[DBG] deferring start (45354 us)
+[DBG] deferring start (44766 us)
+[DBG] deferring start (44396 us)
+[DBG] deferring start (44069 us)
+[DBG] deferring start (43737 us)
+[DBG] deferring start (43301 us)
+[DBG] deferring start (43029 us)
+[DBG] deferring start (42692 us)
+[DBG] deferring start (42373 us)
+[DBG] deferring start (42092 us)
+[DBG] deferring start (41726 us)
+[DBG] deferring start (41408 us)
+[DBG] deferring start (41116 us)
+[DBG] deferring start (40754 us)
+[DBG] deferring start (40417 us)
+[DBG] deferring start (40140 us)
+[DBG] deferring start (39846 us)
+[DBG] deferring start (39470 us)
+[DBG] deferring start (39169 us)
+[DBG] deferring start (38875 us)
+[DBG] deferring start (38572 us)
+[DBG] deferring start (38260 us)
+[DBG] deferring start (37939 us)
+[DBG] deferring start (37627 us)
+[DBG] deferring start (37330 us)
+[DBG] deferring start (37058 us)
+[DBG] deferring start (36770 us)
+[DBG] deferring start (36545 us)
+[DBG] deferring start (36310 us)
+[DBG] deferring start (36025 us)
+[DBG] deferring start (35811 us)
+[DBG] deferring start (35517 us)
+[DBG] deferring start (35244 us)
+[DBG] deferring start (35001 us)
+[DBG] deferring start (34769 us)
+[DBG] deferring start (34492 us)
+[DBG] deferring start (34250 us)
+[DBG] deferring start (33986 us)
+[DBG] deferring start (33720 us)
+[DBG] deferring start (33477 us)
+[DBG] deferring start (33208 us)
+[DBG] deferring start (32979 us)
+[DBG] deferring start (32624 us)
+[DBG] deferring start (32418 us)
+[DBG] deferring start (32185 us)
+[DBG] deferring start (31931 us)
+[DBG] deferring start (31696 us)
+[DBG] deferring start (31446 us)
+[DBG] deferring start (31221 us)
+[DBG] deferring start (30854 us)
+[DBG] deferring start (30646 us)
+[DBG] deferring start (30441 us)
+[DBG] deferring start (30188 us)
+[DBG] deferring start (29919 us)
+[DBG] deferring start (29535 us)
+[DBG] deferring start (29371 us)
+[DBG] deferring start (29153 us)
+[DBG] deferring start (28939 us)
+[DBG] deferring start (28692 us)
+[DBG] deferring start (28509 us)
+[DBG] deferring start (28280 us)
+[DBG] deferring start (28060 us)
+[DBG] deferring start (27852 us)
+[DBG] deferring start (27636 us)
+[DBG] deferring start (27387 us)
+[DBG] deferring start (27206 us)
+[DBG] deferring start (26973 us)
+[DBG] deferring start (26772 us)
+[DBG] deferring start (26407 us)
+[DBG] deferring start (26234 us)
+[DBG] deferring start (26026 us)
+[DBG] deferring start (25819 us)
+[DBG] deferring start (25516 us)
+[DBG] deferring start (25344 us)
+[DBG] deferring start (25138 us)
+[DBG] deferring start (24924 us)
+[DBG] deferring start (24684 us)
+[DBG] deferring start (24498 us)
+[DBG] deferring start (24196 us)
+[DBG] deferring start (24022 us)
+[DBG] deferring start (23775 us)
+[DBG] deferring start (23592 us)
+[DBG] deferring start (23387 us)
+[DBG] deferring start (23005 us)
+[DBG] deferring start (22817 us)
+[DBG] deferring start (22612 us)
+[DBG] deferring start (22393 us)
+[DBG] deferring start (22183 us)
+[DBG] deferring start (21892 us)
+[DBG] deferring start (21757 us)
+[DBG] started
+[DBG] picture displayed late (missing 13 ms)
+9:43:03.214 AM [skip] after=300654 ms
+9:43:03.934 AM [skip] +30 s (click) before=300654 ms target=330654 ms
+[DBG] ES_OUT_RESET_PCR called
+9:43:03.940 AM [player] buffering 0.0
+[DBG] SET_TIME to 330654000
+[DBG] seek request to i_pos = 330654000
+[DBG] seek: preroll{ track: 1, pts: 324741000, fpos: 580576105 skip: 580576105} 
+[DBG] resolving 192.168.1.250 ...
+[DBG] outgoing request:
+GET /stream/1 HTTP/1.1
+Host: 192.168.1.250:8093
+Accept: */*
+Accept-Language: en_US
+User-Agent: VLC/4.0.0-dev LibVLC/4.0.0-dev
+If-Unmodified-Since: Tue, 04 May 2021 22:49:24 GMT
+Range: bytes=580576105-
+
+
+[DBG] incoming response:
+HTTP/1.1 206 Partial Content
+Accept-Ranges: bytes
+Content-Length: 12634124058
+Content-Range: bytes 580576105-13214700162/13214700163
+Content-Type: video/x-matroska
+Last-Modified: Tue, 04 May 2021 22:49:24 GMT
+Date: Mon, 14 Sep 2026 13:43:04 GMT
+
+
+[DBG] connection failed
+[DBG] seek: preroll{ req: 330654001, start-pts: 324741001, start-fpos: 580576105} 
+[DBG] Buffering 0%
+9:43:04.133 AM [player] buffering 0.0
+[DBG] Buffering 1%
+[DBG] Buffering 2%
+[DBG] Buffering 4%
+[DBG] Buffering 5%
+[DBG] Buffering 7%
+[DBG] Buffering 8%
+[DBG] Buffering 10%
+[DBG] Buffering 11%
+[DBG] Buffering 13%
+[DBG] Buffering 14%
+[DBG] Buffering 16%
+[DBG] Buffering 19%
+[DBG] Buffering 21%
+[DBG] Buffering 22%
+[DBG] Buffering 24%
+[DBG] Buffering 26%
+[DBG] Buffering 27%
+[DBG] Buffering 29%
+[DBG] Buffering 30%
+[DBG] Buffering 31%
+[DBG] Buffering 32%
+[DBG] Buffering 34%
+[DBG] Buffering 35%
+[DBG] Buffering 38%
+[DBG] Buffering 40%
+[DBG] Buffering 41%
+[DBG] Buffering 42%
+[DBG] Buffering 43%
+[DBG] Buffering 45%
+[DBG] Buffering 47%
+[DBG] Buffering 48%
+[DBG] Buffering 50%
+[DBG] Buffering 52%
+[DBG] Buffering 53%
+[DBG] Buffering 54%
+[DBG] Buffering 55%
+[DBG] Buffering 57%
+[DBG] Buffering 59%
+[DBG] Buffering 60%
+[DBG] Buffering 62%
+[DBG] Buffering 64%
+[DBG] Buffering 65%
+[DBG] Buffering 66%
+[DBG] Buffering 67%
+[DBG] Buffering 69%
+[DBG] Buffering 71%
+[DBG] Buffering 72%
+[DBG] Buffering 74%
+[DBG] Buffering 76%
+[DBG] Buffering 77%
+[DBG] Buffering 79%
+[DBG] Buffering 81%
+[DBG] Buffering 82%
+[DBG] Buffering 83%
+[DBG] end of audio preroll
+[DBG] Buffering 84%
+[DBG] Buffering 86%
+[DBG] Buffering 88%
+[DBG] Buffering 89%
+[DBG] Buffering 91%
+[DBG] Buffering 93%
+[DBG] Buffering 94%
+[DBG] Buffering 95%
+[DBG] Buffering 96%
+[DBG] Buffering 98%
+9:43:04.463 AM [skip] after=330654 ms
+[DBG] Stream buffering done (6965 ms in 331 ms)
+9:43:04.464 AM [player] buffering 1.0
+[DBG] end of video preroll
+[DBG] Received first picture
+[DBG] Decoder wait done in 245 ms
+[DBG] deferring start (89039 us)
+[DBG] deferring start (68022 us)
+[DBG] deferring start (56009 us)
+[DBG] deferring start (54800 us)
+[DBG] deferring start (54030 us)
+[DBG] deferring start (53412 us)
+[DBG] deferring start (52917 us)
+[DBG] deferring start (52619 us)
+[DBG] deferring start (52235 us)
+[DBG] deferring start (51881 us)
+[DBG] deferring start (51566 us)
+[DBG] deferring start (51201 us)
+[DBG] deferring start (50861 us)
+[DBG] deferring start (50581 us)
+[DBG] deferring start (50294 us)
+[DBG] deferring start (49921 us)
+[DBG] deferring start (49300 us)
+[DBG] deferring start (49041 us)
+[DBG] deferring start (48758 us)
+[DBG] deferring start (48476 us)
+[DBG] deferring start (48152 us)
+[DBG] deferring start (47856 us)
+[DBG] deferring start (47477 us)
+[DBG] deferring start (47198 us)
+[DBG] deferring start (46897 us)
+[DBG] deferring start (46584 us)
+[DBG] deferring start (46126 us)
+[DBG] deferring start (45374 us)
+[DBG] deferring start (45081 us)
+[DBG] deferring start (44841 us)
+[DBG] deferring start (44590 us)
+[DBG] deferring start (44361 us)
+[DBG] deferring start (44129 us)
+[DBG] deferring start (43881 us)
+[DBG] deferring start (43574 us)
+[DBG] deferring start (43308 us)
+[DBG] deferring start (43064 us)
+[DBG] deferring start (42802 us)
+[DBG] deferring start (42073 us)
+[DBG] deferring start (41439 us)
+[DBG] deferring start (41189 us)
+[DBG] deferring start (40796 us)
+[DBG] deferring start (40524 us)
+[DBG] deferring start (40210 us)
+[DBG] deferring start (39875 us)
+[DBG] deferring start (39461 us)
+[DBG] deferring start (39217 us)
+[DBG] deferring start (38897 us)
+[DBG] deferring start (38578 us)
+[DBG] deferring start (38236 us)
+[DBG] deferring start (37907 us)
+[DBG] deferring start (37503 us)
+[DBG] deferring start (37239 us)
+[DBG] deferring start (36914 us)
+[DBG] deferring start (36601 us)
+[DBG] deferring start (36220 us)
+[DBG] deferring start (35928 us)
+[DBG] deferring start (35614 us)
+[DBG] deferring start (35275 us)
+[DBG] deferring start (34958 us)
+[DBG] deferring start (34629 us)
+[DBG] deferring start (34302 us)
+[DBG] deferring start (34011 us)
+[DBG] deferring start (33747 us)
+[DBG] deferring start (33474 us)
+[DBG] deferring start (33214 us)
+[DBG] deferring start (32875 us)
+[DBG] deferring start (32636 us)
+[DBG] deferring start (32371 us)
+[DBG] deferring start (32090 us)
+[DBG] deferring start (31786 us)
+[DBG] deferring start (31493 us)
+[DBG] deferring start (31208 us)
+[DBG] deferring start (30943 us)
+[DBG] deferring start (30675 us)
+[DBG] deferring start (30387 us)
+[DBG] deferring start (30105 us)
+[DBG] deferring start (29751 us)
+[DBG] deferring start (29569 us)
+[DBG] deferring start (29295 us)
+[DBG] deferring start (29011 us)
+[DBG] deferring start (28684 us)
+[DBG] deferring start (28462 us)
+[DBG] deferring start (28175 us)
+[DBG] deferring start (27881 us)
+[DBG] deferring start (27646 us)
+[DBG] deferring start (27235 us)
+[DBG] deferring start (27067 us)
+[DBG] deferring start (26812 us)
+[DBG] deferring start (26462 us)
+[DBG] deferring start (26214 us)
+[DBG] deferring start (25995 us)
+[DBG] deferring start (25756 us)
+[DBG] deferring start (25505 us)
+[DBG] deferring start (25183 us)
+[DBG] deferring start (25005 us)
+[DBG] deferring start (24777 us)
+[DBG] deferring start (24548 us)
+[DBG] deferring start (24237 us)
+[DBG] deferring start (23989 us)
+[DBG] deferring start (23743 us)
+[DBG] deferring start (23491 us)
+[DBG] deferring start (23265 us)
+[DBG] deferring start (23027 us)
+[DBG] deferring start (22724 us)
+[DBG] deferring start (22509 us)
+[DBG] deferring start (22259 us)
+[DBG] deferring start (21927 us)
+[DBG] deferring start (21745 us)
+[DBG] deferring start (21527 us)
+[DBG] deferring start (21293 us)
+[DBG] deferring start (21029 us)
+[DBG] deferring start (20744 us)
+[DBG] deferring start (20569 us)
+[DBG] deferring start (20235 us)
+[DBG] deferring start (20051 us)
+[DBG] deferring start (19798 us)
+[DBG] deferring start (19531 us)
+[DBG] deferring start (19287 us)
+[DBG] deferring start (19027 us)
+[DBG] deferring start (18795 us)
+[DBG] deferring start (18554 us)
+[DBG] deferring start (18305 us)
+[DBG] deferring start (18079 us)
+[DBG] deferring start (17881 us)
+[DBG] started
+[WARN] picture is too late to be displayed (missing 29 ms)
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] new PPS parsed: 0
+[DBG] New Chapter 477477000 uid=2
+9:47:02.788 AM [player] dismiss at 568195 ms, state Playing
+9:47:02.790 AM [player] state Stopping at 568469 ms
+[DBG] killing decoder fourcc `hevc'
+[DBG] removing "video decoder" module "videotoolbox"
+[DBG] saving a free vout
+[DBG] ES track unselected: 'video/1' (fourcc: 'hevc')
+9:47:02.810 AM [player] track selected type=1 selected= unselected=video/1
+[DBG] killing decoder fourcc `dts '
+[DBG] removing "audio decoder" module "avcodec"
+[DBG] removing "audio packetizer" module "dts"
+[DBG] removing "audio resampler" module "soxr"
+[DBG] removing "audio converter" module "audio_format"
+[DBG] removing "audio filter" module "scaletempo"
+[DBG] removing "audio volume" module "float_mixer"
+[DBG] keeping audio output
+[DBG] ES track unselected: 'audio/2' (fourcc: 'dts ')
+9:47:02.892 AM [player] track selected type=0 selected= unselected=audio/2
+[DBG] removing "demux" module "mkv"
+[DBG] ES track deleted: 'video/1' (fourcc: 'hevc')
+[DBG] ES track deleted: 'audio/2' (fourcc: 'dts ')
+[DBG] ES track deleted: 'spu/3' (fourcc: 'subt')
+[DBG] ES track deleted: 'spu/4' (fourcc: 'subt')
+[DBG] ES track deleted: 'spu/5' (fourcc: 'bdpg')
+[DBG] ES track deleted: 'spu/6' (fourcc: 'bdpg')
+[DBG] ES track deleted: 'spu/7' (fourcc: 'bdpg')
+[DBG] ES track deleted: 'spu/8' (fourcc: 'bdpg')
+[DBG] Program doesn't contain anymore ES
+[DBG] removing "stream_filter" module "record"
+[DBG] removing "stream_filter" module "prefetch"
+[DBG] removing "access" module "http"
+[DBG] connection failed
+[DBG] stop free vout
+9:47:02.894 AM [player] state Stopped at 568469 ms
