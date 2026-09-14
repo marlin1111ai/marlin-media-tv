@@ -7,12 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BB0000000000000000000010 /* VLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB000000000000000000000C /* VLCKit */; };
+		BB0000000000000000000010 /* VLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000011 /* VLCKit.xcframework */; };
+		BB0000000000000000000012 /* VLCKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000011 /* VLCKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BB0000000000000000000013 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BB0000000000000000000012 /* VLCKit.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BB0000000000000000000004 /* Marlin Media TV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Marlin Media TV.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB00000000000000000000C4 /* Marlin Media TVUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Marlin Media TVUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0000000000000000000011 /* VLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = VLCKit.xcframework; path = Frameworks/VLCKit.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -25,7 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB0000000000000000000010 /* VLCKit in Frameworks */,
+				BB0000000000000000000010 /* VLCKit.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -45,7 +61,16 @@
 				BB0000000000000000000002 /* Marlin Media TV */,
 				BB00000000000000000000C2 /* Marlin Media TVUITests */,
 				BB0000000000000000000003 /* Products */,
+				BB0000000000000000000014 /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		BB0000000000000000000014 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BB0000000000000000000011 /* VLCKit.xcframework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		BB0000000000000000000003 /* Products */ = {
@@ -67,6 +92,7 @@
 				BB0000000000000000000007 /* Sources */,
 				BB0000000000000000000008 /* Frameworks */,
 				BB0000000000000000000009 /* Resources */,
+				BB0000000000000000000013 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -76,9 +102,6 @@
 				BB0000000000000000000002 /* Marlin Media TV */,
 			);
 			name = "Marlin Media TV";
-			packageProductDependencies = (
-				BB000000000000000000000C /* VLCKit */,
-			);
 			productName = "Marlin Media TV";
 			productReference = BB0000000000000000000004 /* Marlin Media TV.app */;
 			productType = "com.apple.product-type.application";
@@ -133,9 +156,6 @@
 			);
 			mainGroup = BB0000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				BB000000000000000000000B /* XCRemoteSwiftPackageReference "VLCKit" */,
-			);
 			productRefGroup = BB0000000000000000000003 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -440,24 +460,7 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		BB000000000000000000000B /* XCRemoteSwiftPackageReference "VLCKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://code.videolan.org/videolan/VLCKit";
-			requirement = {
-				kind = exactVersion;
-				version = "4.0.0-a24";
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
 
-/* Begin XCSwiftPackageProductDependency section */
-		BB000000000000000000000C /* VLCKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BB000000000000000000000B /* XCRemoteSwiftPackageReference "VLCKit" */;
-			productName = VLCKit;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BB0000000000000000000006 /* Project object */;
 }

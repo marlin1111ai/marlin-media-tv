@@ -17,3 +17,5 @@ marlin1111ai/marlin-media (DECISIONS.md there) and are referenced by their numbe
 - **D009** resume/watched state and Recently Added are in — server request sent 2026-09-13, client wires them once served.
 - **D010** sort control: Title, Year, Recently Added.
 - **D011** device-proof: VLCKit logs + device screenshot from builder, HDR indicator and Denon panel from owner.
+- **D012** custom VLCKit build with the TrueHD decoder compiled in — supersedes playing a TrueHD title on its AC-3 core. Reason: 7.1 PCM to the Denon. VLCKit 4.0.0-a24 from VideoLAN's own scripts, one change: the hunk of VLCKit's patch 0007 that disables ffmpeg's mlp decoder/demuxer/parser is removed (`tools/vlckit-truehd/0007-truehd-enable.diff`).
+- **D013** the built framework stays out of git at `Frameworks/VLCKit.xcframework` (ignored; 716 MB); it is built at `~/vlckit-build` because VideoLAN's scripts cannot take spaces in paths, with a local GNU make 4.4.1 (`~/vlckit-build/tools`, passed as `VLC_PATH`) and python.org Python 3.14.7; recipe in `tools/vlckit-truehd/`; NAS backup of the framework is separate and the owner's.

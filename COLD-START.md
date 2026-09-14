@@ -29,10 +29,18 @@ the file bytes with HTTP Range support at `/stream/{fileId}`.
 
 ## Toolchain facts
 
-- **VLCKit:** VideoLAN's own Swift package, `https://code.videolan.org/videolan/VLCKit`,
-  exact version `4.0.0-a24` (D003). The package is one binary `VLCKit.xcframework` (tvOS device
-  + simulator slices, Video Toolbox decoding, `samplebufferdisplay` video output,
-  `avsamplebuffer` audio output). Reported version string: `4.0.0-dev Otto Chriek`.
+- **VLCKit:** a custom build of VideoLAN's VLCKit 4.0.0-a24 with the TrueHD/MLP decoder compiled in
+  (D012). It lives at `Frameworks/VLCKit.xcframework` (git-ignored, 716 MB; tvOS device + simulator
+  slices) and the Xcode project links and embeds it by path — the Swift package is gone (D013).
+  Built by `tools/vlckit-truehd/build.sh` at `~/vlckit-build` (VideoLAN's scripts cannot take spaces
+  in paths) from libvlc master 5dd4aebda + VLCKit's 17 patches, patch 0007 minus its mlp hunk;
+  ffmpeg 9.0 (`Lavc63.1.100`), Video Toolbox decoding, `samplebufferdisplay` video output,
+  `avsamplebuffer` audio output. Reported version string: `4.0.0-dev Otto Chriek`.
+- **VLCKit build prerequisites (not the app's):** python.org Python 3.14.7 at
+  `/Library/Frameworks/Python.framework` (installed 2026-09-13; VideoLAN's script looks only there)
+  and GNU make 4.4.1 built into `~/vlckit-build/tools` and passed as `VLC_PATH` (Xcode's make 3.81
+  breaks the jobserver with VLC's ninja). A full build took 9 min 13 s on the M2 Ultra; the first
+  run also builds VLC's host tools (about 8 min more). `~/vlckit-build` is 22 GB.
 - **Minimum tvOS:** 26.0 exactly (`TVOS_DEPLOYMENT_TARGET = 26.0`, D004). Both Apple TVs run 26.6.
 - **No CocoaPods, no xcodegen, no brew installs.** The project file was written by hand
   (objectVersion 71, file-system-synchronized groups); Xcode opens it normally.
@@ -75,6 +83,8 @@ It makes no server write.
 - `PlayerModel.swift` (VLCKit + the remote's meaning, D008), `PlayerHost.swift` (the UIKit
   surface that owns every press, touch and swipe — an edge click is a `UIPress`, a swipe is not),
   `PlayerScreen.swift` (frames 10–15, visuals only, nothing focusable), `EvidenceLog.swift`.
+- `Frameworks/VLCKit.xcframework` — the custom VLCKit (D012/D013), linked and embedded (code-sign on
+  copy) by the project; not in git. Rebuild with `tools/vlckit-truehd/build.sh`.
 - `Info.plist` carries `NSAllowsLocalNetworking` so plain-HTTP to 192.168.1.250 is allowed.
 
 ## Current state after pass 1 (2026-09-13)
@@ -85,16 +95,13 @@ picker, and VLCKit playback of the four MKVs and a Magicians episode with the ov
 pause, frame step, audio and subtitle panels. Committed locally on `main`; **not pushed** — the
 owner tests first.
 
-**Pass 1b (2026-09-13) is stopped, four times**: the repo path's spaces (build now at
-`~/vlckit-build`), two GNU tool tarballs missing from mirrors (pre-fetched by the recipe), meson
-refusing Xcode's Python 3.9.6 (python.org 3.14.7 now installed), and last the make jobserver —
-Xcode's GNU make 3.81 with `-j24` cannot share its job pipe with the ninja VLC's tools build; the
-fix VideoLAN's CI uses is a newer GNU make on `VLC_PATH`. See
-`reports/2026-09-13-pass1b-vlckit-truehd.md`. The recipe is `tools/vlckit-truehd/build.sh`; the
-app still uses the Swift package; `Frameworks/` is empty and ignored.
+**Pass 1b (2026-09-13) done after four stops** (repo path spaces, missing GNU mirror tarballs,
+Xcode's Python 3.9.6, Xcode's make 3.81 — all recorded in
+`reports/2026-09-13-pass1b-vlckit-truehd.md`): the custom VLCKit decodes Wonder Woman's TrueHD
+track on Home Theater and hands tvOS 8-channel 48 kHz PCM; Divergent (DTS) and Stargate (AC-3)
+unchanged. The app links `Frameworks/VLCKit.xcframework`; the Swift package is gone.
 
-Two findings wait on the owner (open questions 1 and 2 of the report): **VLCKit 4.0.0-a24
-cannot decode TrueHD** (Wonder Woman plays on its AC-3 core), and **the D008 seek-based frame
-back shows a wrong frame and puts this VLC alpha into a rebuffer loop over HTTP** — the native
-`gotoPreviousFrame` exists in this build but was not tried. Deferred to a later pass (D009):
+One finding still waits on the owner (pass-1 report, open question 2): **the D008 seek-based
+frame back shows a wrong frame and puts this VLC alpha into a rebuffer loop over HTTP** — the
+native `gotoPreviousFrame` exists in this build but was not tried. TrueHD is solved by pass 1b. Deferred to a later pass (D009):
 Continue Watching, progress, watched marks, Resume / Start over, Recently Added.

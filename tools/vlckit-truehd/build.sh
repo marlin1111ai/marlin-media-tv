@@ -40,6 +40,20 @@ if [ -d "$TOOLS" ]; then
     done
 fi
 
+# Step 0 (rerun 4) — GNU make 4.4.1 local to the build directory, put on VLC_PATH (VideoLAN's own hook,
+# compileAndBuildVLCKit.sh line 568: PATH puts $VLC_PATH ahead of /usr/bin). Xcode's make 3.81 breaks
+# the jobserver with the ninja VLC's tools build. Tarball from ftp.gnu.org, MD5 from GNU's release
+# announcement (info-gnu 2023-02 msg00011). Nothing is installed on the system.
+if [ ! -x "$BUILD_DIR/tools/bin/make" ]; then
+    mkdir -p "$BUILD_DIR/tools/src" && cd "$BUILD_DIR/tools/src"
+    [ -f make-4.4.1.tar.gz ] || curl -f -sS -L --retry 3 -o make-4.4.1.tar.gz https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
+    [ "$(md5 -q make-4.4.1.tar.gz)" = "c8469a3713cbbe04d955d4ae4be23eeb" ] || { echo "make-4.4.1.tar.gz: MD5 mismatch" >&2; exit 1; }
+    rm -rf make-4.4.1 && tar xzf make-4.4.1.tar.gz && cd make-4.4.1 && ./configure --prefix="$BUILD_DIR/tools" && /usr/bin/make -j8 && /usr/bin/make install
+    cd "$BUILD_DIR/VLCKit"
+fi
+"$BUILD_DIR/tools/bin/make" --version | head -1
+export VLC_PATH="$BUILD_DIR/tools/bin"
+
 # Step 3 — VideoLAN's own build: clones libvlc master at the pinned hash (TESTEDHASH in the script),
 # applies the 17 patches, builds host tools under extras/tools, the contribs, libvlc, then the framework.
 # -v verbose, -f device + simulator + xcframework, -t tvOS, -r Release.

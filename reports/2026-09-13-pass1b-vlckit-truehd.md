@@ -411,3 +411,165 @@ Disk: `~/vlckit-build` 4.3G; `Frameworks/` 0 B.
   ninja's warning names the fifo jobserver that 4.4 introduced, but it was not tried.
 - Whether further contribs fail after these five; make stopped at the first batch.
 - The full build's duration.
+
+---
+
+# Rerun 4, GNU make 4.4.1 on VLC_PATH — 2026-09-13 — DONE
+
+**Result: built, installed and proven on Home Theater.** The custom VLCKit decodes Wonder Woman's
+TrueHD track (`codec (truehd) started`, no "not supported") and hands tvOS 8-channel 48 kHz float
+PCM over HDMI; VLC now selects that track by itself at start. Divergent (DTS) and Stargate (AC-3)
+play with the same decoder and output fields as in pass 1. The app links
+`Frameworks/VLCKit.xcframework` by path; the VideoLAN Swift package is removed.
+
+Committed locally. **Not pushed** — the owner tests first.
+
+## Step 0 — a GNU make local to the build directory
+
+```
+ftp.gnu.org/gnu/make/: latest 4.x = make-4.4.1.tar.gz (+ .sig); no gpg on this Mac, so the checksum
+GNU published in the release announcement was used (info-gnu, Feb 2023, msg00011 "GNU Make 4.4.1 released!"):
+  published MD5: c8469a3713cbbe04d955d4ae4be23eeb  make-4.4.1.tar.gz
+  computed  MD5: c8469a3713cbbe04d955d4ae4be23eeb   → MATCH
+./configure --prefix=~/vlckit-build/tools && make -j8 && make install   (configure/make/install exit 0)
+~/vlckit-build/tools/bin/make --version → GNU Make 4.4.1, Built for aarch64-apple-darwin25.6.0
+compileAndBuildVLCKit.sh 568: export PATH="${PYTHON3_PATH}:${VLCROOT}/extras/tools/build/bin:${VLCROOT}/contrib/${TARGET}/bin:$VLC_PATH:/usr/bin:/bin:/usr/sbin:/sbin"
+```
+`tools/vlckit-truehd/build.sh` builds it when absent and exports `VLC_PATH`; the README says why.
+Nothing was installed on the system (the tarball, source and binary are all under `~/vlckit-build/tools`).
+
+## Step 1 — patch check
+
+`git apply --check` of the edited 0007 against the base commit's index: OK.
+
+## Step 3 — the build
+
+```
+build start: 2026-09-13 23:12:25
+command: VLC_PATH=/Users/marlin1111/vlckit-build/tools/bin ./compileAndBuildVLCKit.sh -v -f -t -r
+make on VLC_PATH: GNU Make 4.4.1
+[info] Building tools · Compiling aarch64 (appletvos) · Building contribs for arm64 · Building VLC for arm64 · Build succeeded!
+[info] Compiling x86_64 (appletvsimulator) … Build succeeded! · Compiling aarch64 (appletvsimulator) … Build succeeded!
+[info] building simulator static lib for appletv · building device static lib for appletv · all done
+[info] Building VLCKit.xcframework for tvOS · Building VLCKit (Release, appletvos) · Building VLCKit (Release, appletvsimulator)
+[info] Build of VLCKit.xcframework for tvOS completed
+build exit=0 end: 2026-09-13 23:21:38
+```
+Wall clock 9 min 13 s for this run (the host tools were already built by rerun 2, which spent
+7 min 34 s mostly on them; rerun 3 added 48 s). Jobserver errors this run: 0.
+
+Rules check, taken at 23:12:33 after the script had reset and re-patched libvlc and before ffmpeg
+configured: libvlc head at patch 17 on 5dd4aebda; `contrib/src/ffmpeg/rules.mak` lines 43–48
+hold only `--disable-securetransport`; the only `mlp` left in the file is inside the watchOS-only
+whitelist. ffmpeg's configure as it actually ran (build.log line 153, compiler and flag
+arguments elided):
+```
+cd ffmpeg/vlc_build && CC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" CXX="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++" OBJC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" OBJCXX="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cla
+```
+It carries `--disable-decoder=opus` and no mlp entry.
+
+## Step 4 — nm proof
+
+```
+$ nm ~/vlckit-build/VLCKit/build/tvOS/VLCKit.xcframework/tvos-arm64/VLCKit.framework/VLCKit | grep -E ' _ff_(mlp|truehd)_(decoder|parser)$'
+0000000002344b90 S _ff_mlp_decoder
+0000000002344b58 S _ff_mlp_parser
+0000000002344c40 S _ff_truehd_decoder
+```
+(the simulator slice has the same three; the a24 package binary had none — TrueHD symbol recon).
+The xcframework: `tvos-arm64` + `tvos-arm64_x86_64-simulator`, 716 MB with debug symbols.
+
+## Step 5 — the app
+
+`Frameworks/VLCKit.xcframework` is the copy (ignored). `project.pbxproj`: the
+`XCRemoteSwiftPackageReference` / `XCSwiftPackageProductDependency` sections, `packageReferences` and
+`packageProductDependencies` are removed; a `PBXFileReference` (`wrapper.xcframework`, path
+`Frameworks/VLCKit.xcframework`) in a `Frameworks` group is linked in the Frameworks phase and
+embedded by a new "Embed Frameworks" copy phase with `CodeSignOnCopy, RemoveHeadersOnCopy`;
+`Package.resolved` deleted. Nothing else in the project changed (diff: 53 lines in the pbxproj).
+
+## Step 6 — device build and proof
+
+```
+$ xcodebuild build-for-testing … -destination 'platform=tvOS,name=Home Theater' -allowProvisioningUpdates
+ProcessXCFramework Frameworks/VLCKit.xcframework → build/DerivedData/Build/Products/Debug-appletvos/VLCKit.framework
+CodeSign …/Marlin Media TV.app/Frameworks/VLCKit.framework · CodeSign …/Marlin Media TV.app · Validate …/Marlin Media TV.app
+** TEST BUILD SUCCEEDED **
+embedded Marlin Media TV.app/Frameworks/VLCKit.framework/VLCKit: _ff_mlp_decoder, _ff_mlp_parser, _ff_truehd_decoder present; TeamIdentifier=C879JNVK7Z
+```
+Harness runs on Home Theater (all passed): test4_WonderWoman 121.9 s, test2_Divergent 54.6 s,
+test3_Stargate 99.9 s. Screenshots `reports/screenshots/1b-*.jpg`, logs `reports/logs/1b-*.log`.
+
+**Wonder Woman, TrueHD** (`1b-wonder-woman-truehd-vlckit.log`, line numbers):
+```
+ 10  [player] request Wonder Woman — Wonder Woman (2017).mkv · 4K HDR · TrueHD 7.1 — http://192.168.1.250:8093/stream/4
+449  [DBG] ES track added: 'audio/2' (fourcc: 'mlpa')
+491  [DBG] using audio packetizer module "mlp"
+499  [DBG] codec (truehd) started
+500  [DBG] using audio decoder module "avcodec"
+501  [DBG] ES track selected: 'audio/2' (fourcc: 'mlpa')          ← VLC's own default choice now
+517  [WARN] failed to start passthrough audio output, failing back to linear format
+557  [DBG] Output on HDMI, channel count: 8
+560  [DBG] output 'f32l' 48000 Hz 3F2M2R/LFE frame=1 samples/32 bytes
+565  [DBG] format: 48000 rate, 8 nch, 4 bps, fl32
+2445 [audio] panel opened: audio/2 English TrueHD 7.1 ✓ | audio/3 English AC-3 5.1 | audio/4 English AC-3 5.1
+2458 [audio] select audio/2 Surround 7.1 - [English] TrueHD Audio ch=8
+2514 [audio] panel opened: audio/2 English TrueHD 7.1 ✓ | …          ← 1b-11-audio-panel-truehd-checked.jpg
+2540 [DBG] killing decoder fourcc `mlpa'                               (switching to AC-3 on purpose, then PGS on)
+2577 [DBG] Output on HDMI, channel count: 6
+```
+No "not supported" / "could not decode" line exists in the log. Skips: +30 s 29000→59000 ms,
+−10 s 59000→49000 ms; subtitles PGS selected (spu/5). Screenshots: `1b-11-audio-panel.jpg` and
+`1b-11-audio-panel-truehd-checked.jpg` (Audio panel open, "English / TrueHD · 7.1" with the check,
+film playing at 00:56 and 01:16), `1b-10-player-wonder-woman.jpg`.
+
+**Divergent, DTS** (`1b-divergent-vlckit.log`): `Using Video Toolbox to decode 'hevc'`, `x420`,
+`codec (dca) started`, `Output on HDMI, channel count: 8`, `output 'f32l' 48000 Hz 3F2M2R/LFE`,
+`format: 48000 rate, 8 nch, 4 bps, fl32` — identical to pass 1. `1b-10-player-divergent.jpg`.
+
+**Stargate, both editions, AC-3** (`1b-stargate-both-editions-vlckit.log`): `codec (mpeg2video)`
+and `codec (ac3) started` via avcodec, `Output on HDMI, channel count: 6`, `output 'f32l' 48000 Hz
+3F2M/LFE`, `format: 48000 rate, 6 nch, 4 bps, fl32` — identical to pass 1. Frame step unchanged:
++1 19527→19653→19686 ms; −1 seek 19686→19653→19620 ms (the D008 back-step caveat from pass 1 stands).
+
+## Disk and time
+
+`~/vlckit-build` 22 GB (two clones, three contrib trees, three libvlc builds, the archives, tools);
+`Frameworks/` 716 MB. This run 9 min 13 s; the recipe from scratch is that plus the host tools
+(about 8 min) plus GNU make 4.4.1 (under a minute).
+
+## Files touched, by step (rerun 4)
+
+| Step | Files / actions |
+|---|---|
+| 0 | `~/vlckit-build/tools/{src,bin,…}` (make 4.4.1, outside the repo); `tools/vlckit-truehd/build.sh` (make step + `VLC_PATH`); `tools/vlckit-truehd/README.md` (one line) |
+| 1 | check only |
+| 3 | `~/vlckit-build/build.log` (kept); earlier logs `build.log.stopped-2236/-2242/-2247/-2303` |
+| 4 | nm only |
+| 5 | `Frameworks/VLCKit.xcframework` (ignored); `Marlin Media TV.xcodeproj/project.pbxproj`; `Marlin Media TV.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` (deleted) |
+| 6 | `reports/screenshots/1b-*.jpg` (17), `reports/logs/1b-*.log` (3) |
+| 7 | `DECISIONS.md` (D012, D013), `COLD-START.md`, this section |
+
+## Not tested, and what was traced instead
+
+- The Denon's input display (D011, the owner's): the log proves 8-channel 48 kHz float PCM leaves
+  VLC; what the receiver shows was not seen.
+- The simulator slice was built and carries the symbols, but nothing was run in a simulator (D005).
+- The Magicians episode (AAC) was not replayed this pass; its path is unchanged code and the same
+  avcodec audio module used by AC-3 and DTS above.
+- A full clean rebuild from an empty `~/vlckit-build` with the final `build.sh` was not run; the
+  recipe was assembled from the four runs and its syntax checked.
+
+## Open questions for the owner
+
+1. The pass-1 open question on the frame-back step (native `gotoPreviousFrame`) is still open.
+2. The 22 GB build directory: keep for incremental rebuilds, or delete once the framework is
+   backed up to the NAS (D013)?
+3. VLC picks the TrueHD track by default now; if the Denon cannot take 8-channel PCM at 48 kHz on
+   some input, the Audio panel still offers the AC-3 tracks.
+
+## Least sure of
+
+- Whether VideoLAN's App Store reasoning for disabling MLP (2016) matters for a development-signed home app.
+- The recipe end to end from an empty directory (see above).
+- Long-run stability of the custom build: the longest playback here was about 100 s.
