@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/nocturne-cd16098c-beea-4866-98d8-a7f5e2b3cacd/styles.css">
+<script src="_ds/nocturne-cd16098c-beea-4866-98d8-a7f5e2b3cacd/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+  body { background: #0c0d14; }
+</style>
+</helmet>
+
+<div style="display:flex;flex-direction:column;gap:88px;padding:96px;background:#0c0d14;font-family:var(--font-body);color:#e9e9ed;width:max-content">
+
+<div style="display:flex;flex-direction:column;gap:10px;max-width:1100px">
+  <div style="font:500 68px/1.05 var(--font-heading);letter-spacing:-0.02em">Marlin Media</div>
+  <div style="font:400 26px/1.5 var(--font-body);color:#9397ab">tvOS client for a home media server. 1920 × 1080, Siri-remote focus model: focus is an accent outline plus a lift and a soft glow, and only one element carries it per screen.</div>
+</div>
+
+<!-- 01 LIBRARY / MOVIES -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">01 · Library — Movies</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="01" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
+      <div style="display:flex;align-items:center;gap:60px">
+        <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+        <div style="display:flex;align-items:stretch;gap:14px">
+          <div style="padding:13px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.16);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.34)">Movies</div>
+          <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">TV Shows</div>
+          <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Videos</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
+        <span style="color:#75798c;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
+        <span>{{ sortLabel }}</span>
+        <span style="color:#9184d9;font-size:20px">▾</span>
+      </div>
+    </div>
+
+    <div style="padding:46px 80px 0">
+      <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Continue watching</div>
+      <div style="display:flex;gap:34px">
+        <sc-for list="{{ cwMovies }}" as="c" hint-placeholder-count="4">
+          <div style="width:262px">
+            <div style="position:relative;height:393px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ c.initial }}</span>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(233,233,237,.18)">
+                <div style="height:5px;width:{{ c.pct }};background:#9184d9"></div>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ c.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ c.left }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="padding:52px 80px 0">
+      <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">All movies · 128</div>
+      <div style="display:flex;gap:36px;align-items:flex-start">
+        <div style="width:250px;transform:translateY(-8px) scale(1.05);transform-origin:top center">
+          <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#332e4e 0%,#1b1d2b 62%,#232532 100%);outline:4px solid #9184d9;outline-offset:6px;box-shadow:0 26px 70px rgba(0,0,0,.65), 0 0 70px rgba(145,132,217,.3);display:flex;align-items:center;justify-content:center">
+            <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.1)">B</span>
+            <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+              <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">4K</span>
+              <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #9184d9;color:#d2cefd">HDR</span>
+            </div>
+          </div>
+          <div style="margin-top:20px;font:500 23px/1.25 var(--font-heading);color:#f5f4ff">Blade Runner</div>
+          <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#b2b6ca">1982</div>
+        </div>
+        <sc-for list="{{ movies }}" as="m" hint-placeholder-count="5">
+          <div style="width:250px;opacity:.82">
+            <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ m.initial }}</span>
+              <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+                <sc-for list="{{ m.badges }}" as="b" hint-placeholder-count="1">
+                  <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">{{ b }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ m.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ m.y }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 LIBRARY / TV SHOWS -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">02 · Library — TV Shows</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="02" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
+      <div style="display:flex;align-items:center;gap:60px">
+        <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+        <div style="display:flex;align-items:stretch;gap:14px">
+          <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Movies</div>
+          <div style="padding:13px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.16);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.34)">TV Shows</div>
+          <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Videos</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
+        <span style="color:#75798c;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
+        <span>Title</span>
+        <span style="color:#9184d9;font-size:20px">▾</span>
+      </div>
+    </div>
+
+    <div style="padding:46px 80px 0">
+      <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Continue watching</div>
+      <div style="display:flex;gap:34px">
+        <sc-for list="{{ cwShows }}" as="c" hint-placeholder-count="3">
+          <div style="width:262px">
+            <div style="position:relative;height:393px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ c.initial }}</span>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(233,233,237,.18)">
+                <div style="height:5px;width:{{ c.pct }};background:#9184d9"></div>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ c.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ c.sub }}</div>
+            <div style="margin-top:2px;font:400 19px/1.3 var(--font-body);color:#75798c">{{ c.left }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="padding:52px 80px 0">
+      <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">All shows · 34</div>
+      <div style="display:flex;gap:36px;align-items:flex-start">
+        <div style="width:250px;transform:translateY(-8px) scale(1.05);transform-origin:top center">
+          <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#332e4e 0%,#1b1d2b 62%,#232532 100%);outline:4px solid #9184d9;outline-offset:6px;box-shadow:0 26px 70px rgba(0,0,0,.65), 0 0 70px rgba(145,132,217,.3);display:flex;align-items:center;justify-content:center">
+            <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.1)">S</span>
+            <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+              <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">4K</span>
+              <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #9184d9;color:#d2cefd">HDR</span>
+            </div>
+          </div>
+          <div style="margin-top:20px;font:500 23px/1.25 var(--font-heading);color:#f5f4ff">Severance</div>
+          <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#b2b6ca">2022</div>
+        </div>
+        <sc-for list="{{ shows }}" as="m" hint-placeholder-count="5">
+          <div style="width:250px;opacity:.82">
+            <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ m.initial }}</span>
+              <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+                <sc-for list="{{ m.badges }}" as="b" hint-placeholder-count="1">
+                  <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">{{ b }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ m.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ m.y }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 03 LIBRARY / VIDEOS -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">03 · Library — Videos</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="03" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
+      <div style="display:flex;align-items:center;gap:60px">
+        <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+        <div style="display:flex;align-items:stretch;gap:14px">
+          <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Movies</div>
+          <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">TV Shows</div>
+          <div style="padding:13px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.16);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.34)">Videos</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
+        <span style="color:#75798c;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
+        <span>Recently Added</span>
+        <span style="color:#9184d9;font-size:20px">▾</span>
+      </div>
+    </div>
+
+    <div style="padding:44px 80px 0;display:flex;flex-direction:column;gap:16px;width:1200px">
+      <div style="display:flex;align-items:center;gap:30px;padding:12px 24px;border-radius:10px;background:rgba(145,132,217,.14);outline:4px solid #9184d9;outline-offset:2px;box-shadow:0 0 60px rgba(145,132,217,.26)">
+        <div style="width:250px;height:141px;border-radius:6px;background:linear-gradient(150deg,#332e4e,#1b1d2b);box-shadow:0 0 0 1px #595d6c;flex:none"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font:500 30px/1.2 var(--font-heading);color:#f5f4ff">Gran Canaria 2024</div>
+          <div style="margin-top:8px;font:400 21px/1.3 var(--font-body);color:#b2b6ca">2160p · HEVC</div>
+        </div>
+        <div style="font:500 28px/1 var(--font-heading);color:#e9e9ed;font-variant-numeric:tabular-nums">12:41</div>
+      </div>
+      <sc-for list="{{ videos }}" as="v" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:30px;padding:12px 24px;border-radius:10px;opacity:.86">
+          <div style="width:250px;height:141px;border-radius:6px;background:linear-gradient(150deg,#2b2741,#1b1d2b);box-shadow:0 0 0 1px #3f424d;flex:none"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font:500 30px/1.2 var(--font-heading);color:#e9e9ed">{{ v.t }}</div>
+            <div style="margin-top:8px;font:400 21px/1.3 var(--font-body);color:#9397ab">{{ v.spec }}</div>
+          </div>
+          <div style="font:500 28px/1 var(--font-heading);color:#b2b6ca;font-variant-numeric:tabular-nums">{{ v.dur }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+
+<!-- 04 VIDEOS EMPTY + 05 SORT MENU -->
+<div style="display:flex;gap:64px;align-items:flex-start">
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">04 · Videos — empty state</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+      </div>
+    </sc-if>
+    <div data-screen-label="04" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
+        <div style="display:flex;align-items:center;gap:60px">
+          <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+          <div style="display:flex;align-items:stretch;gap:14px">
+            <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Movies</div>
+            <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">TV Shows</div>
+            <div style="padding:13px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.16);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.34)">Videos</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #3f424d;background:#1a1c29;font:500 24px/1 var(--font-heading);color:#75798c">
+          <span style="letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
+          <span>Recently Added</span>
+          <span style="font-size:20px">▾</span>
+        </div>
+      </div>
+      <div style="position:absolute;inset:170px 80px 80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
+        <div style="width:190px;height:107px;border-radius:8px;border:2px dashed #3f424d"></div>
+        <div style="font:500 46px/1.15 var(--font-heading);color:#e9e9ed">No videos yet</div>
+        <div style="font:400 26px/1.5 var(--font-body);color:#9397ab;max-width:700px;text-align:center">Drop files into the Videos folder on your server. Marlin picks them up on the next scan.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">05 · Sort control — open</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">detail, top-right of any tab</span>
+      </div>
+    </sc-if>
+    <div style="width:760px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(140% 70% at 80% 0%, #1d2033 0%, #161826 60%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d;padding:52px 60px 0;display:flex;flex-direction:column;align-items:flex-end">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:3px solid #9184d9;background:rgba(145,132,217,.16);font:500 24px/1 var(--font-heading);color:#f5f4ff;box-shadow:0 0 44px rgba(145,132,217,.3)">
+        <span style="color:#b2b6ca;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
+        <span>Recently Added</span>
+        <span style="color:#9184d9;font-size:20px">▴</span>
+      </div>
+      <div style="margin-top:18px;width:420px;border-radius:12px;background:#232532;box-shadow:0 0 0 1px #595d6c, 0 22px 60px rgba(0,0,0,.7);overflow:hidden">
+        <div style="padding:22px 28px;font:500 28px/1 var(--font-heading);color:#cfd3e5;border-bottom:1px solid #2f3240">Title</div>
+        <div style="padding:22px 28px;font:500 28px/1 var(--font-heading);color:#cfd3e5;border-bottom:1px solid #2f3240">Year</div>
+        <div style="padding:22px 28px;display:flex;align-items:center;justify-content:space-between;background:rgba(145,132,217,.2);border-left:4px solid #9184d9;font:500 28px/1 var(--font-heading);color:#f5f4ff">
+          <span>Recently Added</span>
+          <span style="color:#9184d9;font-size:26px">✓</span>
+        </div>
+      </div>
+      <div style="margin-top:26px;width:420px;font:400 19px/1.45 var(--font-body);color:#75798c;text-align:right">Focus moves vertically through the three options; the current sort carries the check and the accent mark.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 MOVIE DETAIL -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">06 · Movie detail</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080 · partially watched</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="06" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#161826;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;inset:0;background:radial-gradient(80% 90% at 78% 10%, #3b3560 0%, #232538 45%, #161826 75%)"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(100deg, #161826 26%, rgba(22,24,38,.82) 48%, rgba(22,24,38,.25) 76%, rgba(22,24,38,.6) 100%)"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;height:340px;background:linear-gradient(to top, #161826, rgba(22,24,38,0))"></div>
+
+    <div style="position:relative;padding:78px 80px 0;display:flex;gap:56px">
+      <div style="width:300px;height:450px;border-radius:8px;flex:none;background:linear-gradient(155deg,#332e4e 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #595d6c, 0 22px 60px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center">
+        <span style="font:500 120px/1 var(--font-heading);color:rgba(233,233,237,.1)">B</span>
+      </div>
+      <div style="max-width:1400px">
+        <div style="font:500 82px/1.02 var(--font-heading);letter-spacing:-0.02em;color:#f5f4ff">Blade Runner</div>
+        <div style="margin-top:22px;display:flex;align-items:center;gap:20px;font:400 24px/1 var(--font-body);color:#cfd3e5">
+          <span>1982</span>
+          <span style="color:#595d6c">·</span>
+          <span>1 h 57 min</span>
+          <span style="color:#595d6c">·</span>
+          <span style="padding:6px 12px;border:1px solid #75798c;border-radius:4px;font-size:19px;letter-spacing:.06em">R</span>
+          <span style="color:#595d6c">·</span>
+          <span>Sci-Fi · Thriller · Noir</span>
+          <span style="display:flex;align-items:center;gap:9px;padding:6px 14px;border-radius:20px;background:rgba(145,132,217,.16);border:1px solid #5d5294;color:#d2cefd;font-size:19px">
+            <span>✓</span><span>Watched 2 ×</span>
+          </span>
+        </div>
+        <div style="margin-top:26px;font:400 26px/1.55 var(--font-body);color:#b2b6ca;max-width:960px;text-wrap:pretty">A blade runner is pulled out of retirement to hunt four replicants hiding in the crowds of Los Angeles, 2019. The longer he tracks them, the less certain the line between the hunted and the hunter becomes.</div>
+
+        <div style="margin-top:40px;display:flex;align-items:center;gap:26px">
+          <div style="width:520px;border-radius:12px;background:rgba(145,132,217,.18);outline:4px solid #9184d9;outline-offset:3px;box-shadow:0 0 70px rgba(145,132,217,.3);overflow:hidden">
+            <div style="padding:26px 34px;display:flex;align-items:center;gap:18px">
+              <span style="font-size:26px;color:#f5f4ff">▶</span>
+              <span style="font:500 32px/1 var(--font-heading);color:#f5f4ff">Resume · 47 min left</span>
+            </div>
+            <div style="height:5px;background:rgba(233,233,237,.2)">
+              <div style="height:5px;width:60%;background:#9184d9"></div>
+            </div>
+          </div>
+          <div style="padding:28px 30px;border-radius:12px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap;flex:none">Start over</div>
+          <div style="padding:28px 30px;border-radius:12px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap;flex:none">Mark unwatched</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="position:relative;padding:56px 80px 0">
+      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:20px">
+        <span style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab">Editions</span>
+        <span style="font:400 20px/1 var(--font-body);color:#75798c">4 files on server</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ editions }}" as="e" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:28px;padding:20px 26px;border-radius:8px;background:rgba(35,37,50,.6);box-shadow:0 0 0 1px #2f3240">
+            <div style="width:320px;font:500 27px/1.2 var(--font-heading);color:#e9e9ed">{{ e.name }}</div>
+            <div style="display:flex;gap:9px;width:230px">
+              <span style="font:600 17px/1 var(--font-body);letter-spacing:.07em;padding:7px 10px;border-radius:4px;background:#1c1e2d;border:1px solid #75798c;color:#e4e7f5">{{ e.res }}</span>
+              <sc-for list="{{ e.hdr }}" as="h" hint-placeholder-count="1">
+                <span style="font:600 17px/1 var(--font-body);letter-spacing:.07em;padding:7px 10px;border-radius:4px;background:rgba(145,132,217,.16);border:1px solid #9184d9;color:#d2cefd">{{ h }}</span>
+              </sc-for>
+            </div>
+            <div style="width:150px;font:400 22px/1 var(--font-body);color:#9397ab">{{ e.codec }}</div>
+            <div style="flex:1;font:400 22px/1.35 var(--font-body);color:#b2b6ca">{{ e.audio }}</div>
+            <div style="width:170px;font:400 22px/1 var(--font-body);color:#9397ab;text-align:right">{{ e.subs }}</div>
+            <div style="width:110px;font:400 22px/1 var(--font-body);color:#75798c;text-align:right">{{ e.size }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 07 EDITION PICKER -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">07 · Edition picker</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">overlay on Play, when more than one edition exists</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="07" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#161826;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;inset:0;background:radial-gradient(80% 90% at 78% 10%, #3b3560 0%, #232538 45%, #161826 75%);filter:blur(2px);opacity:.5"></div>
+    <div style="position:absolute;inset:0;background:rgba(11,12,19,.74)"></div>
+    <div style="position:absolute;left:80px;top:78px;display:flex;gap:40px;align-items:flex-start;opacity:.35">
+      <div style="width:200px;height:300px;border-radius:8px;background:linear-gradient(155deg,#332e4e,#1b1d2b)"></div>
+      <div style="font:500 62px/1.05 var(--font-heading);color:#cfd3e5;padding-top:10px">Blade Runner<div style="font:400 24px/1 var(--font-body);color:#9397ab;margin-top:18px">1982 · 1 h 57 min</div></div>
+    </div>
+
+    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:1180px;border-radius:16px;background:#1e2030;box-shadow:0 0 0 1px #75798c, 0 30px 90px rgba(0,0,0,.75);overflow:hidden">
+      <div style="padding:38px 44px 28px">
+        <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab">Choose an edition</div>
+        <div style="margin-top:14px;font:500 42px/1.1 var(--font-heading);color:#f5f4ff">Blade Runner</div>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:26px;padding:26px 44px;background:rgba(145,132,217,.2);outline:4px solid #9184d9;outline-offset:-4px">
+          <div style="width:300px">
+            <div style="font:500 30px/1.2 var(--font-heading);color:#f5f4ff">The Final Cut</div>
+            <div style="margin-top:6px;font:400 20px/1 var(--font-body);color:#b5abfc">Resume · 47 min left</div>
+          </div>
+          <div style="display:flex;gap:9px;width:210px">
+            <span style="font:600 17px/1 var(--font-body);letter-spacing:.07em;padding:7px 10px;border-radius:4px;background:#1c1e2d;border:1px solid #b2b6ca;color:#f3f5fe">4K</span>
+            <span style="font:600 17px/1 var(--font-body);letter-spacing:.07em;padding:7px 10px;border-radius:4px;background:rgba(145,132,217,.2);border:1px solid #b5abfc;color:#e7e5fe">Dolby Vision</span>
+          </div>
+          <div style="width:130px;font:400 22px/1 var(--font-body);color:#cfd3e5">HEVC</div>
+          <div style="flex:1;font:400 22px/1 var(--font-body);color:#e4e7f5">TrueHD Atmos 7.1</div>
+          <div style="width:150px;font:400 22px/1 var(--font-body);color:#cfd3e5;text-align:right">16 subtitles</div>
+        </div>
+        <sc-for list="{{ pickerEditions }}" as="e" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:26px;padding:26px 44px;border-top:1px solid #2b2e3c">
+            <div style="width:300px;font:500 30px/1.2 var(--font-heading);color:#cfd3e5">{{ e.name }}</div>
+            <div style="display:flex;gap:9px;width:210px">
+              <span style="font:600 17px/1 var(--font-body);letter-spacing:.07em;padding:7px 10px;border-radius:4px;background:#1c1e2d;border:1px solid #75798c;color:#e4e7f5">{{ e.res }}</span>
+              <sc-for list="{{ e.hdr }}" as="h" hint-placeholder-count="1">
+                <span style="font:600 17px/1 var(--font-body);letter-spacing:.07em;padding:7px 10px;border-radius:4px;background:rgba(145,132,217,.16);border:1px solid #9184d9;color:#d2cefd">{{ h }}</span>
+              </sc-for>
+            </div>
+            <div style="width:130px;font:400 22px/1 var(--font-body);color:#9397ab">{{ e.codec }}</div>
+            <div style="flex:1;font:400 22px/1 var(--font-body);color:#b2b6ca">{{ e.audio }}</div>
+            <div style="width:150px;font:400 22px/1 var(--font-body);color:#9397ab;text-align:right">{{ e.subs }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding:24px 44px 34px;font:400 20px/1 var(--font-body);color:#75798c">Menu to cancel</div>
+    </div>
+  </div>
+</div>
+
+<!-- 08 TV SHOW DETAIL -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">08 · TV show detail</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080 · season 2 selected</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="08" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#161826;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;inset:0;background:radial-gradient(75% 85% at 80% 6%, #37345e 0%, #22243a 45%, #161826 72%)"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(100deg, #161826 24%, rgba(22,24,38,.85) 46%, rgba(22,24,38,.35) 74%, rgba(22,24,38,.62) 100%)"></div>
+
+    <div style="position:relative;padding:44px 80px 0;display:flex;gap:48px">
+      <div style="width:210px;height:315px;border-radius:8px;flex:none;background:linear-gradient(155deg,#332e4e 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #595d6c, 0 20px 50px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center">
+        <span style="font:500 84px/1 var(--font-heading);color:rgba(233,233,237,.1)">S</span>
+      </div>
+      <div style="max-width:1120px">
+        <div style="font:500 72px/1.02 var(--font-heading);letter-spacing:-0.02em;color:#f5f4ff">Severance</div>
+        <div style="margin-top:18px;display:flex;align-items:center;gap:18px;font:400 24px/1 var(--font-body);color:#cfd3e5">
+          <span>2022 – present</span>
+          <span style="color:#595d6c">·</span>
+          <span>2 seasons · 19 episodes</span>
+          <span style="color:#595d6c">·</span>
+          <span>Drama · Mystery</span>
+          <span style="color:#595d6c">·</span>
+          <span style="color:#b5abfc">3 unwatched</span>
+        </div>
+        <div style="margin-top:22px;font:400 25px/1.5 var(--font-body);color:#b2b6ca;max-width:1000px;text-wrap:pretty">Employees at Lumon Industries undergo a procedure that severs their work memories from the rest of their lives. One of them starts to piece the two halves back together.</div>
+        <div style="margin-top:34px;display:flex;gap:16px;align-items:center">
+          <div style="padding:16px 34px;border-radius:10px;font:500 28px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Season 1</div>
+          <div style="padding:13px 34px;border-radius:10px;font:500 28px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.18);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.32)">Season 2</div>
+          <div style="padding:16px 34px;border-radius:10px;font:500 28px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Specials</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="position:relative;padding:10px 80px 0;display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ episodes }}" as="ep" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:26px;padding:10px 20px;border-radius:10px;background:rgba(35,37,50,.5);box-shadow:0 0 0 1px #2b2e3c">
+          <div style="position:relative;width:192px;height:108px;border-radius:6px;flex:none;background:linear-gradient(150deg,#2b2741,#1b1d2b);box-shadow:0 0 0 1px #3f424d;overflow:hidden">
+            <span style="position:absolute;left:12px;bottom:10px;font:500 22px/1 var(--font-heading);color:rgba(233,233,237,.4)">{{ ep.num }}</span>
+            <sc-if value="{{ ep.inProgress }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(233,233,237,.2)">
+                <div style="height:5px;width:72%;background:#9184d9"></div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:baseline;gap:16px">
+              <span style="font:500 28px/1.2 var(--font-heading);color:#e9e9ed">{{ ep.title }}</span>
+              <span style="font:400 21px/1 var(--font-body);color:#75798c">{{ ep.dur }}</span>
+            </div>
+            <div style="margin-top:8px;font:400 21px/1.35 var(--font-body);color:#9397ab;max-width:1020px">{{ ep.syn }}</div>
+          </div>
+          <div style="width:190px;text-align:right;font:400 21px/1 var(--font-body);color:#b5abfc">{{ ep.state }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+
+<!-- 09 VIDEO DETAIL -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">09 · Video detail</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="09" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(90% 80% at 20% 0%, #1f2235 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;left:80px;top:96px;width:1100px">
+      <div style="width:1100px;height:619px;border-radius:12px;background:linear-gradient(150deg,#332e4e 0%,#1b1d2b 60%,#232532 100%);box-shadow:0 0 0 1px #595d6c, 0 24px 70px rgba(0,0,0,.6)"></div>
+    </div>
+    <div style="position:absolute;left:1250px;top:150px;width:580px">
+      <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab">Video</div>
+      <div style="margin-top:20px;font:500 60px/1.08 var(--font-heading);letter-spacing:-0.02em;color:#f5f4ff">Gran Canaria 2024</div>
+      <div style="margin-top:24px;font:400 26px/1.5 var(--font-body);color:#cfd3e5">12:41</div>
+      <div style="margin-top:8px;font:400 24px/1.5 var(--font-body);color:#9397ab">2160p · HEVC · AAC 2.0 · 3.4 GB</div>
+      <div style="margin-top:8px;font:400 22px/1.5 var(--font-body);color:#75798c">Added 4 Aug 2026 · /Videos/Trips</div>
+      <div style="margin-top:44px;width:460px;border-radius:12px;background:rgba(145,132,217,.18);outline:4px solid #9184d9;outline-offset:3px;box-shadow:0 0 70px rgba(145,132,217,.3);overflow:hidden">
+        <div style="padding:26px 34px;display:flex;align-items:center;gap:18px">
+          <span style="font-size:26px;color:#f5f4ff">▶</span>
+          <span style="font:500 32px/1 var(--font-heading);color:#f5f4ff">Resume · 8:02 left</span>
+        </div>
+        <div style="height:5px;background:rgba(233,233,237,.2)">
+          <div style="height:5px;width:37%;background:#9184d9"></div>
+        </div>
+      </div>
+      <div style="margin-top:18px;width:460px;padding:26px 34px;border-radius:12px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;text-align:center">Start over</div>
+    </div>
+  </div>
+</div>
+
+<!-- 10 PLAYER OVERLAY -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">10 · Player — overlay visible</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">appears on touch, fades after 4 s</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="10" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#07080c;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;inset:0;background:radial-gradient(60% 70% at 62% 40%, #2e2b47 0%, #14151f 55%, #07080c 100%)"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(7,8,12,.92) 0%, rgba(7,8,12,.55) 26%, rgba(7,8,12,0) 52%)"></div>
+
+    <div style="position:absolute;left:80px;right:80px;bottom:78px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div>
+          <div style="font:500 46px/1.1 var(--font-heading);color:#f5f4ff">Blade Runner</div>
+          <div style="margin-top:12px;font:400 26px/1 var(--font-body);color:#b2b6ca">The Final Cut · 4K Dolby Vision · TrueHD Atmos 7.1</div>
+        </div>
+        <div style="display:flex;gap:16px">
+          <div style="padding:13px 30px;border-radius:10px;font:500 26px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.18);border:3px solid #9184d9;box-shadow:0 0 40px rgba(145,132,217,.3)">Audio</div>
+          <div style="padding:16px 30px;border-radius:10px;font:500 26px/1 var(--font-heading);color:#cfd3e5;border:1px solid #75798c;background:rgba(22,24,38,.6)">Subtitles</div>
+        </div>
+      </div>
+
+      <div style="margin-top:40px;display:flex;align-items:center;gap:26px">
+        <div style="font:500 30px/1 var(--font-heading);color:#e9e9ed;font-variant-numeric:tabular-nums;width:130px">1:10:22</div>
+        <div style="flex:1;position:relative;height:8px;border-radius:4px;background:rgba(233,233,237,.22)">
+          <div style="position:absolute;left:0;top:0;height:8px;width:60%;border-radius:4px;background:#9184d9"></div>
+          <div style="position:absolute;left:60%;top:-13px;width:10px;height:34px;border-radius:5px;background:#f5f4ff;box-shadow:0 0 24px rgba(145,132,217,.8);transform:translateX(-5px)"></div>
+        </div>
+        <div style="font:500 30px/1 var(--font-heading);color:#b2b6ca;font-variant-numeric:tabular-nums;width:130px;text-align:right">−46:38</div>
+      </div>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:14px;font:400 24px/1 var(--font-body);color:#9397ab">
+        <span style="color:#9184d9;font-size:22px">▶</span>
+        <span>Playing</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 11 + 12 TRACK PANELS -->
+<div style="display:flex;gap:64px;align-items:flex-start">
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">11 · Audio track panel</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+      </div>
+    </sc-if>
+    <div data-screen-label="11" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#07080c;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+      <div style="position:absolute;inset:0;background:radial-gradient(60% 70% at 62% 40%, #2e2b47 0%, #14151f 55%, #07080c 100%);opacity:.7"></div>
+      <div style="position:absolute;inset:0;background:rgba(7,8,12,.55)"></div>
+      <div style="position:absolute;left:80px;bottom:78px;font:400 24px/1.4 var(--font-body);color:#595d6c">Blade Runner · The Final Cut · 1:10:22</div>
+      <div style="position:absolute;right:80px;top:90px;width:760px;border-radius:16px;background:#1e2030;box-shadow:0 0 0 1px #75798c, 0 30px 90px rgba(0,0,0,.8);overflow:hidden">
+        <div style="padding:34px 40px 26px;border-bottom:1px solid #2b2e3c">
+          <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab">Audio</div>
+          <div style="margin-top:12px;font:500 38px/1.1 var(--font-heading);color:#f5f4ff">5 tracks</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px 40px;background:rgba(145,132,217,.2);outline:4px solid #9184d9;outline-offset:-4px">
+          <div>
+            <div style="font:500 30px/1.2 var(--font-heading);color:#f5f4ff">English</div>
+            <div style="margin-top:6px;font:400 22px/1 var(--font-body);color:#d2cefd">TrueHD Atmos · 7.1</div>
+          </div>
+          <span style="font-size:28px;color:#b5abfc">✓</span>
+        </div>
+        <sc-for list="{{ audioTracks }}" as="a" hint-placeholder-count="4">
+          <div style="padding:26px 40px;border-top:1px solid #2b2e3c">
+            <div style="font:500 30px/1.2 var(--font-heading);color:#cfd3e5">{{ a.lang }}</div>
+            <div style="margin-top:6px;font:400 22px/1 var(--font-body);color:#9397ab">{{ a.spec }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">12 · Subtitle track panel</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+      </div>
+    </sc-if>
+    <div data-screen-label="12" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#07080c;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+      <div style="position:absolute;inset:0;background:radial-gradient(60% 70% at 62% 40%, #2e2b47 0%, #14151f 55%, #07080c 100%);opacity:.7"></div>
+      <div style="position:absolute;inset:0;background:rgba(7,8,12,.55)"></div>
+      <div style="position:absolute;left:80px;bottom:78px;font:400 24px/1.4 var(--font-body);color:#595d6c">Blade Runner · The Final Cut · 1:10:22</div>
+      <div style="position:absolute;right:80px;top:90px;width:760px;border-radius:16px;background:#1e2030;box-shadow:0 0 0 1px #75798c, 0 30px 90px rgba(0,0,0,.8);overflow:hidden">
+        <div style="padding:34px 40px 26px;border-bottom:1px solid #2b2e3c">
+          <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab">Subtitles</div>
+          <div style="margin-top:12px;font:500 38px/1.1 var(--font-heading);color:#f5f4ff">Off</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px 40px;background:rgba(145,132,217,.2);outline:4px solid #9184d9;outline-offset:-4px">
+          <div style="font:500 30px/1.2 var(--font-heading);color:#f5f4ff">Off</div>
+          <span style="font-size:28px;color:#b5abfc">✓</span>
+        </div>
+        <sc-for list="{{ subTracks }}" as="s" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px 40px;border-top:1px solid #2b2e3c">
+            <div style="font:500 30px/1.2 var(--font-heading);color:#cfd3e5">{{ s.lang }}</div>
+            <div style="font:400 22px/1 var(--font-body);color:#9397ab">{{ s.fmt }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 13 PAUSED + FRAME STEP -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">13 · Player — paused, frame step</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080 · indicator shown after a step</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="13" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#07080c;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;inset:0;background:radial-gradient(60% 70% at 62% 40%, #2e2b47 0%, #14151f 55%, #07080c 100%)"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(7,8,12,.92) 0%, rgba(7,8,12,.5) 28%, rgba(7,8,12,.25) 55%, rgba(7,8,12,.4) 100%)"></div>
+
+    <div style="position:absolute;left:50%;top:300px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:30px">
+      <div style="width:126px;height:126px;border-radius:63px;border:3px solid rgba(233,233,237,.4);display:flex;align-items:center;justify-content:center;gap:12px;background:rgba(7,8,12,.45)">
+        <div style="width:13px;height:48px;border-radius:3px;background:#f5f4ff"></div>
+        <div style="width:13px;height:48px;border-radius:3px;background:#f5f4ff"></div>
+      </div>
+      <div style="padding:16px 34px;border-radius:12px;background:rgba(145,132,217,.22);border:1px solid #9184d9;font:500 40px/1 var(--font-heading);color:#f5f4ff;font-variant-numeric:tabular-nums;box-shadow:0 0 60px rgba(145,132,217,.32)">Frame +1</div>
+    </div>
+
+    <div style="position:absolute;left:80px;right:80px;bottom:78px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div>
+          <div style="font:500 46px/1.1 var(--font-heading);color:#f5f4ff">Blade Runner</div>
+          <div style="margin-top:12px;font:400 26px/1 var(--font-body);color:#b2b6ca">The Final Cut · 4K Dolby Vision</div>
+        </div>
+        <div style="display:flex;gap:16px">
+          <div style="padding:16px 30px;border-radius:10px;font:500 26px/1 var(--font-heading);color:#cfd3e5;border:1px solid #75798c;background:rgba(22,24,38,.6)">Audio</div>
+          <div style="padding:16px 30px;border-radius:10px;font:500 26px/1 var(--font-heading);color:#cfd3e5;border:1px solid #75798c;background:rgba(22,24,38,.6)">Subtitles</div>
+        </div>
+      </div>
+      <div style="margin-top:40px;display:flex;align-items:center;gap:26px">
+        <div style="font:500 30px/1 var(--font-heading);color:#e9e9ed;font-variant-numeric:tabular-nums;width:130px">1:10:22</div>
+        <div style="flex:1;position:relative;height:8px;border-radius:4px;background:rgba(233,233,237,.22)">
+          <div style="position:absolute;left:0;top:0;height:8px;width:60%;border-radius:4px;background:#9184d9"></div>
+          <div style="position:absolute;left:60%;top:-13px;width:10px;height:34px;border-radius:5px;background:#f5f4ff;box-shadow:0 0 24px rgba(145,132,217,.8);transform:translateX(-5px)"></div>
+        </div>
+        <div style="font:500 30px/1 var(--font-heading);color:#b2b6ca;font-variant-numeric:tabular-nums;width:130px;text-align:right">−46:38</div>
+      </div>
+      <div style="margin-top:24px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:14px;font:400 24px/1 var(--font-body);color:#9397ab">
+          <span style="color:#9184d9;font-size:20px">❙❙</span>
+          <span>Paused</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:34px;font:400 24px/1 var(--font-body);color:#b2b6ca">
+          <span style="display:flex;align-items:center;gap:12px"><span style="color:#9184d9">◀</span> click: frame back</span>
+          <span style="display:flex;align-items:center;gap:12px">click <span style="color:#9184d9">▶</span>: frame forward</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 14 + 15 SKIP FEEDBACK -->
+<div style="display:flex;gap:64px;align-items:flex-start">
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">14 · Skip back — swipe left</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+      </div>
+    </sc-if>
+    <div data-screen-label="14" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#07080c;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+      <div style="position:absolute;inset:0;background:radial-gradient(60% 70% at 62% 40%, #2e2b47 0%, #14151f 55%, #07080c 100%)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(145,132,217,.14), rgba(7,8,12,0) 45%)"></div>
+      <div style="position:absolute;left:180px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:28px">
+        <span style="font:400 72px/1 var(--font-body);color:rgba(233,233,237,.45)">◀◀</span>
+        <span style="padding:20px 42px;border-radius:14px;background:rgba(7,8,12,.6);border:1px solid #9184d9;font:500 66px/1 var(--font-heading);color:#f5f4ff;font-variant-numeric:tabular-nums;box-shadow:0 0 70px rgba(145,132,217,.3)">−10 s</span>
+      </div>
+      <div style="position:absolute;left:80px;right:80px;bottom:78px;display:flex;align-items:center;gap:26px">
+        <div style="font:500 30px/1 var(--font-heading);color:#e9e9ed;font-variant-numeric:tabular-nums;width:130px">1:10:12</div>
+        <div style="flex:1;position:relative;height:8px;border-radius:4px;background:rgba(233,233,237,.22)">
+          <div style="position:absolute;left:0;top:0;height:8px;width:59.8%;border-radius:4px;background:#9184d9"></div>
+          <div style="position:absolute;left:59.8%;top:-13px;width:10px;height:34px;border-radius:5px;background:#f5f4ff;box-shadow:0 0 24px rgba(145,132,217,.8);transform:translateX(-5px)"></div>
+        </div>
+        <div style="font:500 30px/1 var(--font-heading);color:#b2b6ca;font-variant-numeric:tabular-nums;width:130px;text-align:right">−46:48</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">15 · Skip forward — swipe right</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+      </div>
+    </sc-if>
+    <div data-screen-label="15" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#07080c;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+      <div style="position:absolute;inset:0;background:radial-gradient(60% 70% at 62% 40%, #2e2b47 0%, #14151f 55%, #07080c 100%)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to left, rgba(145,132,217,.14), rgba(7,8,12,0) 45%)"></div>
+      <div style="position:absolute;right:180px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:28px">
+        <span style="padding:20px 42px;border-radius:14px;background:rgba(7,8,12,.6);border:1px solid #9184d9;font:500 66px/1 var(--font-heading);color:#f5f4ff;font-variant-numeric:tabular-nums;box-shadow:0 0 70px rgba(145,132,217,.3)">+30 s</span>
+        <span style="font:400 72px/1 var(--font-body);color:rgba(233,233,237,.45)">▶▶</span>
+      </div>
+      <div style="position:absolute;left:80px;right:80px;bottom:78px;display:flex;align-items:center;gap:26px">
+        <div style="font:500 30px/1 var(--font-heading);color:#e9e9ed;font-variant-numeric:tabular-nums;width:130px">1:10:52</div>
+        <div style="flex:1;position:relative;height:8px;border-radius:4px;background:rgba(233,233,237,.22)">
+          <div style="position:absolute;left:0;top:0;height:8px;width:60.4%;border-radius:4px;background:#9184d9"></div>
+          <div style="position:absolute;left:60.4%;top:-13px;width:10px;height:34px;border-radius:5px;background:#f5f4ff;box-shadow:0 0 24px rgba(145,132,217,.8);transform:translateX(-5px)"></div>
+        </div>
+        <div style="font:500 30px/1 var(--font-heading);color:#b2b6ca;font-variant-numeric:tabular-nums;width:130px;text-align:right">−46:08</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 16 + 17 LOADING AND ERROR -->
+<div style="display:flex;gap:64px;align-items:flex-start">
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">16 · Library — loading</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080</span>
+      </div>
+    </sc-if>
+    <div data-screen-label="16" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+      <div style="display:flex;align-items:center;gap:60px;padding:52px 80px 0">
+        <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+        <div style="display:flex;gap:14px">
+          <div style="width:150px;height:52px;border-radius:10px;background:#232532"></div>
+          <div style="width:180px;height:52px;border-radius:10px;background:#1f2130"></div>
+          <div style="width:140px;height:52px;border-radius:10px;background:#1f2130"></div>
+        </div>
+      </div>
+      <div style="padding:46px 80px 0">
+        <div style="width:300px;height:22px;border-radius:4px;background:#232532"></div>
+        <div style="margin-top:26px;display:flex;gap:34px">
+          <sc-for list="{{ skeletons }}" as="s" hint-placeholder-count="6">
+            <div>
+              <div style="width:250px;height:375px;border-radius:8px;background:linear-gradient(105deg,#1e2030 0%,#262939 45%,#1e2030 100%)"></div>
+              <div style="margin-top:16px;width:190px;height:20px;border-radius:4px;background:#232532"></div>
+              <div style="margin-top:10px;width:90px;height:18px;border-radius:4px;background:#1f2130"></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="position:absolute;left:80px;bottom:96px;display:flex;align-items:center;gap:20px">
+        <div style="width:34px;height:34px;border-radius:17px;border:3px solid #423a6a;border-top-color:#9184d9"></div>
+        <div style="font:400 26px/1 var(--font-body);color:#9397ab">Loading library from marlin.local…</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">17 · Can't reach server</span>
+        <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080 · Retry focused</span>
+      </div>
+    </sc-if>
+    <div data-screen-label="17" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(90% 80% at 50% 30%, #1d1f2f 0%, #161826 55%, #101220 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+      <div style="position:absolute;left:80px;top:52px;font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</div>
+      <div style="position:absolute;left:80px;top:50%;transform:translateY(-50%);max-width:900px">
+        <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab">Connection</div>
+        <div style="margin-top:22px;font:500 66px/1.06 var(--font-heading);letter-spacing:-0.02em;color:#f5f4ff">Can't reach server</div>
+        <div style="margin-top:24px;font:400 27px/1.5 var(--font-body);color:#b2b6ca;max-width:780px;text-wrap:pretty">marlin.local did not answer. Check that the server is powered on and on the same network as this Apple TV.</div>
+        <div style="margin-top:20px;font:400 22px/1.5 var(--font-body);color:#75798c">Last successful sync: today, 09:14 · 128 movies, 34 shows cached</div>
+        <div style="margin-top:48px;display:flex;align-items:center;gap:20px">
+          <div style="padding:24px 60px;border-radius:12px;background:rgba(145,132,217,.18);outline:4px solid #9184d9;outline-offset:3px;box-shadow:0 0 70px rgba(145,132,217,.3);font:500 32px/1 var(--font-heading);color:#f5f4ff">Retry</div>
+          <div style="padding:26px 44px;border-radius:12px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5">Browse cached</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showFrameLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Board&quot;},&quot;showTechBadges&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Library&quot;},&quot;sortLabel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Title&quot;,&quot;Year&quot;,&quot;Recently Added&quot;],&quot;default&quot;:&quot;Recently Added&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Library&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const tech = this.props.showTechBadges ?? true;
+    const M = (t, y, res, hdr) => ({
+      t, y, initial: t[0],
+      badges: tech ? [res === '4K' ? '4K' : null, hdr ? 'HDR' : null].filter(Boolean) : []
+    });
+    const movies = [
+      M('Dune', 2021, '4K', true), M('Heat', 1995, '1080p', false),
+      M('Arrival', 2016, '4K', true), M('The Thing', 1982, '1080p', false),
+      M('Paprika', 2006, '1080p', false), M('Solaris', 1972, '1080p', false),
+      M('Sicario', 2015, '4K', false), M('Children of Men', 2006, '1080p', false),
+      M('Ran', 1985, '4K', true), M('Point Break', 1991, '720p', false),
+      M('Tampopo', 1985, '1080p', false)
+    ];
+    const shows = [
+      M('Andor', 2022, '4K', true), M('The Bear', 2022, '1080p', false),
+      M('Chernobyl', 2019, '4K', false), M('Fargo', 2014, '1080p', false),
+      M('Twin Peaks', 1990, '1080p', false), M('Dark', 2017, '4K', true),
+      M('The Leftovers', 2014, '1080p', false), M('Better Call Saul', 2015, '4K', true),
+      M('Mr. Robot', 2015, '1080p', false), M('Halt and Catch Fire', 2014, '1080p', false),
+      M('Utopia', 2013, '1080p', false)
+    ];
+    const cwMovies = [
+      { t: 'Blade Runner', initial: 'B', left: '47 min left', pct: '60%' },
+      { t: 'Heat', initial: 'H', left: '1 h 12 min left', pct: '31%' },
+      { t: 'Ran', initial: 'R', left: '22 min left', pct: '84%' },
+      { t: 'Sicario', initial: 'S', left: '9 min left', pct: '92%' }
+    ];
+    const cwShows = [
+      { t: 'Severance', initial: 'S', sub: 'S2 E4 · Woe\u2019s Hollow', left: '18 min left', pct: '58%' },
+      { t: 'Andor', initial: 'A', sub: 'S1 E9 · Nobody\u2019s Listening!', left: '31 min left', pct: '27%' },
+      { t: 'Chernobyl', initial: 'C', sub: 'E3 · Open Wide, O Earth', left: '12 min left', pct: '78%' }
+    ];
+    const videos = [
+      { t: 'Kitchen remodel — timelapse', spec: '1080p · H.264', dur: '03:08' },
+      { t: 'Wedding ceremony, full', spec: '1080p · H.264', dur: '1:24:06' },
+      { t: 'Drone — coast at dawn', spec: '2160p · HEVC', dur: '06:52' },
+      { t: 'Nora\u2019s first steps', spec: '1080p · H.264', dur: '00:47' }
+    ];
+    const editions = [
+      { name: 'The Final Cut', res: '4K', hdr: ['Dolby Vision'], codec: 'HEVC', audio: 'TrueHD Atmos 7.1 · AC-3 5.1 · Commentary 2.0', subs: '16 subtitles', size: '62 GB' },
+      { name: 'Director\u2019s Cut', res: '1080p', hdr: [], codec: 'H.264', audio: 'DTS-HD MA 5.1 · AC-3 2.0', subs: '9 subtitles', size: '18 GB' },
+      { name: 'Theatrical', res: '1080p', hdr: [], codec: 'H.264', audio: 'AC-3 5.1', subs: '4 subtitles', size: '11 GB' },
+      { name: 'Workprint', res: 'SD', hdr: [], codec: 'MPEG-2', audio: 'AC-3 2.0', subs: 'No subtitles', size: '2.1 GB' }
+    ];
+    const episodes = [
+      { num: 'E1', title: 'Hello, Ms. Cobel', dur: '48 min', syn: 'Mark returns to a floor that has quietly rearranged itself around his absence.', state: 'Watched ✓', inProgress: false },
+      { num: 'E2', title: 'Goodbye, Mrs. Selvig', dur: '43 min', syn: 'Helly tests how far a refiner\u2019s consent actually reaches.', state: 'Watched ✓', inProgress: false },
+      { num: 'E3', title: 'Who Is Alive?', dur: '46 min', syn: 'A wellness session turns into an interrogation neither side admits to.', state: 'Watched ✓', inProgress: false },
+      { num: 'E4', title: 'Woe\u2019s Hollow', dur: '52 min', syn: 'The team is sent outdoors for an exercise with no stated purpose.', state: '18 min left', inProgress: true },
+      { num: 'E5', title: 'Trojan\u2019s Horse', dur: '41 min', syn: 'Optics management arrives on the severed floor.', state: 'Unwatched', inProgress: false }
+    ];
+    const audioTracks = [
+      { lang: 'English', spec: 'AC-3 · 5.1' },
+      { lang: 'English — commentary', spec: 'AC-3 · 2.0' },
+      { lang: 'Français', spec: 'DTS-HD MA · 5.1' },
+      { lang: 'Deutsch', spec: 'AC-3 · 2.0' }
+    ];
+    const subTracks = [
+      { lang: 'English', fmt: 'PGS' },
+      { lang: 'English SDH', fmt: 'SRT' },
+      { lang: 'Español', fmt: 'SRT' },
+      { lang: 'Français', fmt: 'PGS' },
+      { lang: '日本語', fmt: 'ASS' }
+    ];
+    return {
+      showLabels: this.props.showFrameLabels ?? true,
+      sortLabel: this.props.sortLabel ?? 'Recently Added',
+      movies, shows, cwMovies, cwShows, videos, editions,
+      pickerEditions: editions.slice(1),
+      episodes, audioTracks, subTracks,
+      skeletons: [1, 2, 3, 4, 5, 6]
+    };
+  }
+}
+</script>
+</body>
+</html>

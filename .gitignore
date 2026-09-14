@@ -1,0 +1,44 @@
+# Xcode / Swift .gitignore
+
+## Build artifacts
+build/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+## Xcode user-specific files
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+*.xcscmblueprint
+*.xccheckout
+
+## Swift Package Manager
+.build/
+.swiftpm/
+
+## CocoaPods / Carthage (not used, but ignored just in case)
+Pods/
+Carthage/Build/
+
+## macOS junk
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*~.nib
+
+## Misc
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+timeline.xctimeline
+playground.xcworkspace
