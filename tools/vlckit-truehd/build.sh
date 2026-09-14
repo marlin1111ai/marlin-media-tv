@@ -54,6 +54,12 @@ fi
 "$BUILD_DIR/tools/bin/make" --version | head -1
 export VLC_PATH="$BUILD_DIR/tools/bin"
 
+# Step 2b — pass 1d (D015): install the TrueHD/MLP block-coalescing patch as VLCKit patch 0018 so that
+# compileAndBuildVLCKit.sh applies it with the other seventeen (it resets libvlc to TESTEDHASH and re-applies
+# libvlc/patches/*.patch on every run). Idempotent copy.
+cp "$REPO/tools/vlckit-truehd/0018-avcodec-audio-coalesce-TrueHD-MLP-frames.patch" "$BUILD_DIR/VLCKit/libvlc/patches/"
+echo "patch 0018 installed"
+
 # Step 3 — VideoLAN's own build: clones libvlc master at the pinned hash (TESTEDHASH in the script),
 # applies the 17 patches, builds host tools under extras/tools, the contribs, libvlc, then the framework.
 # -v verbose, -f device + simulator + xcframework, -t tvOS, -r Release.

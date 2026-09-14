@@ -1,0 +1,177 @@
+From d9b28edad5b02b3b7dce0402cc0a1d9cb4a1bb9c Mon Sep 17 00:00:00 2001
+From: Marlin Media TV build <build@marlin-media-tv.local>
+Date: Mon, 14 Sep 2026 12:46:12 -0400
+Subject: [PATCH] avcodec audio: coalesce TrueHD/MLP decoder frames into ~20 ms
+ blocks
+
+FFmpeg's TrueHD/MLP decoder emits one 40-sample frame per access unit
+(1200 blocks per second at 48 kHz) and VLC hands each one to the audio
+output as its own block; on the Apple AVSampleBufferAudioRenderer output
+that is 1200 CMSampleBuffers per second, 13-38x more than DTS or AC-3.
+Gather them into ~20 ms blocks (whole frames, PTS of the first, summed
+length) in the avcodec audio decoder, for AV_CODEC_ID_TRUEHD and
+AV_CODEC_ID_MLP only. Flush drops the accumulator, drain sends it.
+
+Marlin Media TV pass 1d, D015.
+---
+ modules/codec/avcodec/audio.c | 102 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 101 insertions(+), 1 deletion(-)
+
+diff --git a/modules/codec/avcodec/audio.c b/modules/codec/avcodec/audio.c
+index e6c9128ef7..c5cec9dfd3 100644
+--- a/modules/codec/avcodec/audio.c
++++ b/modules/codec/avcodec/audio.c
+@@ -71,6 +71,14 @@ typedef struct
+     int     pi_extraction[AOUT_CHAN_MAX];
+     int     i_previous_channels;
+     uint64_t i_previous_layout;
++
++    /* TrueHD/MLP only: the decoder emits one 40-sample frame per access
++     * unit (1200 per second at 48 kHz). Coalesce them into ~20 ms blocks
++     * before they reach the audio output; every other codec is untouched. */
++    bool     b_coalesce;
++    unsigned i_coalesce_target;    /* samples per output block, 0 = not yet known */
++    size_t   i_coalesce_capacity;  /* bytes allocated for the accumulator */
++    block_t *p_coalesce;           /* accumulator, NULL when empty */
+ } decoder_sys_t;
+ 
+ #define BLOCK_FLAG_PRIVATE_REALLOCATED (1 << BLOCK_FLAG_PRIVATE_SHIFT)
+@@ -230,6 +238,8 @@ void EndAudioDec( vlc_object_t *obj )
+     decoder_sys_t *sys = p_dec->p_sys;
+     AVCodecContext *ctx = sys->p_context;
+ 
++    if( sys->p_coalesce != NULL )
++        block_Release( sys->p_coalesce );
+     avcodec_free_context( &ctx );
+     free( sys );
+ }
+@@ -275,6 +285,10 @@ int InitAudioDec( vlc_object_t *obj )
+     p_sys->i_previous_channels = 0;
+     p_sys->i_previous_layout = 0;
+     p_sys->discontinuity = false;
++    p_sys->b_coalesce = ( codec->id == AV_CODEC_ID_TRUEHD || codec->id == AV_CODEC_ID_MLP );
++    p_sys->i_coalesce_target = 0;
++    p_sys->i_coalesce_capacity = 0;
++    p_sys->p_coalesce = NULL;
+ 
+     /* */
+     /* Try to set as much information as possible but do not trust it */
+@@ -292,6 +306,78 @@ int InitAudioDec( vlc_object_t *obj )
+     return VLC_SUCCESS;
+ }
+ 
++/*****************************************************************************
++ * CoalesceAndQueue: TrueHD/MLP frames are 40 samples; gather ~20 ms of them
++ * into one block before decoder_QueueAudio. PTS/flags come from the first
++ * frame of a block, the length is the sum. A discontinuity flushes what is
++ * pending first; a frame at least as big as the target is passed through.
++ *****************************************************************************/
++static void CoalesceAndQueue( decoder_t *p_dec, block_t *p_in )
++{
++    decoder_sys_t *p_sys = p_dec->p_sys;
++
++    if( p_sys->i_coalesce_target == 0 )
++    {
++        unsigned i_frame = p_in->i_nb_samples > 0 ? p_in->i_nb_samples : 1;
++        unsigned i_target = p_dec->fmt_out.audio.i_rate / 50; /* 20 ms */
++        i_target = ((i_target + i_frame - 1) / i_frame) * i_frame; /* whole frames */
++        if( i_target < i_frame )
++            i_target = i_frame;
++        p_sys->i_coalesce_target = i_target;
++        p_sys->i_coalesce_capacity = (size_t)i_target * p_dec->fmt_out.audio.i_bytes_per_frame;
++        msg_Dbg( p_dec, "coalescing %u-sample decoder frames into %u-sample blocks (%u ms) before the audio output",
++                 i_frame, i_target,
++                 p_dec->fmt_out.audio.i_rate ? i_target * 1000 / p_dec->fmt_out.audio.i_rate : 0 );
++    }
++
++    block_t *p_acc = p_sys->p_coalesce;
++    if( p_acc != NULL &&
++        ( (p_in->i_flags & BLOCK_FLAG_DISCONTINUITY) ||
++          p_acc->i_buffer + p_in->i_buffer > p_sys->i_coalesce_capacity ) )
++    {
++        decoder_QueueAudio( p_dec, p_acc );
++        p_acc = NULL;
++    }
++
++    if( p_in->i_nb_samples >= p_sys->i_coalesce_target ||
++        p_in->i_buffer > p_sys->i_coalesce_capacity )
++    {
++        p_sys->p_coalesce = p_acc;
++        decoder_QueueAudio( p_dec, p_in );
++        return;
++    }
++
++    if( p_acc == NULL )
++    {
++        p_acc = block_Alloc( p_sys->i_coalesce_capacity );
++        if( unlikely(p_acc == NULL) )
++        {
++            p_sys->p_coalesce = NULL;
++            decoder_QueueAudio( p_dec, p_in ); /* out of memory: pass through */
++            return;
++        }
++        p_acc->i_buffer = 0;
++        p_acc->i_nb_samples = 0;
++        p_acc->i_length = 0;
++        p_acc->i_pts = p_in->i_pts;
++        p_acc->i_dts = p_in->i_dts;
++        p_acc->i_flags = p_in->i_flags;
++    }
++
++    memcpy( p_acc->p_buffer + p_acc->i_buffer, p_in->p_buffer, p_in->i_buffer );
++    p_acc->i_buffer += p_in->i_buffer;
++    p_acc->i_nb_samples += p_in->i_nb_samples;
++    p_acc->i_length += p_in->i_length;
++    block_Release( p_in );
++
++    if( p_acc->i_nb_samples >= p_sys->i_coalesce_target )
++    {
++        decoder_QueueAudio( p_dec, p_acc );
++        p_acc = NULL;
++    }
++    p_sys->p_coalesce = p_acc;
++}
++
+ /*****************************************************************************
+  * Flush:
+  *****************************************************************************/
+@@ -308,6 +394,11 @@ static void Flush( decoder_t *p_dec )
+         ctx->codec_id == AV_CODEC_ID_MP3 )
+         p_sys->i_reject_count = 3;
+     p_sys->discontinuity = false;
++    if( p_sys->p_coalesce != NULL )
++    {
++        block_Release( p_sys->p_coalesce );
++        p_sys->p_coalesce = NULL;
++    }
+ }
+ 
+ /*****************************************************************************
+@@ -478,7 +569,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+                     p_sys->discontinuity = false;
+                     p_converted->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                 }
+-                decoder_QueueAudio( p_dec, p_converted );
++                if( p_sys->b_coalesce )
++                    CoalesceAndQueue( p_dec, p_converted );
++                else
++                    decoder_QueueAudio( p_dec, p_converted );
+             }
+ 
+             /* Prepare new frame */
+@@ -494,6 +588,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+             av_frame_free( &frame );
+         }
+     };
++    if( pp_block == NULL && p_sys->p_coalesce != NULL )
++    {
++        /* Drain: send what was accumulated */
++        decoder_QueueAudio( p_dec, p_sys->p_coalesce );
++        p_sys->p_coalesce = NULL;
++    }
+ 
+     if (send_failed)
+     {
+-- 
+2.54.0
+

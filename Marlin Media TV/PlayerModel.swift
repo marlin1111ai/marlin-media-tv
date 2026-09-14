@@ -14,6 +14,9 @@ import Foundation
 import Observation
 import UIKit
 import VLCKit
+import AVFoundation
+import AVKit
+import CoreMedia
 
 enum RemoteInput {
     case select, playPause, menu, up, down, touch
@@ -23,7 +26,7 @@ enum RemoteInput {
 
 @MainActor
 @Observable
-final class PlayerModel: NSObject, VLCMediaPlayerDelegate {
+final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegate {
     enum Focus: Equatable { case surface, audio, subtitles }
     enum Panel: Equatable { case audio, subtitles }
 
@@ -115,6 +118,16 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate {
     @ObservationIgnored private var hasPlayed = false
     @ObservationIgnored private var dismissed = false
 
+    // Display matching (D016): the parse-before-play step, the display request and its observers.
+    @ObservationIgnored private weak var drawableView: UIView?
+    @ObservationIgnored private var parser: VLCMediaParser?
+    @ObservationIgnored private var pendingMedia: VLCMedia?
+    @ObservationIgnored private var playbackStarted = false
+    @ObservationIgnored private var parseFallbackTask: Task<Void, Never>?
+    @ObservationIgnored private var modeObservers: [NSObjectProtocol] = []
+    @ObservationIgnored private var displayLogTask: Task<Void, Never>?
+    @ObservationIgnored private var displayRequestPending = false   // parse gave no frame rate: use the player's video track
+
     init(request: PlayRequest, onDismiss: @escaping () -> Void) {
         self.request = request
         self.onDismiss = onDismiss
@@ -147,17 +160,144 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate {
         if request.file.path.lowercased().hasSuffix(".mkv") {
             media.addOption(":demux=mkv_trusted")
         }
+        drawableView = drawable
+        pendingMedia = media
+        // D016: ask tvOS for the stream's frame rate and dynamic range before playback. The server does not
+        // report a frame rate, so VLCKit parses the stream header first (one short read over the LAN); the
+        // dynamic range comes from the server's hdr flag. If the parse fails or exceeds 5 s, playback starts anyway.
+        EvidenceLog.line("[display] before: \(displayState())")
+        let parser = VLCMediaParser(library: library, timeout: 5_000_000)   // libvlc_parser_cfg.timeout is in microseconds
+        parser.delegate = self
+        self.parser = parser
+        parseFallbackTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(6))
+            guard let self, !Task.isCancelled, !self.playbackStarted else { return }
+            EvidenceLog.line("[display] parse did not finish in 6 s; playing without a display request")
+            self.startPlayback()
+        }
+        if parser.queue(media, options: [.parse]) != 0 {
+            EvidenceLog.line("[display] parse could not be queued; playing without a display request")
+            startPlayback()
+        }
+    }
+
+    private func startPlayback() {
+        guard !playbackStarted, let media = pendingMedia else { return }
+        playbackStarted = true
+        parseFallbackTask?.cancel()
         player.media = media
         player.play()
         EvidenceLog.line("[player] play() called")
         bumpOverlay()
     }
 
+    // MARK: display matching (D016)
+
+    private var displayWindow: UIWindow? {
+        drawableView?.window ?? UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.first
+    }
+
+    private func displayState() -> String {
+        let screen = UIScreen.main
+        var s = "maxFPS=\(screen.maximumFramesPerSecond) edrHeadroom=\(String(format: "%.2f", screen.currentEDRHeadroom))/\(String(format: "%.2f", screen.potentialEDRHeadroom)) gamut=\(screen.traitCollection.displayGamut.rawValue)"
+        if let dm = displayWindow?.avDisplayManager {
+            s += " matchingEnabled=\(dm.isDisplayCriteriaMatchingEnabled) switchInProgress=\(dm.isDisplayModeSwitchInProgress) criteria=\(dm.preferredDisplayCriteria == nil ? "nil" : "set")"
+        } else {
+            s += " (no window yet)"
+        }
+        return s
+    }
+
+    private func requestDisplayMode(for media: VLCMedia) {
+        guard let track = media.tracksInformation.first(where: { $0.type == .video }), let video = track.video else {
+            EvidenceLog.line("[display] no video track in the parsed media; will use the player's video track")
+            displayRequestPending = true; return
+        }
+        let fps = video.frameRateDenominator > 0 ? Double(video.frameRate) / Double(video.frameRateDenominator) : Double(video.frameRate)
+        guard fps > 0 else {
+            // VLC's Matroska demuxer does not put a usable frame rate on the parsed ES (matroska_segment_parse.cpp:512-513);
+            // the player's own video track carries the one the packetizer reads from the stream (SPS VUI), ~0.1 s after play().
+            EvidenceLog.line("[display] frame rate unknown from the parse (\(video.frameRate)/\(video.frameRateDenominator)); will use the player's video track once it reports one")
+            displayRequestPending = true; return
+        }
+        requestDisplayMode(fps: fps, width: Int(video.width), height: Int(video.height), codecName: VLCMedia.codecName(forFourCC: track.codec, trackType: .video), source: "parsed media")
+    }
+
+    private func requestDisplayModeFromPlayerIfPending() {
+        guard displayRequestPending, let track = player.videoTracks.first, let v = track.video, v.frameRate > 0 else { return }
+        displayRequestPending = false
+        let fps = v.frameRateDenominator > 0 ? Double(v.frameRate) / Double(v.frameRateDenominator) : Double(v.frameRate)
+        requestDisplayMode(fps: fps, width: Int(v.width), height: Int(v.height), codecName: track.codecName(), source: "player video track")
+    }
+
+    private func requestDisplayMode(fps: Double, width: Int, height: Int, codecName: String, source: String) {
+        let hdr = request.file.hdr
+        let isH264 = codecName.localizedCaseInsensitiveContains("H264") || codecName.localizedCaseInsensitiveContains("H.264")
+        let codecType: CMVideoCodecType = isH264 ? kCMVideoCodecType_H264 : kCMVideoCodecType_HEVC
+        let ext: [CFString: Any] = hdr
+            ? [kCMFormatDescriptionExtension_ColorPrimaries: kCMFormatDescriptionColorPrimaries_ITU_R_2020,
+               kCMFormatDescriptionExtension_TransferFunction: kCMFormatDescriptionTransferFunction_SMPTE_ST_2084_PQ,
+               kCMFormatDescriptionExtension_YCbCrMatrix: kCMFormatDescriptionYCbCrMatrix_ITU_R_2020]
+            : [kCMFormatDescriptionExtension_ColorPrimaries: kCMFormatDescriptionColorPrimaries_ITU_R_709_2,
+               kCMFormatDescriptionExtension_TransferFunction: kCMFormatDescriptionTransferFunction_ITU_R_709_2,
+               kCMFormatDescriptionExtension_YCbCrMatrix: kCMFormatDescriptionYCbCrMatrix_ITU_R_709_2]
+        var desc: CMVideoFormatDescription?
+        let status = CMVideoFormatDescriptionCreate(allocator: kCFAllocatorDefault, codecType: codecType, width: Int32(width), height: Int32(height), extensions: ext as CFDictionary, formatDescriptionOut: &desc)
+        guard status == noErr, let desc else { EvidenceLog.line("[display] format description failed (\(status)); no display request"); return }
+        guard let window = displayWindow else { EvidenceLog.line("[display] no window; no display request"); return }
+        let criteria = AVDisplayCriteria(refreshRate: Float(fps), formatDescription: desc)
+        observeModeSwitches()
+        window.avDisplayManager.preferredDisplayCriteria = criteria
+        EvidenceLog.line("[display] request (from \(source)) refresh=\(String(format: "%.3f", fps)) range=\(hdr ? "HDR10 (PQ, BT.2020)" : "SDR (BT.709)") codec=\(codecName) \(width)x\(height) — after set: \(displayState())")
+        displayLogTask?.cancel()
+        displayLogTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(4))
+            guard let self, !Task.isCancelled else { return }
+            EvidenceLog.line("[display] 4 s after request: \(self.displayState())")
+        }
+    }
+
+    private func observeModeSwitches() {
+        guard modeObservers.isEmpty else { return }
+        let names: [(Notification.Name, String)] = [(.AVDisplayManagerModeSwitchStart, "start"), (.AVDisplayManagerModeSwitchEnd, "end"), (.AVDisplayManagerModeSwitchSettingsChanged, "settings changed")]
+        for (name, label) in names {
+            modeObservers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor in
+                    guard let self else { return }
+                    EvidenceLog.line("[display] mode switch \(label): \(self.displayState())")
+                }
+            })
+        }
+    }
+
+    private func clearDisplayRequest() {
+        displayLogTask?.cancel()
+        if let dm = displayWindow?.avDisplayManager, dm.preferredDisplayCriteria != nil {
+            dm.preferredDisplayCriteria = nil
+            EvidenceLog.line("[display] cleared: \(displayState())")
+        }
+        for observer in modeObservers { NotificationCenter.default.removeObserver(observer) }
+        modeObservers.removeAll()
+    }
+
+    // MARK: VLCMediaParserDelegate (D016)
+
+    nonisolated func mediaFinishedParsing(_ media: VLCMedia, with status: VLCMediaParsedStatus) {
+        Task { @MainActor in
+            EvidenceLog.line("[display] parse finished with status \(status.rawValue)")
+            if status == .done { self.requestDisplayMode(for: media) }
+            else { EvidenceLog.line("[display] no display request (parse status \(status.rawValue))") }
+            self.startPlayback()
+        }
+    }
+
     func dismiss() {
         guard !dismissed else { return }
         dismissed = true
         hideTask?.cancel(); skipTask?.cancel(); frameTask?.cancel()
+        parseFallbackTask?.cancel(); parser?.cancelAllParsing()
         EvidenceLog.line("[player] dismiss at \(timeMs) ms, state \(stateName)")
+        clearDisplayRequest()
         player.stop()
         player.drawable = nil
         onDismiss()
@@ -413,11 +553,12 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate {
         Task { @MainActor in
             self.refreshTracks()
             EvidenceLog.line("[player] track added \(trackId) type=\(trackType.rawValue)")
+            self.requestDisplayModeFromPlayerIfPending()
         }
     }
 
     nonisolated func mediaPlayerTrackUpdated(_ trackId: String, with trackType: VLCMedia.TrackType) {
-        Task { @MainActor in self.refreshTracks() }
+        Task { @MainActor in self.refreshTracks(); self.requestDisplayModeFromPlayerIfPending() }
     }
 
     nonisolated func mediaPlayerTrackSelected(_ trackType: VLCMedia.TrackType, selectedId: String, unselectedId: String) {

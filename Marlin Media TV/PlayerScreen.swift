@@ -32,7 +32,7 @@ struct PlayerScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .background(Nocturne.playerBg)
-        .onExitCommand { model.dismiss() }
+        .onExitCommand { model.handle(.menu) }   // Menu with a panel open closes the panel; otherwise exits (pass 1d)
         .onDisappear { model.dismiss() }
         .accessibilityIdentifier("player")
     }
