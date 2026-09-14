@@ -24,7 +24,7 @@ the file bytes with HTTP Range support at `/stream/{fileId}`.
   `Marlin Media TV/Theme.swift`. Build what the frames show; design nothing (D006).
 - **Device:** Apple TV 4K (3rd generation), named **Home Theater**, tvOS 26.6, Developer Mode on,
   paired with this Mac (D005). The bedroom Apple TV is not used.
-- **Xcode:** 26.6 (17F113), tvOS 26.5 SDK. Bundle id `com.marlin1111.marlin-media-tv`, team
+- **Xcode:** 27.0 (27A266a), tvOS 27.0 SDK (24J360) — since 2026-09-14 (pass 1e rerun; supersedes 26.6 (17F113) / tvOS 26.5 SDK). Bundle id `com.marlin1111.marlin-media-tv`, team
   `C879JNVK7Z`, automatic signing (both read from Marlin DVR TV).
 
 ## Toolchain facts

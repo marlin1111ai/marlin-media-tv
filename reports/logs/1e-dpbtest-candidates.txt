@@ -1,0 +1,570 @@
+# Pass 1e rerun — VLC's videotoolbox dpb_test.c against candidates A and B (2026-09-14)
+
+Harness: modules/codec/videotoolbox/{dpb_test.c,dpb.c,dpb.h} copied from ~/vlckit-build/VLCKit/libvlc/vlc (libvlc a2b09c9741, 18 patches) plus date_Init/date_Increment verbatim from src/misc/mtime.c,
+built for the Mac with Xcode 27.0 clang: xcrun clang -std=gnu17 -O0 -g -DHAVE_CONFIG_H -DDPB_DEBUG -I<build-appletvsimulator-arm64/build> -I<libvlc>/include -I<candidate dir> dpb_test.c dpb.c dates.c
+(VLC's rule: modules/codec/Makefile.am:360-366 videotoolbox_dpb_test_SOURCES = dpb_test.c dpb.c dpb.h, CFLAGS -DDPB_DEBUG).
+
+## Result of the unmodified test program
+- base: exit 0
+- A: exit 134
+- B: exit 134
+
+## Candidate A — diff against the tree (dpb.c, dpb.h, and dpb_test.c CheckOutput made to follow A's decoder.c call order)
+```diff
+--- ~/vlckit-build/VLCKit/libvlc/vlc/modules/codec/videotoolbox/dpb.c	2026-09-13 22:37:08
++++ dpb.c	2026-09-14 16:35:44
+@@ -145,7 +145,8 @@
+     return p_output;
+ }
+ 
+-static picture_t * BumpDPB(struct dpb_s *dpb, date_t *ptsdate, const frame_info_t *p_info)
++static picture_t * BumpDPB(struct dpb_s *dpb, date_t *ptsdate, const frame_info_t *p_info,
++                          bool b_before_insert)
+ {
+     picture_t *p_output = NULL;
+     picture_t **pp_output_next = &p_output;
+@@ -154,14 +155,14 @@
+     {
+         bool b_output = false;
+ 
+-        if(p_info->b_flush && dpb->i_stored_fields > 0)
++        if(b_before_insert && p_info->b_flush && dpb->i_stored_fields > 0)
+             b_output = true;
+-        else if(dpb->i_size >= p_info->i_max_pics_buffering)
++        else if(b_before_insert && dpb->i_size >= p_info->i_max_pics_buffering)
+             b_output = true;
+         else if(p_info->i_max_num_reorder > 0 &&
+                  dpb->i_need_output_size > p_info->i_max_num_reorder)
+             b_output = true;
+-        else if(p_info->i_max_latency_pics > 0 &&
++        else if(!b_before_insert && p_info->i_max_latency_pics > 0 &&
+                  dpb->i_need_output_size > 0 )
+         {
+             for(const frame_info_t *p = dpb->p_entries; p; p = p->p_next)
+@@ -206,14 +207,6 @@
+                                 const frame_info_t *p_info)
+ {
+     picture_t *output = NULL;
+-
+-    /* C 5.2.3 Additional Bumping */
+-    if(p_info->b_output_needed)
+-    {
+-        for(frame_info_t *p = dpb->p_entries; p; p = p->p_next)
+-            if(p->b_output_needed && p->i_foc > p_info->i_foc)
+-                p->i_latency++;
+-    }
+ 
+     /* IRAP picture with NoRaslOutputFlag */
+     if(p_info->b_no_rasl_output && p_info->b_keyframe)
+@@ -248,8 +241,21 @@
+     }
+     else /* Regular bump process */
+     {
+-        output = BumpDPB(dpb, ptsdate, p_info);
++        output = BumpDPB(dpb, ptsdate, p_info, true);
+     }
+ 
+     return output;
+ }
++
++picture_t * DPBOutputAfterInsert(struct dpb_s *dpb, date_t *ptsdate,
++                                 const frame_info_t *p_info)
++{
++    /* C 5.2.3 Additional Bumping, once the current picture is stored */
++    if(p_info->b_output_needed)
++    {
++        for(frame_info_t *p = dpb->p_entries; p; p = p->p_next)
++            if(p->b_output_needed && p->i_foc > p_info->i_foc)
++                p->i_latency++;
++    }
++    return BumpDPB(dpb, ptsdate, p_info, false);
++}
+--- ~/vlckit-build/VLCKit/libvlc/vlc/modules/codec/videotoolbox/dpb.h	2026-09-13 22:37:08
++++ dpb.h	2026-09-14 16:35:44
+@@ -80,4 +80,6 @@
+ 
+ picture_t * DPBOutputAndRemoval(struct dpb_s *, date_t *, const frame_info_t *);
+ 
++picture_t * DPBOutputAfterInsert(struct dpb_s *, date_t *, const frame_info_t *);
++
+ #endif // VIDEOTOOLBOX_DPB_H
+--- ~/vlckit-build/VLCKit/libvlc/vlc/modules/codec/videotoolbox/dpb_test.c	2026-09-13 22:37:08
++++ dpb_test.c	2026-09-14 16:35:44
+@@ -115,11 +115,16 @@
+             info->b_flush, dpb->i_size, dpb->i_need_output_size);
+     picture_t *output = DPBOutputAndRemoval(dpb, ptsdate, info);
+     assert(dpb->i_size < DPB_MAX_PICS);
++    frame_info_t current = *info; /* candidate A: decoder.c order — release, store, release */
++    InsertIntoDPB(dpb, info);
++    picture_t *more = DPBOutputAfterInsert(dpb, ptsdate, &current);
++    picture_t **tail = &output;
++    while(*tail) tail = &(*tail)->p_next;
++    *tail = more;
+     va_list args;
+     va_start(args, info);
+     VaCheckOutput(output, args);
+     va_end(args);
+-    InsertIntoDPB(dpb, info);
+ }
+ 
+ static void CheckDPBWithFramesTest(void)
+```
+
+## Candidate A — unmodified-expectation run, last lines
+```
+Assertion failed: (output == NULL), function VaCheckOutput, file dpb_test.c, line 87.
+ 0(Nl0)
+ 0(Nl0) 4(Nl0)
+ 0(Nl0) 2(Nl0) 4(Nl0)
+ 0(Nl0)
+ 0(Nl0) 8(Nl0)
+ 0(Nl0) 2(Nl0) 8(Nl0)
+ 0(Nl0) 2(Nl0) 6(Nl0) 8(Nl1)
+ 2(Nl0) 4(Nl0) 6(Nl0) 8(Nl2)
+ 8(Nl3) 10(Nl0)
+ 0(Nl0)
+ 4(Nl0)
+ 2(Nl0) 4(Nl0)
+ 2(Nl0) 4(Nl1) 8(Nl0)
+```
+
+## Candidate B — diff against the tree (dpb.c only)
+```diff
+--- ~/vlckit-build/VLCKit/libvlc/vlc/modules/codec/videotoolbox/dpb.c	2026-09-13 22:37:08
++++ dpb.c	2026-09-14 16:35:44
+@@ -153,6 +153,7 @@
+     for(;dpb->i_stored_fields;)
+     {
+         bool b_output = false;
++        bool b_latency_only = false;
+ 
+         if(p_info->b_flush && dpb->i_stored_fields > 0)
+             b_output = true;
+@@ -170,12 +171,17 @@
+                    p->i_latency >= p_info->i_max_latency_pics)
+                 {
+                     b_output = true;
++                    b_latency_only = true;
+                     break;
+                 }
+             }
+         }
+ 
+         if(!b_output)
++            break;
++
++        /* never release ahead of the arriving picture on latency alone */
++        if(b_latency_only && dpb->p_entries->i_foc > p_info->i_foc)
+             break;
+ 
+         *pp_output_next = DPBOutputFrame(dpb, ptsdate, dpb->p_entries);
+```
+
+## Candidate B — unmodified-expectation run, last lines
+```
+ 20(Nl0) 22(_l0) 24(Nl0)
+ 20(Nl0) 22(_l0) 24(Nl0) 26(Nl0)
+ 22(_l0) 24(Nl0) 26(Nl0) 28(Nl0)
+ 22(_l0)
+ 20(Nl0) 22(_l0)
+ 20(Nl0) 22(_l0) 24(Nl0)
+ 0(Nl0)
+ 22(_l0)
+ 20(Nl0) 22(_l0)
+ 20(Nl0) 22(_l0) 24(Nl0)
+ 0(Nl0)
+ 10(Nl0)
+ 8(Nl0) 10(Nl1)
+ 6(Nl0) 8(Nl1) 10(Nl2)
+```
+
+## Diagnostic runs (scratch copies of dpb_test.c whose VaCheckOutput records expected vs actual and continues; asserts made non-fatal)
+- base: checks 53, mismatches 0, soft asserts 0
+- A: checks 53, mismatches 8, soft asserts 0
+- B: checks 53, mismatches 2, soft asserts 0
+
+```
+check | test expects | today | A | B
+1 | [] | [] | [] | []
+2 | [] | [] | [] | []
+3 | [] | [] | [] | []
+4 | [0 2 4 ] | [0 2 4 ] | [0 2 4 ] | [0 2 4 ]
+5 | [] | [] | [] | []
+6 | [] | [] | [] | []
+7 | [] | [] | [] | []
+8 | [0 ] | [0 ] | [0 ] | [0 ]
+9 | [2 4 6 ] | [2 4 6 ] | [2 4 6 ] | [2 4 6 ]
+10 | [8 10 ] | [8 10 ] | [8 10 ] | [8 10 ]
+11 | [0 ] | [0 ] | [0 ] | [0 ]
+12 | [] | [] | [] | []
+13 | [] | [] | [] | []
+14 | [] | [] | [2 ] | []
+15 | [2 ] | [2 ] | [4 ] | [2 ]
+16 | [4 6 8 ] | [4 6 8 ] | [6 8 ] | [4 6 8 ]
+17 | [] | [] | [] | []
+18 | [] | [] | [] | []
+19 | [] | [] | [] | []
+20 | [] | [] | [20 ] | []
+21 | [20 ] | [20 ] | [22 24 ] | [20 ]
+22 | [22 24 26 28 ] | [22 24 26 28 ] | [26 28 ] | [22 24 26 28 ]
+23 | [] | [] | [] | []
+24 | [] | [] | [] | []
+25 | [] | [] | [] | []
+26 | [20 22 24 ] | [20 22 24 ] | [20 22 24 ] | [20 22 24 ]
+27 | [0 ] | [0 ] | [0 ] | [0 ]
+28 | [] | [] | [] | []
+29 | [] | [] | [] | []
+30 | [] | [] | [] | []
+31 | [20 24 ] | [20 24 ] | [20 24 ] | [20 24 ]
+32 | [0 ] | [0 ] | [0 ] | [0 ]
+33 | [] | [] | [] | []
+34 | [] | [] | [] | []
+35 | [] | [] | [] | []
+36 | [6 8 10 ] | [6 8 10 ] | [2 6 8 10 ] | []
+37 | [2 ] | [2 ] | [] | [2 6 8 10 ]
+38 | [] | [] | [] | []
+39 | [] | [] | [] | []
+40 | [0 ] | [0 ] | [0 ] | [0 ]
+41 | [1 2 ] | [1 2 ] | [1 2 ] | [1 2 ]
+42 | [] | [] | [] | []
+43 | [] | [] | [] | []
+44 | [] | [] | [] | []
+45 | [0 1 2 ] | [0 1 2 ] | [0 1 2 ] | [0 1 2 ]
+46 | [] | [] | [] | []
+47 | [] | [] | [] | []
+48 | [] | [] | [] | []
+49 | [0 2 3 ] | [0 2 3 ] | [0 2 3 ] | [0 2 3 ]
+50 | [] | [] | [] | []
+51 | [] | [] | [] | []
+52 | [] | [] | [] | []
+53 | [0 2 3 ] | [0 2 3 ] | [0 2 3 ] | [0 2 3 ]
+```
+
+## Diagnostic run output, all three
+### base
+```
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 1 expected [] actual [] ok
+enqueing foc 4 flush 0 dpb sz 1 ndsz 1
+CHECK 2 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+CHECK 3 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 3
+CHECK 4 expected [0 2 4 ] actual [0 2 4 ] ok
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+CHECK 5 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+CHECK 6 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 3 ndsz 3
+CHECK 7 expected [] actual [] ok
+enqueing foc 4 flush 0 dpb sz 4 ndsz 4
+CHECK 8 expected [0 ] actual [0 ] ok
+enqueing foc 10 flush 0 dpb sz 4 ndsz 4
+CHECK 9 expected [2 4 6 ] actual [2 4 6 ] ok
+enqueing foc 0 flush 1 dpb sz 2 ndsz 2
+CHECK 10 expected [8 10 ] actual [8 10 ] ok
+drain
+CHECK 11 expected [0 ] actual [0 ] ok
+enqueing foc 4 flush 0 dpb sz 0 ndsz 0
+CHECK 12 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 1
+CHECK 13 expected [] actual [] ok
+enqueing foc 8 flush 0 dpb sz 2 ndsz 2
+CHECK 14 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 3 ndsz 3
+CHECK 15 expected [2 ] actual [2 ] ok
+drain
+CHECK 16 expected [4 6 8 ] actual [4 6 8 ] ok
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 17 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 18 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 19 expected [] actual [] ok
+enqueing foc 26 flush 0 dpb sz 3 ndsz 2
+CHECK 20 expected [] actual [] ok
+enqueing foc 28 flush 0 dpb sz 4 ndsz 3
+CHECK 21 expected [20 ] actual [20 ] ok
+drain
+CHECK 22 expected [22 24 26 28 ] actual [22 24 26 28 ] ok
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 23 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 24 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 25 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+CHECK 26 expected [20 22 24 ] actual [20 22 24 ] ok
+drain
+CHECK 27 expected [0 ] actual [0 ] ok
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 28 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 29 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 30 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+CHECK 31 expected [20 24 ] actual [20 24 ] ok
+drain
+CHECK 32 expected [0 ] actual [0 ] ok
+enqueing foc 10 flush 0 dpb sz 0 ndsz 0
+CHECK 33 expected [] actual [] ok
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+CHECK 34 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 2 ndsz 2
+CHECK 35 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 3 ndsz 3
+CHECK 36 expected [6 8 10 ] actual [6 8 10 ] ok
+drain
+CHECK 37 expected [2 ] actual [2 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 38 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+CHECK 39 expected [] actual [] ok
+enqueing foc 1 flush 0 dpb sz 2 ndsz 0
+CHECK 40 expected [0 ] actual [0 ] ok
+drain
+CHECK 41 expected [1 2 ] actual [1 2 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 42 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+CHECK 43 expected [] actual [] ok
+enqueing foc 1 flush 0 dpb sz 1 ndsz 0
+CHECK 44 expected [] actual [] ok
+drain
+CHECK 45 expected [0 1 2 ] actual [0 1 2 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 46 expected [] actual [] ok
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+CHECK 47 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+CHECK 48 expected [] actual [] ok
+drain
+CHECK 49 expected [0 2 3 ] actual [0 2 3 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 50 expected [] actual [] ok
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+CHECK 51 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+CHECK 52 expected [] actual [] ok
+drain
+CHECK 53 expected [0 2 3 ] actual [0 2 3 ] ok
+```
+### A
+```
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 1 expected [] actual [] ok
+enqueing foc 4 flush 0 dpb sz 1 ndsz 1
+CHECK 2 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+CHECK 3 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 3
+CHECK 4 expected [0 2 4 ] actual [0 2 4 ] ok
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+CHECK 5 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+CHECK 6 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 3 ndsz 3
+CHECK 7 expected [] actual [] ok
+enqueing foc 4 flush 0 dpb sz 4 ndsz 4
+CHECK 8 expected [0 ] actual [0 ] ok
+enqueing foc 10 flush 0 dpb sz 4 ndsz 4
+CHECK 9 expected [2 4 6 ] actual [2 4 6 ] ok
+enqueing foc 0 flush 1 dpb sz 2 ndsz 2
+CHECK 10 expected [8 10 ] actual [8 10 ] ok
+drain
+CHECK 11 expected [0 ] actual [0 ] ok
+enqueing foc 4 flush 0 dpb sz 0 ndsz 0
+CHECK 12 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 1
+CHECK 13 expected [] actual [] ok
+enqueing foc 8 flush 0 dpb sz 2 ndsz 2
+CHECK 14 expected [] actual [2 ] MISMATCH
+enqueing foc 6 flush 0 dpb sz 2 ndsz 2
+CHECK 15 expected [2 ] actual [4 ] MISMATCH
+drain
+CHECK 16 expected [4 6 8 ] actual [6 8 ] MISMATCH
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 17 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 18 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 19 expected [] actual [] ok
+enqueing foc 26 flush 0 dpb sz 3 ndsz 2
+CHECK 20 expected [] actual [20 ] MISMATCH
+enqueing foc 28 flush 0 dpb sz 3 ndsz 2
+CHECK 21 expected [20 ] actual [22 24 ] MISMATCH
+drain
+CHECK 22 expected [22 24 26 28 ] actual [26 28 ] MISMATCH
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 23 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 24 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 25 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+CHECK 26 expected [20 22 24 ] actual [20 22 24 ] ok
+drain
+CHECK 27 expected [0 ] actual [0 ] ok
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 28 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 29 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 30 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+CHECK 31 expected [20 24 ] actual [20 24 ] ok
+drain
+CHECK 32 expected [0 ] actual [0 ] ok
+enqueing foc 10 flush 0 dpb sz 0 ndsz 0
+CHECK 33 expected [] actual [] ok
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+CHECK 34 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 2 ndsz 2
+CHECK 35 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 3 ndsz 3
+CHECK 36 expected [6 8 10 ] actual [2 6 8 10 ] MISMATCH
+drain
+CHECK 37 expected [2 ] actual [] MISMATCH
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 38 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+CHECK 39 expected [] actual [] ok
+enqueing foc 1 flush 0 dpb sz 2 ndsz 0
+CHECK 40 expected [0 ] actual [0 ] ok
+drain
+CHECK 41 expected [1 2 ] actual [1 2 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 42 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+CHECK 43 expected [] actual [] ok
+enqueing foc 1 flush 0 dpb sz 1 ndsz 0
+CHECK 44 expected [] actual [] ok
+drain
+CHECK 45 expected [0 1 2 ] actual [0 1 2 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 46 expected [] actual [] ok
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+CHECK 47 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+CHECK 48 expected [] actual [] ok
+drain
+CHECK 49 expected [0 2 3 ] actual [0 2 3 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 50 expected [] actual [] ok
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+CHECK 51 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+CHECK 52 expected [] actual [] ok
+drain
+CHECK 53 expected [0 2 3 ] actual [0 2 3 ] ok
+```
+### B
+```
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 1 expected [] actual [] ok
+enqueing foc 4 flush 0 dpb sz 1 ndsz 1
+CHECK 2 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+CHECK 3 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 3
+CHECK 4 expected [0 2 4 ] actual [0 2 4 ] ok
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+CHECK 5 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 2
+CHECK 6 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 3 ndsz 3
+CHECK 7 expected [] actual [] ok
+enqueing foc 4 flush 0 dpb sz 4 ndsz 4
+CHECK 8 expected [0 ] actual [0 ] ok
+enqueing foc 10 flush 0 dpb sz 4 ndsz 4
+CHECK 9 expected [2 4 6 ] actual [2 4 6 ] ok
+enqueing foc 0 flush 1 dpb sz 2 ndsz 2
+CHECK 10 expected [8 10 ] actual [8 10 ] ok
+drain
+CHECK 11 expected [0 ] actual [0 ] ok
+enqueing foc 4 flush 0 dpb sz 0 ndsz 0
+CHECK 12 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 1
+CHECK 13 expected [] actual [] ok
+enqueing foc 8 flush 0 dpb sz 2 ndsz 2
+CHECK 14 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 3 ndsz 3
+CHECK 15 expected [2 ] actual [2 ] ok
+drain
+CHECK 16 expected [4 6 8 ] actual [4 6 8 ] ok
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 17 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 18 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 19 expected [] actual [] ok
+enqueing foc 26 flush 0 dpb sz 3 ndsz 2
+CHECK 20 expected [] actual [] ok
+enqueing foc 28 flush 0 dpb sz 4 ndsz 3
+CHECK 21 expected [20 ] actual [20 ] ok
+drain
+CHECK 22 expected [22 24 26 28 ] actual [22 24 26 28 ] ok
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 23 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 24 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 25 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+CHECK 26 expected [20 22 24 ] actual [20 22 24 ] ok
+drain
+CHECK 27 expected [0 ] actual [0 ] ok
+enqueing foc 22 flush 0 dpb sz 0 ndsz 0
+CHECK 28 expected [] actual [] ok
+enqueing foc 20 flush 0 dpb sz 1 ndsz 0
+CHECK 29 expected [] actual [] ok
+enqueing foc 24 flush 0 dpb sz 2 ndsz 1
+CHECK 30 expected [] actual [] ok
+enqueing foc 0 flush 1 dpb sz 3 ndsz 2
+CHECK 31 expected [20 24 ] actual [20 24 ] ok
+drain
+CHECK 32 expected [0 ] actual [0 ] ok
+enqueing foc 10 flush 0 dpb sz 0 ndsz 0
+CHECK 33 expected [] actual [] ok
+enqueing foc 8 flush 0 dpb sz 1 ndsz 1
+CHECK 34 expected [] actual [] ok
+enqueing foc 6 flush 0 dpb sz 2 ndsz 2
+CHECK 35 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 3 ndsz 3
+CHECK 36 expected [6 8 10 ] actual [] MISMATCH
+drain
+CHECK 37 expected [2 ] actual [2 6 8 10 ] MISMATCH
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 38 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+CHECK 39 expected [] actual [] ok
+enqueing foc 1 flush 0 dpb sz 2 ndsz 0
+CHECK 40 expected [0 ] actual [0 ] ok
+drain
+CHECK 41 expected [1 2 ] actual [1 2 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 42 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 1 ndsz 0
+CHECK 43 expected [] actual [] ok
+enqueing foc 1 flush 0 dpb sz 1 ndsz 0
+CHECK 44 expected [] actual [] ok
+drain
+CHECK 45 expected [0 1 2 ] actual [0 1 2 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 46 expected [] actual [] ok
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+CHECK 47 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+CHECK 48 expected [] actual [] ok
+drain
+CHECK 49 expected [0 2 3 ] actual [0 2 3 ] ok
+enqueing foc 0 flush 1 dpb sz 0 ndsz 0
+CHECK 50 expected [] actual [] ok
+enqueing foc 3 flush 0 dpb sz 1 ndsz 0
+CHECK 51 expected [] actual [] ok
+enqueing foc 2 flush 0 dpb sz 2 ndsz 0
+CHECK 52 expected [] actual [] ok
+drain
+CHECK 53 expected [0 2 3 ] actual [0 2 3 ] ok
+```
