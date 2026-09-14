@@ -85,10 +85,12 @@ picker, and VLCKit playback of the four MKVs and a Magicians episode with the ov
 pause, frame step, audio and subtitle panels. Committed locally on `main`; **not pushed** — the
 owner tests first.
 
-**Pass 1b (2026-09-13) stopped at its build step**: VideoLAN's `compileAndBuildVLCKit.sh` cannot
-run from a path with spaces (`~/Xcode/Marlin Media TV`); see
-`reports/2026-09-13-pass1b-vlckit-truehd.md`. The recipe is in `tools/vlckit-truehd/`; the
-clone and log sit in the ignored `vlckit-build/`. The app still uses the Swift package.
+**Pass 1b (2026-09-13) is stopped twice**: first because VideoLAN's `compileAndBuildVLCKit.sh`
+cannot run from a path with spaces (so the build now lives at `~/vlckit-build`, outside the
+repo), then because its host-tools stage could not download `m4-1.4.21` and `gettext-0.26` from
+the GNU mirror network. See `reports/2026-09-13-pass1b-vlckit-truehd.md`. The recipe is
+`tools/vlckit-truehd/build.sh` (BUILD_DIR defaults to `~/vlckit-build`); the app still uses the
+Swift package; `Frameworks/` is empty and ignored.
 
 Two findings wait on the owner (open questions 1 and 2 of the report): **VLCKit 4.0.0-a24
 cannot decode TrueHD** (Wonder Woman plays on its AC-3 core), and **the D008 seek-based frame

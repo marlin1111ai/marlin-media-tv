@@ -43,6 +43,5 @@ Carthage/Build/
 timeline.xctimeline
 playground.xcworkspace
 
-## Pass 1b: custom VLCKit build (source clone + build) and the finished framework
-vlckit-build/
+## Pass 1b: the custom VLCKit framework (built at ~/vlckit-build, see tools/vlckit-truehd/)
 Frameworks/

@@ -101,3 +101,111 @@ the project change, and the device playback. The harness change for step 7 is un
 - Whether the tools bootstrap accepts Xcode's Python 3.9.6 (the README wants python.org 3.7+;
   the script's PATH lookup for that framework finds nothing on this Mac).
 - The time the full build takes: still unmeasured; the only run ended at the clone.
+
+---
+
+# Rerun, build relocated to ~/vlckit-build — 2026-09-13 — STOPPED at step 3 (host tools)
+
+**Result: stopped, nothing built.** With the build moved out of the repo path, VideoLAN's script
+got past its patch step, but its host-tools stage (`extras/tools`) could not download two of the
+thirteen tool tarballs it needs — `m4-1.4.21.tar.gz` and `gettext-0.26.tar.gz` — and `make`
+exited 2 after 9 seconds. The tarballs exist on `ftp.gnu.org`; the two sources the makefile
+uses (VideoLAN's contrib mirror, then `ftpmirror.gnu.org`, which redirects to a random public
+mirror) both answered 404 tonight. Per the pass rules: no retry, no workaround, no change to
+VideoLAN's scripts. Steps 1 and 2 are done; steps 4–7 were not reached.
+
+Committed locally (recipe pointing at ~/vlckit-build, ignore rule, this record). **Not pushed.**
+
+## Step 1 — relocation
+
+`vlckit-build/` was moved with `mv` to `~/vlckit-build` (both clones intact, nothing
+re-fetched); the empty folder and its ignore line are gone, `Frameworks/` stays ignored.
+`tools/vlckit-truehd/build.sh` now takes `BUILD_DIR` (default `~/vlckit-build`, refuses spaces)
+and `REPO`, and ends by copying the result to `$REPO/Frameworks/VLCKit.xcframework`; the README
+says so. The stopped run's log was kept as `~/vlckit-build/build.log.stopped-2236`.
+
+## Step 2 — patch check at the new location
+
+```
+libvlc clone: 5dd4aebdab macosx: fix favorite albums detail row layout, 0 dirty files, no rebase in progress
+git apply --check 0007 (edited) on libvlc @ 5dd4aebdab: OK
+```
+
+## Step 3 — the run
+
+`~/vlckit-build/build.log` (363 lines), head and the failure:
+```
+build start: 2026-09-13 22:42:12
+command: ./compileAndBuildVLCKit.sh -v -f -t -r  (cwd /Users/marlin1111/vlckit-build/VLCKit)
+[info] Preparing build dirs
+[info] Building tools
+curl: (22) The requested URL returned error: 404
+make: *** [m4-1.4.21.tar.gz] Error 22
+make: *** Waiting for unfinished jobs....
+curl: (22) The requested URL returned error: 404
+make: *** [gettext-0.26.tar.gz] Error 22
+…   (pkg-config 0.28-1 finished building and installing in the meantime)
+build exit=2 end: 2026-09-13 22:42:21
+```
+Wall clock: 9 s. The patch step, which the script runs silently on an existing clone
+(`git fetch --all; git reset --hard 5dd4aebda; git am`), succeeded before that:
+```
+libvlc patched at 22:42:19: 9b3e39bbbd doc: add samples_libvlc_downloader        (patch 17 of 17)
+base: 5dd4aebdab macosx: fix favorite albums detail row layout
+contrib/src/ffmpeg/rules.mak, lines matching mlp|HAVE_IOS|disable-decoder:
+  25:	--disable-decoder=opus \
+  149:ifdef HAVE_IOS                       (the --enable-pic line; the whitelist below it is ifdef HAVE_WATCHOS)
+  154:FFMPEGCONF += --enable-parser='…,mlp,…'
+lines 43-48:  ifdef HAVE_DARWIN_OS / FFMPEGCONF += \ / --disable-securetransport / endif / (blank) / ifdef ENABLE_PDB
+```
+So the applied rules carry no `--disable-decoder=mlp`, `--disable-demuxer=mlp` or
+`--disable-parser=mlp`; the ffmpeg contrib was never reached (no `contrib-*/ffmpeg` directory).
+
+Why the downloads failed (`extras/tools/tools.mak` lines 38–39, `packages.mak` lines 1, 4, 22–23, 46–47):
+`download_pkg` tries `https://downloads.videolan.org/pub/contrib/<tarball>` and then the
+package's own URL under `GNU=https://ftpmirror.gnu.org/gnu`. Read-only HEAD requests tonight:
+```
+https://ftpmirror.gnu.org/gnu/m4/m4-1.4.21.tar.gz            404  (redirected to ftp.snt.utwente.nl)
+https://ftpmirror.gnu.org/gnu/gettext/gettext-0.26.tar.gz    404  (redirected to mirror.clientvps.com)
+https://downloads.videolan.org/pub/contrib/m4-1.4.21.tar.gz  404
+https://downloads.videolan.org/pub/contrib/gettext-0.26.tar.gz 404
+https://ftp.gnu.org/gnu/m4/m4-1.4.21.tar.gz                  200
+https://ftp.gnu.org/gnu/gettext/gettext-0.26.tar.gz          200
+ftp.gnu.org lists m4-1.4.18 … 1.4.21 and gettext-0.24.2 … 0.26
+```
+The other eleven tool tarballs did download (ant, autoconf 2.73, automake 1.18.1, bison 3.8.2,
+cmake 4.1.2, help2man, libtool 2.6.2, meson 1.12.0, nasm 2.16.03, ninja, pkg-config, xz, zstd —
+in `~/vlckit-build/VLCKit/libvlc/vlc/extras/tools/`), and pkg-config was built and installed.
+
+Disk: `~/vlckit-build` 559M; `Frameworks/`   0B.
+
+## Files touched, by step (this rerun)
+
+| Step | Files / actions |
+|---|---|
+| 1 | `vlckit-build/` → `~/vlckit-build/` (mv); `.gitignore` (ignore line removed, `Frameworks/` kept); `tools/vlckit-truehd/build.sh` (BUILD_DIR/REPO variables, copy to the repo's Frameworks/); `tools/vlckit-truehd/README.md` |
+| 2 | check only, nothing written |
+| 3 | `~/vlckit-build/build.log` (kept), `~/vlckit-build/build.log.stopped-2236` (the first run's log) |
+| 4–6 | not reached |
+| 7 | this section; `COLD-START.md` (paragraph updated). D012/D013 still **not** added: nothing to record yet |
+
+## Not tested, and what was traced instead
+
+Everything after the tools stage, as in the first stop: the remaining tool builds, 55 contribs,
+libvlc, the framework archives, the `nm` proof, the project change, the device playback. The
+harness change for the TrueHD-checked Audio panel screenshot remains unexecuted.
+
+## Open questions for the owner
+
+1. The two missing tarballs are a mirror problem, not a version problem. The tools makefile
+   uses any tarball already present in `extras/tools/` (it only downloads what is absent). Is
+   placing the two files there from `ftp.gnu.org` (verified 200) acceptable as the way to unblock
+   the next run, or would you rather rerun and let `ftpmirror.gnu.org` pick another mirror?
+   Both are outside this pass's rules, so neither was done.
+2. As before: should D013 record the `~/vlckit-build` location (it is written into the recipe now)?
+
+## Least sure of
+
+- Whether the next mirror `ftpmirror.gnu.org` chooses would have the files; two different
+  mirrors were missing them tonight.
+- The full build's duration is still unmeasured.
