@@ -66,6 +66,15 @@ cp "$REPO/tools/vlckit-truehd/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arr
    "$BUILD_DIR/VLCKit/libvlc/patches/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arriving-picture.patch"
 echo "patch 0019 installed"
 
+# Step 2d — pass 1e rerun 3 (D018): Xcode 27 refuses to archive VLCKit.xcodeproj with its tvOS deployment target 11.0
+# ("supported deployment target versions is 15.0 to 27.0.x"); VideoLAN's archive call overrides only the iOS target.
+# Set the project's TVOS_DEPLOYMENT_TARGET to 26.0 (the app's minimum, D004) before the build. libvlc's own minimum
+# (extras/package/apple/build.conf) is left as is. Idempotent; stops if any other tvOS target value remains.
+PBX="$BUILD_DIR/VLCKit/VLCKit.xcodeproj/project.pbxproj"
+sed -i '' 's/TVOS_DEPLOYMENT_TARGET = 11\.0;/TVOS_DEPLOYMENT_TARGET = 26.0;/' "$PBX"
+[ "$(grep -c 'TVOS_DEPLOYMENT_TARGET = ' "$PBX")" = "$(grep -c 'TVOS_DEPLOYMENT_TARGET = 26\.0;' "$PBX")" ] || { echo "VLCKit.xcodeproj: a TVOS_DEPLOYMENT_TARGET other than 26.0 remains" >&2; exit 1; }
+echo "VLCKit.xcodeproj TVOS_DEPLOYMENT_TARGET = 26.0 ($(grep -c 'TVOS_DEPLOYMENT_TARGET = 26\.0;' "$PBX") build configurations)"
+
 # Step 3 — VideoLAN's own build: clones libvlc master at the pinned hash (TESTEDHASH in the script),
 # applies the 17 patches, builds host tools under extras/tools, the contribs, libvlc, then the framework.
 # -v verbose, -f device + simulator + xcframework, -t tvOS, -r Release.

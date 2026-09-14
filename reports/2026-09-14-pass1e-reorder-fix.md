@@ -472,3 +472,89 @@ final class Diag1eUITests: XCTestCase {
     }
 }
 ```
+
+---
+
+# Pass 1e RERUN 3 — package the Xcode 27 build — STOPPED before item 2's run (the recipe would recompile) — 2026-09-14
+
+**Item 1 is done. Item 2 was not run, because the evidence shows the recipe would recompile libvlc and contribs rather than only repackage.** Every run, VideoLAN's script resets libvlc to `5dd4aebda` and re-applies all 19 patches with `git am`. That rewrites 65 source files, including two contrib rule files, with fresh timestamps, so `make` would rebuild what depends on them. The script's own `-n -l` flags would package only, but the recipe does not pass them, and changing that is outside the numbered items (§R3-3, question 1).
+
+No framework was built. `Frameworks/` is still the 12:50 Xcode 26.6 build without 0019. No app build, install or device run; no D017/D018. The rerun-2 libvlc slices and 27.0 contribs are untouched. Committed locally, not pushed.
+
+## Result per item
+
+| Item | Result |
+|---|---|
+| 1 tvOS deployment target 26.0 in the recipe | **Done (written, not yet run).** `tools/vlckit-truehd/build.sh` step 2d, before the VLCKit build: `sed` sets `TVOS_DEPLOYMENT_TARGET = 26.0;` in `VLCKit.xcodeproj/project.pbxproj`, replacing the project's 11.0 in 4 build configurations (pbxproj lines 1381, 1472, 1651, 1727). It is idempotent and stops if any other tvOS target value remains. libvlc's `VLC_DEPLOYMENT_TARGET_TVOS` is unchanged. README: one line. `sh -n tools/vlckit-truehd/build.sh` → syntax ok. |
+| 2 Rerun the recipe, packaging only | **Not run — the recipe as written would recompile** (§R3-2). |
+| 3 App build, install, fresh container | Not started. |
+| 4 Device verification | Not started. |
+| 5 D017, D018, COLD-START | Not written (no framework with 0019 exists). |
+
+## R3-1. The recipe change (item 1)
+
+```sh
+# Step 2d — pass 1e rerun 3 (D018): Xcode 27 refuses to archive VLCKit.xcodeproj with its tvOS deployment target 11.0
+# ("supported deployment target versions is 15.0 to 27.0.x"); VideoLAN's archive call overrides only the iOS target.
+# Set the project's TVOS_DEPLOYMENT_TARGET to 26.0 (the app's minimum, D004) before the build. libvlc's own minimum
+# (extras/package/apple/build.conf) is left as is. Idempotent; stops if any other tvOS target value remains.
+PBX="$BUILD_DIR/VLCKit/VLCKit.xcodeproj/project.pbxproj"
+sed -i '' 's/TVOS_DEPLOYMENT_TARGET = 11\.0;/TVOS_DEPLOYMENT_TARGET = 26.0;/' "$PBX"
+[ "$(grep -c 'TVOS_DEPLOYMENT_TARGET = ' "$PBX")" = "$(grep -c 'TVOS_DEPLOYMENT_TARGET = 26\.0;' "$PBX")" ] || { echo "VLCKit.xcodeproj: a TVOS_DEPLOYMENT_TARGET other than 26.0 remains" >&2; exit 1; }
+echo "VLCKit.xcodeproj TVOS_DEPLOYMENT_TARGET = 26.0 ($(grep -c 'TVOS_DEPLOYMENT_TARGET = 26\.0;' "$PBX") build configurations)"
+```
+
+## R3-2. Why a recipe rerun would not be packaging only
+
+1. **`compileAndBuildVLCKit.sh:522-541`**, when `libvlc/vlc` already exists and `-n` is not given, runs `git fetch --all`, `git reset --hard ${TESTEDHASH}` and `git am ${ROOT_DIR}/libvlc/patches/*.patch` on every run. `build.sh` calls the script with `-v -f -t -r`, without `-n`.
+2. **What the 19 patches touch** (`git diff --stat 5dd4aebda HEAD` in libvlc): 65 files changed, 2569 insertions(+), 176 deletions(-). By area: 13 contrib/src; 11 modules/access; 5 modules/demux; 4 modules/misc; 3 modules/codec; 3 include/vlc; 1 test/Makefile.am; 1 test/libvlc; 1 src/player; 1 src/network; 1 src/misc; 1 src/libvlccore.sym; 1 src/libvlc.c; 1 src/input; 1 NEWS/; 1 modules/stream_out; 1 modules/common.am; 1 modules/access_output; 1 lib/meson.build; 1 lib/media.c; 1 lib/media_player.c; 1 lib/media_internal.h; 1 lib/Makefile.am; 1 lib/libvlc.sym; 1 lib/downloader.c; 1 include/vlc_stream.h; 1 include/vlc_player.h; 1 include/vlc_http.h; 1 include/meson.build; 1 extras/tools; 1 doc/Makefile.am; 1 doc/libvlc; . Contrib files:
+  - `contrib/src/ffmpeg/avcodec-enable-audiotoolbox-ac3.patch`
+  - `contrib/src/ffmpeg/rules.mak`
+  - `contrib/src/live555/DISABLE_LOOPBACK_IP_ADDRESS_CHECK.patch`
+  - `contrib/src/live555/SHA512SUMS`
+  - `contrib/src/live555/add-pkgconfig-file.patch`
+  - `contrib/src/live555/android-no-ifaddrs.patch`
+  - `contrib/src/live555/expose_server_string.patch`
+  - `contrib/src/live555/in_addr-s_addr-field.patch`
+  - `contrib/src/live555/live555-nosignal.patch`
+  - `contrib/src/live555/live555-vista-inet.patch`
+  - `contrib/src/live555/no-null-reference.patch`
+  - `contrib/src/live555/rules.mak`
+  - `contrib/src/live555/winstore.patch`
+3. **Timestamps from rerun 2 show the dependency.** The patched source `modules/codec/videotoolbox/dpb.c` is dated **16:49:49** (written by that run's `git am`); its object `build-appletvos-arm64/build/modules/codec/videotoolbox/libvideotoolbox_plugin_la-dpb.o` is dated **16:52:37**. `contrib/src/ffmpeg/rules.mak` is 16:49:49 and `contrib-arm64-apple-tvOS_11.0/.ffmpeg` 16:51. A new reset + `git am` gives all 65 files a new time, newer than their objects and stamps.
+4. **libvlc's `extras/package/apple/build.sh` runs the builds every time for each slice.** It runs contrib `../bootstrap` and `$MAKE` (lines ~711-742) unless contribs are disabled, then `configure` and `$MAKE` / `$MAKE install` for libvlc (lines ~830-842), then regenerates the static module list and `libvlc-full-static.a`. With the patched sources newer than their objects, `make` recompiles those objects (at least the libvlc ones; the contrib stamps may also trigger FFmpeg/live555 rebuilds) in all three slices before any packaging.
+
+## R3-3. The packaging-only path the script already has (not taken)
+
+- `-n` (`NONETWORK=yes`, line 428): skips the fetch / reset / `git am` block (line 522). The libvlc tree stays at `e50d9ac36a` with the 19 patches, the state rerun 2 compiled.
+- `-l` (`SKIPLIBVLCCOMPILATION=yes`, line 431): skips building the host tools (line 564) and every `buildLibVLC` call (line 229). The static-lib steps then `lipo` the existing `build-appletv*/static-lib/libvlc-full-static.a` (747.2 / 750.5 / 785.0 MB from rerun 2), and the script goes on to the two `xcodebuild archive` calls and `-create-xcframework`.
+
+Running `compileAndBuildVLCKit.sh -v -f -t -r -n -l` once, after step 2d's project edit, would therefore package today's Xcode 27 slices with the 26.0 project target. That is either a new recipe option (e.g. a `PACKAGE_ONLY=1` switch adding `-n -l`) or a one-off direct call outside the recipe — both are extras under the scope lock.
+
+## R3-4. Files touched
+
+| Step | Files |
+|---|---|
+| 1 | `tools/vlckit-truehd/build.sh` (step 2d), `tools/vlckit-truehd/README.md` (one line) |
+| 2–5 | none |
+| record | this section |
+
+Unchanged: `~/vlckit-build` (the step 2d edit has not run, so `VLCKit.xcodeproj` still says 11.0; libvlc tree `e50d9ac36a`, clean; rerun-2 slices and contribs intact), `Frameworks/`, the app, `DECISIONS.md`, `COLD-START.md`.
+
+## R3-5. What could not be tested
+
+- **Items 2–4 entirely**, so the before/after drop table still has no "after" (the "before" is in §R2-5).
+- **Whether contrib stamps would really rebuild FFmpeg and live555** after a new `git am`. I read it from the timestamps and the rules; I did not run it, since running it is the recompile the pass forbids.
+
+## R3-6. Questions for the owner
+
+1. **How should the Xcode 27 slices be packaged?**
+   - (a) A recipe switch, e.g. `PACKAGE_ONLY=1 tools/vlckit-truehd/build.sh`, which runs steps 2b–2d and calls VideoLAN's script with `-v -f -t -r -n -l`, then the `nm` check and the copy. **My recommendation:** it keeps "everything through the recipe" and reuses today's objects exactly.
+   - (b) A one-off direct call of `compileAndBuildVLCKit.sh -v -f -t -r -n -l` after running step 2d by hand, with the recipe otherwise unchanged.
+   - (c) Let the recipe recompile. The result is still Xcode 27 throughout, and should take minutes rather than a clean build's hour, but it is not the reuse this pass asked for.
+2. **`-n` also skips `git fetch --all`.** Is it acceptable that a packaging-only run never touches the network? The tree it packages is the one rerun 2 fetched and patched.
+
+## R3-7. Least-sure items
+
+1. **How much a rerun would rebuild.** The size of the recompile is inferred from make's timestamp rules and the files the patches touch, not measured. It could be only the ~52 libvlc files plus relinks, or also FFmpeg and live555.
+2. **Whether `-l` still regenerates anything per slice** before `lipo`. The code shows it goes straight from the existing `libvlc-full-static.a` to `xcodebuild archive`, but that path has never been run in this project.
