@@ -27,6 +27,18 @@ else
     echo "0007-truehd-enable.diff neither applies nor is applied — stop" >&2; exit 1
 fi
 
+# Step 0 (rerun 2) — two host-tool tarballs are pre-fetched from ftp.gnu.org because the GNU mirror
+# network and VideoLAN's contrib mirror don't reliably carry them; VLC's extras/tools only downloads
+# what is absent and its SHA512SUMS is the check. Same paths the makefile uses ($(GNU)/m4, $(GNU)/gettext).
+TOOLS="$BUILD_DIR/VLCKit/libvlc/vlc/extras/tools"
+if [ -d "$TOOLS" ]; then
+    for f in m4/m4-1.4.21.tar.gz gettext/gettext-0.26.tar.gz; do
+        b=$(basename "$f")
+        [ -f "$TOOLS/$b" ] || curl -f -sS -L --retry 3 --output "$TOOLS/$b" "https://ftp.gnu.org/gnu/$f"
+        (cd "$TOOLS" && grep -E " $b\$" SHA512SUMS | shasum -a 512 -c -) || { echo "checksum failed for $b" >&2; exit 1; }
+    done
+fi
+
 # Step 3 — VideoLAN's own build: clones libvlc master at the pinned hash (TESTEDHASH in the script),
 # applies the 17 patches, builds host tools under extras/tools, the contribs, libvlc, then the framework.
 # -v verbose, -f device + simulator + xcframework, -t tvOS, -r Release.

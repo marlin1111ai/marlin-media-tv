@@ -209,3 +209,103 @@ harness change for the TrueHD-checked Audio panel screenshot remains unexecuted.
 - Whether the next mirror `ftpmirror.gnu.org` chooses would have the files; two different
   mirrors were missing them tonight.
 - The full build's duration is still unmeasured.
+
+---
+
+# Rerun 2, tool tarballs pre-fetched — 2026-09-13 — STOPPED at step 3 (contribs: meson needs Python 3.10+)
+
+**Result: stopped, nothing built.** With `m4-1.4.21` and `gettext-0.26` pre-fetched (step 0), the
+host-tools stage completed in full and the tvOS contrib build began, but every contrib that
+builds with meson fails at once: the meson VideoLAN's tools stage installs (1.12.0) refuses to run
+on the only Python the build's PATH offers, Xcode's `/usr/bin/python3` 3.9.6. fribidi and
+dav1d failed first, `make` stopped, `build.sh` printed `ERROR: Building contribs failed`, exit 1,
+7 min 34 s after the start. This was the recon's flagged uncertainty ("whether the tools
+bootstrap accepts Xcode's Python 3.9.6"): it builds meson fine and meson then declines to run.
+Per the pass rules: no retry, no workaround. The fix is an install or a PATH change, both the
+owner's call (open question 1). Steps 0 and 1 are done; steps 4–7 were not reached.
+
+Committed locally (recipe with the pre-fetch step, this record). **Not pushed.**
+
+## Step 0 — the two tarballs
+
+Fetched with the makefile's own URL layout from ftp.gnu.org into libvlc's
+`extras/tools/` (`~/vlckit-build/VLCKit/libvlc/vlc/extras/tools/`, where VLC's tools makefile lives):
+```
+m4-1.4.21.tar.gz: HTTP 200 3558201 bytes
+gettext-0.26.tar.gz: HTTP 200 31353014 bytes
+shasum -a 512 -c (entries from extras/tools/SHA512SUMS lines 5 and 13):
+m4-1.4.21.tar.gz: OK
+gettext-0.26.tar.gz: OK
+```
+`tools/vlckit-truehd/build.sh` gained the pre-fetch-and-verify block; the README a line.
+
+## Step 1 — patch check
+
+```
+git apply --check 0007 (edited) vs 5dd4aebda (against the base commit's index; the worktree was still patched from the previous run): OK
+```
+
+## Step 3 — the run
+
+`~/vlckit-build/build.log` (35 600 lines). Head, the stage markers, and the failure:
+```
+build start: 2026-09-13 22:47:12
+command: ./compileAndBuildVLCKit.sh -v -f -t -r  (cwd /Users/marlin1111/vlckit-build/VLCKit)
+[info] Preparing build dirs
+[info] Building tools                                              (all 13 tools built: stamps )
+[info] Compiling aarch64 with SDK version 26.5, platform appletvos
+Building contribs for arm64
+Meson works correctly only with python 3.10+.
+You have python 3.9.6 (default, May 22 2026, 11:13:45)
+[Clang 21.0.0 (clang-2100.1.1.101)].
+Please update your environment
+make: *** [.fribidi] Error 1
+make: *** Waiting for unfinished jobs....
+make: *** [.dav1d] Error 1
+ERROR: Building contribs failed
+build exit=1 end: 2026-09-13 22:54:46
+```
+The patch step succeeded again (checked before the tools stage, exactly as in the previous run):
+libvlc head at patch 17 on 5dd4aebda, `contrib/src/ffmpeg/rules.mak` lines 43–48 hold only the
+`--disable-securetransport` block, no `--disable-*=mlp` anywhere for a tvOS host. ffmpeg 9.0's
+tarball was verified and unpacked (`.sum-ffmpeg` stamp, `contrib-arm64-apple-tvOS_11.0/ffmpeg`
+directory) but its configure never ran: no ffmpeg configure line is in the log.
+Contribs that did complete before make stopped: dvbpsi, gsm, lame, openjpeg, utfcpp, zlib.
+
+Why: VideoLAN's script builds its own PATH (`compileAndBuildVLCKit.sh` line 568) from a
+python.org framework install if present (lines 548–553; none on this Mac), its own tools,
+and `/usr/bin:/bin:/usr/sbin:/sbin` — Homebrew's `/opt/homebrew/bin/python3.11` is deliberately
+not on it (README line 162: "do NOT use homebrew … it will be ignored by VLC's build process").
+The meson wrapper the tools stage installs is `python3 …/extras/tools/meson/meson.py "$@"`, and
+`meson.py` line 10 exits on `sys.version_info < (3, 10)`. `/usr/bin/python3` is 3.9.6. Eighteen
+contribs in this build use meson (ass, dav1d, freetype2, fribidi, harfbuzz, libdsm, libnoidea,
+libplacebo, librist, opus, and the disabled bluray/basu/dvdread/dvdnav/dvdcss/glib/microdns/
+medialibrary), so the build cannot pass this stage on this Mac as it stands.
+
+Disk: `~/vlckit-build` 3.7G; `Frameworks/` 0 B.
+
+## Files touched, by step (rerun 2)
+
+| Step | Files / actions |
+|---|---|
+| 0 | `~/vlckit-build/VLCKit/libvlc/vlc/extras/tools/{m4-1.4.21,gettext-0.26}.tar.gz` (outside the repo); `tools/vlckit-truehd/build.sh` (pre-fetch block); `tools/vlckit-truehd/README.md` (one line) |
+| 1 | check only |
+| 3 | `~/vlckit-build/build.log` (kept), previous logs `build.log.stopped-2236`, `build.log.stopped-2242` |
+| 4–6 | not reached |
+| 7 | this section; `COLD-START.md` (paragraph updated). D012/D013 still not added |
+
+## Open questions for the owner
+
+1. **Python 3.10+ for the build.** VideoLAN's supported way is the python.org installer
+   (creates `/Library/Frameworks/Python.framework`, which the script puts first on its PATH) —
+   an install on the Mac, so not done. The alternative is a one-line PATH change in the recipe
+   pointing at Homebrew's existing `python3.11` (`/opt/homebrew/bin`), which VideoLAN's README
+   says not to do but which needs no install. Which?
+2. D013 as before (record `~/vlckit-build`).
+
+## Least sure of
+
+- Whether Homebrew's Python 3.11 would carry the whole build (meson is the only Python
+  consumer seen so far; VLC's README warns against it without saying why).
+- Whether more contribs fail after the meson ones; make stopped at the first two.
+- The full build's duration: 7½ minutes reached the contrib stage with 24 cores; the rest is unmeasured.
