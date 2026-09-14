@@ -42,3 +42,7 @@ Carthage/Build/
 *.dSYM
 timeline.xctimeline
 playground.xcworkspace
+
+## Pass 1b: custom VLCKit build (source clone + build) and the finished framework
+vlckit-build/
+Frameworks/

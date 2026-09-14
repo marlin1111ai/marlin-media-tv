@@ -1,0 +1,37 @@
+diff --git a/libvlc/patches/0007-contrib-ffmpeg-use-audiotoolbox-on-iOS-for-AC-3.patch b/libvlc/patches/0007-contrib-ffmpeg-use-audiotoolbox-on-iOS-for-AC-3.patch
+index 7a21a89..69a25de 100644
+--- a/libvlc/patches/0007-contrib-ffmpeg-use-audiotoolbox-on-iOS-for-AC-3.patch
++++ b/libvlc/patches/0007-contrib-ffmpeg-use-audiotoolbox-on-iOS-for-AC-3.patch
+@@ -8,8 +8,8 @@ as introduced in iOS 9 and disables the use of the MLP decoder to be in
+ compliance with the App Store ToS.
+ ---
+  .../avcodec-enable-audiotoolbox-ac3.patch     | 20 +++++++++++++++++++
+- contrib/src/ffmpeg/rules.mak                  |  7 +++++++
+- 2 files changed, 27 insertions(+)
++ contrib/src/ffmpeg/rules.mak                  |  1 +
++ 2 files changed, 21 insertions(+)
+  create mode 100644 contrib/src/ffmpeg/avcodec-enable-audiotoolbox-ac3.patch
+ 
+ diff --git a/contrib/src/ffmpeg/avcodec-enable-audiotoolbox-ac3.patch b/contrib/src/ffmpeg/avcodec-enable-audiotoolbox-ac3.patch
+@@ -42,20 +42,7 @@ diff --git a/contrib/src/ffmpeg/rules.mak b/contrib/src/ffmpeg/rules.mak
+ index 2e2287085f..ab50f1cead 100644
+ --- a/contrib/src/ffmpeg/rules.mak
+ +++ b/contrib/src/ffmpeg/rules.mak
+-@@ -43,6 +43,12 @@ FFMPEGCONF = --prefix="$(PREFIX)" --enable-static --disable-shared \
+- ifdef HAVE_DARWIN_OS
+- FFMPEGCONF += \
+- 	--disable-securetransport
+-+ifdef HAVE_IOS
+-+FFMPEGCONF += \
+-+	--disable-decoder=mlp \
+-+	--disable-demuxer=mlp \
+-+	--disable-parser=mlp
+-+endif
+- endif
+- 
+- ifdef ENABLE_PDB
+-@@ -245,6 +251,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
++@@ -245,6 +245,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
+  	$(APPLY) $(SRC)/ffmpeg/0011-avcodec-videotoolboxenc-disable-calls-on-unsupported.patch
+  	$(APPLY) $(SRC)/ffmpeg/avcodec-fix-compilation-visionos.patch
+  	$(APPLY) $(SRC)/ffmpeg/0009-swscale-x86-use-HOSTCPPFLAGS-instead-of-CPPFLAGS-for.patch

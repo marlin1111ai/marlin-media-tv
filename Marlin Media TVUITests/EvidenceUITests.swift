@@ -242,9 +242,11 @@ final class EvidenceUITests: XCTestCase {
         press(.up)                       // first track (TrueHD 7.1) — VLC chose AC-3 on its own
         press(.select, wait: 6)          // switch: the log shows whether TrueHD decodes
         shot("11-audio-truehd-selected")
+        sleep(6)                         // let the TrueHD decoder run
         bumpOverlay()
         press(.up)
-        press(.select, wait: 2)          // reopen the audio panel
+        press(.select, wait: 2)          // reopen the audio panel: the check should sit on TrueHD
+        shot("11-audio-panel-truehd-checked")
         press(.down)                     // third track (AC-3 5.1)
         press(.down)
         press(.select, wait: 4)
