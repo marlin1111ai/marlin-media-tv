@@ -1,0 +1,37 @@
+From 0d1f8293fc068de9f51e49ee0362cd620d01fcfb Mon Sep 17 00:00:00 2001
+From: marlin1111ai <marlin1111ai@gmail.com>
+Date: Tue, 15 Sep 2026 12:08:11 -0400
+Subject: [PATCH] input: es_out: do not compensate a late PCR while paused
+
+While es_out is paused, EsOutDecodersStopBuffering anchors the input clock
+of a rebuffer at the pause date, so that resume shifts it by the pause
+length. A PCR read right after a seek taken while paused is then late by
+about the time since the pause minus the pts delay. The late branch resets
+the PCR: it flushes the decoders and rebuffers without moving the demuxer,
+the new rebuffer is anchored at the pause date again, and the input laps
+forward through the stream, raising the jitter up to clock-jitter, until
+Play resumes from wherever the last lap left off instead of the seek target.
+
+Nothing is output while paused, so there is no lateness to compensate. Skip
+the compensation while paused, as is already done while frame stepping.
+The pause-date anchor is unchanged.
+---
+ src/input/es_out.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/input/es_out.c b/src/input/es_out.c
+index 4657e4969f..ca925e83db 100644
+--- a/src/input/es_out.c
++++ b/src/input/es_out.c
+@@ -3658,7 +3658,7 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
+             return VLC_SUCCESS;
+         }
+ 
+-        if (p_pgrm != p_sys->p_pgrm || p_sys->p_next_frame_es != NULL)
++        if (p_pgrm != p_sys->p_pgrm || p_sys->p_next_frame_es != NULL || p_sys->b_paused)
+             return VLC_SUCCESS;
+ 
+         /* The PCR is not considered late, there is no compensation needed. */
+-- 
+2.54.0
+

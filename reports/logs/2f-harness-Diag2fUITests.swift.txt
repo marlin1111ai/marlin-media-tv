@@ -1,0 +1,216 @@
+//
+//  Diag2fUITests.swift — temporary harness for pass 2f (2026-09-15). Not committed.
+//  Attach mode (the app is started by `devicectl … --console` with the run's VLCParams, tracer on), from pass 2e.
+//
+//  Control session (step 7 + step 8 track switches; run on HEAD and on the 0021 build):
+//    play 30 s; Up, Up, Select (audio panel), Menu (panel closes), Down; Right (+30 s); Left (−10 s);
+//    Play/Pause (pause); 5 × Left and 5 × Right clicks ~4.2 s apart, a screenshot 3 s after each;
+//    still paused: Up, Select (audio panel), Down, Select (audio row 1); Right, Select (subtitle panel), Down, Select;
+//    Right, Select (subtitle panel), Up, Select; Down; 5 s; Play/Pause (play); screenshots at +3 s and +60 s;
+//    Play/Pause (plain pause) ~80 s; Play/Pause (play); screenshots at +3 s and +60 s; Menu.
+//  Change sessions (step 8): Stargate Extended plays 30 s, pause, Menu, Play → Theatrical, 30 s, Menu;
+//    Magicians S1E1 plays 30 s, pause, Menu, episode 2, 30 s, Menu.
+//  Scrub session (step 6; 0021 build with the Page Up/Down hook): play 30 s, 4 × Right (+30 s), 20 s, then five paused
+//    scrubs, each: Play/Pause (pause), wait, drag (Page Up = +0.08 of the width, Page Down = −0.04), end at drag +9 s:
+//    1. 3 s, forward, Play/Pause   2. 3 s, back, click   3. 20 s, forward, click   4. 20 s, back, Play/Pause
+//    5. 3 s, forward, Menu (cancel; stays paused at the drag's start)
+//    Screenshots at drag +1 s, +3 s (lifted), +8.5 s (before the ending) and ending +3 s; 30 s of playback after a
+//    landing, 7 s after Menu.
+//
+
+import XCTest
+
+final class Diag2fUITests: XCTestCase {
+    private var app: XCUIApplication!
+    private let remote = XCUIRemote.shared
+    private let headerOrder = ["tab.Movies", "tab.TV Shows", "tab.Videos", "sort"]
+
+    override func setUp() { continueAfterFailure = true }
+
+    private func shot(_ name: String) {
+        let a = XCTAttachment(screenshot: XCUIScreen.main.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+    private func note(_ t: String) { let a = XCTAttachment(string: t); a.name = "note"; a.lifetime = .keepAlways; add(a); NSLog("[p2f] %@", t) }
+    private func press(_ b: XCUIRemote.Button, _ n: Int = 1, wait: UInt32 = 1) { for _ in 0..<n { remote.press(b); sleep(wait) } }
+    private func focusedIds() -> [String] {
+        app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == YES")).allElementsBoundByIndex.map { $0.identifier.isEmpty ? "(\($0.label))" : $0.identifier }
+    }
+    private func isFocused(_ id: String) -> Bool { focusedIds().contains(id) }
+    private func isFocused(prefix: String) -> Bool { focusedIds().contains { $0.hasPrefix(prefix) } }
+    @discardableResult private func moveUntilFocused(_ id: String, pressing b: XCUIRemote.Button, limit: Int = 8) -> Bool {
+        for _ in 0..<limit { if isFocused(id) { return true }; press(b) }
+        return isFocused(id)
+    }
+    private func focusHeader() { for _ in 0..<8 { if isFocused(prefix: "tab.") || isFocused("sort") { return }; press(.up) } }
+    private func focusHeaderItem(_ id: String) {
+        focusHeader(); guard let target = headerOrder.firstIndex(of: id) else { return }
+        for _ in 0..<8 { if isFocused(id) { return }; let cur = headerOrder.firstIndex { isFocused($0) } ?? 0; press(cur < target ? .right : .left) }
+    }
+    private func selectTab(_ name: String) { focusHeaderItem("tab.\(name)"); press(.select, wait: 2) }
+    private func openPoster(_ id: String, tab: String) {
+        selectTab(tab); press(.down); if !isFocused(prefix: "poster.") { press(.down) }
+        _ = moveUntilFocused(id, pressing: .right, limit: 6) || moveUntilFocused(id, pressing: .left, limit: 6)
+        press(.select, wait: 3)
+        XCTAssertTrue(app.staticTexts["detail.title"].waitForExistence(timeout: 20), "detail did not open; focus \(focusedIds())")
+        sleep(2)
+    }
+    private func pressPlay() { if !isFocused("play") { moveUntilFocused("play", pressing: .up, limit: 6) }; press(.select, wait: 2) }
+    private func stamp() -> String { let f = DateFormatter(); f.dateFormat = "HH:mm:ss.SSS"; return f.string(from: Date()) }
+    private func pickEdition(_ name: String) {
+        XCTAssertTrue(app.buttons["pick.\(name)"].waitForExistence(timeout: 5), "edition picker did not open")
+        _ = moveUntilFocused("pick.\(name)", pressing: .up, limit: 3) || moveUntilFocused("pick.\(name)", pressing: .down, limit: 3)
+        press(.select, wait: 2)
+    }
+    private func openStargate() { openPoster("poster.Stargate", tab: "Movies"); pressPlay(); pickEdition("Extended") }
+    private func openEpisode(show: String, season: Int, episode: Int) {
+        openPoster("poster.\(show)", tab: "TV Shows")
+        XCTAssertTrue(app.buttons["season.\(season)"].waitForExistence(timeout: 30), "seasons did not load"); sleep(2)
+        if !app.buttons["episode.\(season).\(episode)"].exists {
+            moveUntilFocused("season.\(season)", pressing: .right, limit: 4); press(.select, wait: 2)
+        }
+        XCTAssertTrue(moveUntilFocused("episode.\(season).\(episode)", pressing: .down, limit: 6), "episode not focused; focus \(focusedIds())")
+        press(.select, wait: 2)
+    }
+    private func open(_ film: String) {
+        switch film {
+        case "stargate": openStargate()
+        case "ww": openPoster("poster.Wonder Woman", tab: "Movies"); pressPlay()
+        case "divergent": openPoster("poster.Divergent", tab: "Movies"); pressPlay()
+        default: openEpisode(show: "The Magicians", season: 1, episode: 1)
+        }
+    }
+    private func attach() {
+        app = XCUIApplication(); app.activate()
+        note("attached at \(stamp())")
+        XCTAssertTrue(app.buttons["tab.Movies"].waitForExistence(timeout: 60), "library did not load")
+        sleep(3)
+    }
+    private func playerUp(_ tag: String) {
+        XCTAssertTrue(app.otherElements["player"].waitForExistence(timeout: 20), "player did not appear; focus \(focusedIds())")
+        note("\(tag): player up at \(stamp())")
+    }
+
+    // MARK: step 7 + step 8 track switches
+
+    private func controlSession(_ film: String) {
+        let tag = "\(film)-control"
+        attach(); open(film); playerUp(tag)
+        sleep(30)
+        note("\(tag): menu-closes-panel: up, up, select at \(stamp())"); press(.up); press(.up); press(.select, wait: 2)
+        shot("p2f-\(tag)-00-audio-panel-open")
+        note("\(tag): menu (panel) at \(stamp())"); press(.menu, wait: 2); press(.down, wait: 2)
+        note("\(tag): right (+30) at \(stamp())"); press(.right, wait: 3)
+        note("\(tag): left (-10) at \(stamp())"); press(.left, wait: 3)
+        note("\(tag): pause (Play/Pause) at \(stamp())"); press(.playPause, wait: 4)
+        shot("p2f-\(tag)-fs-00-paused")
+        for n in 1...10 {
+            let left = n <= 5
+            note("\(tag): click \(n) \(left ? "L" : "R") at \(stamp())")
+            remote.press(left ? .left : .right)
+            sleep(3)
+            shot(String(format: "p2f-\(tag)-fs-%02d-\(left ? "L" : "R")", n))
+            usleep(1_200_000)
+        }
+        note("\(tag): paused audio switch: up, select, down, select at \(stamp())")
+        press(.up); press(.select, wait: 2); press(.down); press(.select, wait: 3)
+        note("\(tag): paused subtitle switch 1: right, select, down, select at \(stamp())")
+        press(.right); press(.select, wait: 2); press(.down); press(.select, wait: 3)
+        note("\(tag): paused subtitle switch 2: right, select, up, select at \(stamp())")
+        press(.right); press(.select, wait: 2); press(.up); press(.select, wait: 3)
+        press(.down, wait: 5)
+        shot("p2f-\(tag)-10-paused-after-switches")
+        note("\(tag): play after switches (Play/Pause) at \(stamp())"); remote.press(.playPause)
+        sleep(3); shot("p2f-\(tag)-11-switches-play+3s")
+        sleep(56); press(.up, wait: 1); shot("p2f-\(tag)-12-switches-play+60s")
+        press(.down, wait: 2)
+        note("\(tag): plain pause (Play/Pause) at \(stamp())"); remote.press(.playPause)
+        sleep(80)
+        note("\(tag): play after plain pause (Play/Pause) at \(stamp())"); remote.press(.playPause)
+        sleep(3); shot("p2f-\(tag)-13-plainpause-play+3s")
+        sleep(56); press(.up, wait: 1); shot("p2f-\(tag)-14-plainpause-play+60s")
+        note("\(tag): exit at \(stamp())")
+        press(.down, wait: 2); press(.menu, wait: 3)
+        XCTAssertFalse(app.otherElements["player"].exists, "player still up after Menu")
+    }
+
+    // MARK: step 8 edition / episode while paused
+
+    private func editionChange() {
+        let tag = "stargate-edition"
+        attach(); openStargate(); playerUp(tag)
+        sleep(30)
+        note("\(tag): pause (Play/Pause) at \(stamp())"); press(.playPause, wait: 5)
+        note("\(tag): menu (exit while paused) at \(stamp())"); press(.menu, wait: 3)
+        XCTAssertTrue(app.staticTexts["detail.title"].waitForExistence(timeout: 10), "detail did not return")
+        note("\(tag): play → Theatrical at \(stamp())"); pressPlay(); pickEdition("Theatrical")
+        playerUp(tag)
+        sleep(3); shot("p2f-\(tag)-01-theatrical+3s")
+        sleep(27); press(.up, wait: 1); shot("p2f-\(tag)-02-theatrical+30s")
+        note("\(tag): exit at \(stamp())"); press(.down, wait: 2); press(.menu, wait: 3)
+    }
+
+    private func episodeChange() {
+        let tag = "magicians-episode"
+        attach(); openEpisode(show: "The Magicians", season: 1, episode: 1); playerUp(tag)
+        sleep(30)
+        note("\(tag): pause (Play/Pause) at \(stamp())"); press(.playPause, wait: 5)
+        note("\(tag): menu (exit while paused) at \(stamp())"); press(.menu, wait: 3)
+        XCTAssertTrue(app.buttons["episode.1.2"].waitForExistence(timeout: 10), "episode list did not return")
+        XCTAssertTrue(moveUntilFocused("episode.1.2", pressing: .down, limit: 6), "episode 2 not focused; focus \(focusedIds())")
+        note("\(tag): select episode 2 at \(stamp())"); press(.select, wait: 2)
+        playerUp(tag)
+        sleep(3); shot("p2f-\(tag)-01-episode2+3s")
+        sleep(27); press(.up, wait: 1); shot("p2f-\(tag)-02-episode2+30s")
+        note("\(tag): exit at \(stamp())"); press(.down, wait: 2); press(.menu, wait: 3)
+    }
+
+    // MARK: step 6 scrubs (0021 build, hook)
+
+    private enum Ending: String { case click, playpause, menu }
+
+    private func scrubSession(_ film: String) {
+        let tag = "\(film)-scrub"
+        attach(); open(film); playerUp(tag)
+        sleep(30)
+        for n in 1...4 { note("\(tag): skip +30 \(n) at \(stamp())"); remote.press(.right); usleep(1_500_000) }
+        sleep(20)
+        let scrubs: [(UInt32, Bool, Ending)] = [(3, true, .playpause), (3, false, .click), (20, true, .click), (20, false, .playpause), (3, true, .menu)]
+        for (i, (hold, forward, ending)) in scrubs.enumerated() {
+            let name = String(format: "p2f-\(tag)-%02d-pause\(hold)s-\(forward ? "fwd" : "back")-\(ending.rawValue)", i + 1)
+            note("\(tag): pause (Play/Pause) before scrub \(i + 1) at \(stamp())")
+            remote.press(.playPause)
+            sleep(hold)
+            note("\(tag): scrub \(i + 1) drag \(forward ? "forward" : "back") at \(stamp())")
+            remote.press(forward ? .pageUp : .pageDown)
+            usleep(1_000_000); shot("\(name)-a-mid-drag")
+            sleep(2); shot("\(name)-b-lifted")
+            usleep(5_500_000); shot("\(name)-c-before-end")
+            usleep(500_000)
+            note("\(tag): scrub \(i + 1) \(ending.rawValue) at \(stamp())")
+            switch ending {
+            case .click: remote.press(.select)
+            case .playpause: remote.press(.playPause)
+            case .menu: remote.press(.menu)
+            }
+            sleep(3)
+            shot("\(name)-d-after+3s")
+            if ending == .menu { sleep(7); note("\(tag): play after cancel (Play/Pause) at \(stamp())"); remote.press(.playPause); sleep(3) } else { sleep(27) }
+        }
+        note("\(tag): exit at \(stamp())")
+        press(.menu, wait: 3)
+        XCTAssertFalse(app.otherElements["player"].exists, "player still up after the final Menu")
+    }
+
+    func t0_Probe() { attach(); open("magicians"); playerUp("magicians-probe"); sleep(15); press(.menu, wait: 3) }
+
+    func tStargateControl() { controlSession("stargate") }
+    func tWonderWomanControl() { controlSession("ww") }
+    func tDivergentControl() { controlSession("divergent") }
+    func tMagiciansControl() { controlSession("magicians") }
+    func tStargateEdition() { editionChange() }
+    func tMagiciansEpisode() { episodeChange() }
+    func tStargateScrub() { scrubSession("stargate") }
+    func tWonderWomanScrub() { scrubSession("ww") }
+    func tDivergentScrub() { scrubSession("divergent") }
+    func tMagiciansScrub() { scrubSession("magicians") }
+}

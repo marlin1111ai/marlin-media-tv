@@ -211,6 +211,17 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 - **Why it can't be scoped as asked.** Nothing in this libvlc reads the `input-fast-seek` option (declared, created on the input, read only by desktop GUI prefs), so a media option is inert; VLCKit has no seek-speed setting (`setTime:` always passes `b_fast = NO`). Fast vs precise is per seek: `libvlc_media_player_set_time(p, t, b_fast)`. The only scoped route is VLCKit's private `_playerInstance` plus that exported C call; the owner chose to stop rather than use it.
 - **State.** Nothing applied, built, installed or run. Tree and Home Theater as after pass 2a (scrub diff uncommitted). The scrub code is not committed: pass 2a's ~30 s landing overshoot stands.
 
+**Pass 2f (2026-09-15): patch 0021 (C1) with a moving scrub picture — STOPPED at step 9.** Report `reports/2026-09-15-pass2f-scrub-live-picture.md`, evidence `reports/logs/2f-analysis.txt`, `reports/logs/2f-vlc-tests.txt`.
+- **What works.** 0021 (`es_out.c:3661`, no late-PCR compensation while paused; one line) passes VLC's host tests unchanged. The full recipe built it with 21 patches; both slices check. On Home Theater, 20 paused scrubs on four films had 0 PCR-late lines, and every landing was within −81…+305 ms of its target. Steps 7–8 (skips, frame steps, panels, paused track switches, plain pause, edition/episode change) matched HEAD.
+- **Why it stopped.**
+  - **Magicians (MP4):** every ending logged a `clock gap`, and VLCKit's time froze after 4 of 5, so the overlay clock and the next drag's start were stale.
+  - **The picture did not track during drags** on Wonder Woman and Divergent (HEVC: 1–5 of 8–9 seeks shown), nor on Magicians scrub 3's lift.
+  - **Stargate scrub 4** dropped 7 pictures at landing.
+- **State, uncommitted.**
+  - `tools/vlckit-truehd/` (0021, `build.sh`, README), the app change and the harness. Copies are in `reports/logs/2f-*`.
+  - `Frameworks/` and the libvlc tree carry 21 patches, and Home Theater runs the 0021 build with the harness hook.
+  - D021 and DECISIONS unchanged. Nothing pushed.
+
 **Pass 2e (2026-09-15): why paused seeks can't make the picture follow the thumb — diagnosis only.** Report `reports/2026-09-15-pass2e-scrub-seek-diagnosis.md`, evidence `reports/logs/2e-analysis.txt`.
 - **Cause (instrumented libvlc, Magicians S1E1 and Stargate on Home Theater).**
   - A paused seek's rebuffer anchors the input clock at the **pause date** (`es_out.c:1219`). The next PCR is late by about (time since the pause − pts_delay), so the late branch resets and rebuffers without moving the demuxer (`es_out.c:3661–3721`).
