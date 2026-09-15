@@ -8,6 +8,8 @@
 //  swipe its recognizers. Learned from Marlin DVR TV's PlayerHost (Passes 28/29): an edge
 //  *click* on the remote is a `UIPress` (.leftArrow/.rightArrow); a swipe is not a press at
 //  all, only touches — so click and swipe are told apart here and handed to the model as such.
+//  A slower horizontal drag is neither: a pan recognizer that waits for the side swipes to fail
+//  hands it to the model as a scrub (pass 2a).
 //
 
 import SwiftUI
@@ -43,13 +45,23 @@ final class PlayerHostController: UIViewController {
         surface.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         surface.backgroundColor = .black
         view.addSubview(surface)
+        var sideSwipes: [UISwipeGestureRecognizer] = []
         for (direction, name) in [(UISwipeGestureRecognizer.Direction.left, "left"), (.right, "right"), (.up, "up"), (.down, "down")] {
             let swipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped(_:)))
             swipe.direction = direction
             swipe.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirect.rawValue)]
             swipe.name = name
             surface.addGestureRecognizer(swipe)
+            if direction == .left || direction == .right { sideSwipes.append(swipe) }
         }
+        // Pass 2a: a horizontal drag scrubs. A flick stays a swipe (D008's skips), so the drag waits for the left
+        // and right swipes to fail; a mostly vertical drag never begins one (see gestureRecognizerShouldBegin).
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
+        pan.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirect.rawValue)]
+        pan.name = "scrub"
+        pan.delegate = self
+        for swipe in sideSwipes { pan.require(toFail: swipe) }
+        surface.addGestureRecognizer(pan)
         model.attach(drawable: surface)
     }
 
@@ -76,6 +88,22 @@ final class PlayerHostController: UIViewController {
         }
     }
 
+    /// Pass 2a: the drag's horizontal travel as a share of the surface's width.
+    @objc private func panned(_ pan: UIPanGestureRecognizer) {
+        let fraction = pan.translation(in: surface).x / max(1, surface.bounds.width)
+        switch pan.state {
+        case .began:
+            model.scrubBegan()
+            model.scrubMoved(fraction: fraction)
+        case .changed:
+            model.scrubMoved(fraction: fraction)
+        case .ended, .cancelled:
+            model.scrubMoved(fraction: fraction)
+            model.scrubLifted()
+        default: break
+        }
+    }
+
     override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
         var handled = false
         for press in presses {
@@ -97,6 +125,15 @@ final class PlayerHostController: UIViewController {
         let ours: Set<UIPress.PressType> = [.select, .playPause, .menu, .leftArrow, .rightArrow, .upArrow, .downArrow]
         if presses.contains(where: { ours.contains($0.type) }) { return }
         super.pressesEnded(presses, with: event)
+    }
+}
+
+extension PlayerHostController: UIGestureRecognizerDelegate {
+    /// Pass 2a: the scrub pan begins only for a drag that has travelled more across than up or down.
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return true }
+        let t = pan.translation(in: pan.view)
+        return abs(t.x) > abs(t.y)
     }
 }
 

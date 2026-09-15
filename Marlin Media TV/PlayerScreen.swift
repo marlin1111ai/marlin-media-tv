@@ -3,7 +3,7 @@
 //  Marlin Media TV
 //
 //  Frames 10 (overlay), 11 (audio panel), 12 (subtitle panel), 13 (paused + frame step),
-//  14/15 (skip feedback). Nothing here is focusable: the UIKit surface underneath owns the
+//  14/15 (skip feedback), and the scrub bar (pass 2a). Nothing here is focusable: the UIKit surface underneath owns the
 //  remote and the model tells this view what to draw.
 //
 
@@ -21,9 +21,10 @@ struct PlayerScreen: View {
             Nocturne.playerBg
             PlayerHost(model: model)
             ZStack {
-                if let pill = model.skipPill { SkipFeedback(text: pill.text, forward: pill.forward) }
-                if !model.isPlaying, model.errorText == nil { PausedCenter(framePill: model.framePill) }
-                if model.overlayVisible || model.panel != nil { overlay }
+                if let pill = model.skipPill, model.scrub == nil { SkipFeedback(text: pill.text, forward: pill.forward) }
+                if !model.isPlaying, model.errorText == nil, model.scrub == nil { PausedCenter(framePill: model.framePill) }
+                if model.scrub == nil, model.overlayVisible || model.panel != nil { overlay }
+                if let scrub = model.scrub { ScrubOverlay(scrub: scrub, lengthMs: model.lengthMs) }
                 if let panel = model.panel { TrackPanel(model: model, panel: panel) }
                 if let error = model.errorText { PlaybackError(text: error) }
             }
@@ -135,9 +136,11 @@ private struct PanelButton: View {
     }
 }
 
-/// Frame 10's scrubber: 8 px track, accent fill, a white knob with a glow.
+/// Frame 10's scrubber: 8 px track, accent fill, a white knob with a glow. While scrubbing (pass 2a) the knob is the
+/// target and `mark` is where playback was when the drag began.
 private struct Scrubber: View {
     let progress: Double
+    var mark: Double? = nil
 
     var body: some View {
         GeometryReader { geo in
@@ -145,6 +148,12 @@ private struct Scrubber: View {
             ZStack(alignment: .leading) {
                 Capsule().fill(Nocturne.text.opacity(0.22)).frame(height: 8)
                 Capsule().fill(Nocturne.accent).frame(width: max(0, x), height: 8)
+                if let mark {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Nocturne.neutral300)
+                        .frame(width: 4, height: 20)
+                        .offset(x: geo.size.width * mark - 2)
+                }
                 RoundedRectangle(cornerRadius: 5)
                     .fill(Nocturne.accent100)
                     .frame(width: 10, height: 34)
@@ -154,6 +163,41 @@ private struct Scrubber: View {
             .frame(height: 34)
         }
         .frame(height: 34)
+    }
+}
+
+/// Pass 2a: the scrub bar — frame 10's timeline row (type, widths, 26 pt spacing) in frames 14/15's place, the bar
+/// alone 78 pt above the bottom edge over frame 10's shade. Elapsed and remaining are the target's.
+private struct ScrubOverlay: View {
+    let scrub: PlayerModel.Scrub
+    let lengthMs: Int
+
+    private func share(_ ms: Int) -> Double { lengthMs > 0 ? min(1, max(0, Double(ms) / Double(lengthMs))) : 0 }
+
+    var body: some View {
+        VStack {
+            Spacer()
+            ZStack(alignment: .bottom) {
+                LinearGradient(stops: [.init(color: Nocturne.playerBg.opacity(0), location: 0),
+                                       .init(color: Nocturne.playerBg.opacity(0.55), location: 0.5),
+                                       .init(color: Nocturne.playerBg.opacity(0.92), location: 1)],
+                               startPoint: .top, endPoint: .bottom)
+                    .frame(height: 1080 * 0.52)
+                HStack(spacing: 26) {
+                    Text(Format.clock(Double(scrub.targetMs) / 1000))
+                        .font(.nocturne(30, .medium)).monospacedDigit()
+                        .foregroundStyle(Nocturne.text)
+                        .frame(width: 130, alignment: .leading)
+                    Scrubber(progress: share(scrub.targetMs), mark: share(scrub.startMs))
+                    Text("−" + Format.clock(Double(max(0, lengthMs - scrub.targetMs)) / 1000))
+                        .font(.nocturne(30, .medium)).monospacedDigit()
+                        .foregroundStyle(Nocturne.neutral400)
+                        .frame(width: 130, alignment: .trailing)
+                }
+                .padding(.horizontal, 80)
+                .padding(.bottom, 78)
+            }
+        }
     }
 }
 

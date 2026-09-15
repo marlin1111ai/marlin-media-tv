@@ -1,0 +1,398 @@
+# Pass 2c — analysis (2026-09-15). Home Theater; clean recipe framework (20 patches); app = reports/logs/2c-scrub-app.diff + the harness hook (reports/logs/2c-harness-app.diff).
+# [scrub] tick= is CLOCK_MONOTONIC µs (VLC vlc_tick_now); tracer Timestamp is ns on the same clock. Drags are scripted (Page Up/Down hook), 2 s, +0.08 / −0.04 of the width.
+
+## probe (magicians, untraced) — [scrub] lines
+8:45:14.126 AM [harness] scripted drag 0.08 of the width over 2 s tick=517672666931
+8:45:14.126 AM [scrub] begin at 17000 ms playing=true tick=517672667319
+8:45:16.199 AM [scrub] lift target=79571 ms tick=517674740044
+8:45:19.895 AM [scrub] land select from 17000 ms at 79571 ms tick=517678436664
+8:45:19.896 AM [scrub] seek 79571 ms after play tick=517678437178
+8:45:20.936 AM [scrub] land +1 s time=79571 ms (expected 79571 ms) state Playing
+8:45:22.973 AM [scrub] land +3 s time=82154 ms (expected 79571 ms) state Playing
+
+## scrub2c.py — every session (48 scrubs)
+== stargate-play: 6 scrubs
+  1: land select     from playing | before 176991 ms | target shown 332952 ms | ending at 332952 ms | seek 332952 | +3 s 335661 ms (error -218 ms), trace pts at +3 s 335635 ms (error -244 ms) | picture pts offset -19 ms, click→picture 0.073 s, old pictures first 0 | dropped 0, late 2 | reads while paused 0 (PCR None), flushed events 0 | ignored none
+  2: land select     from playing | before 364960 ms | target shown 286980 ms | ending at 286980 ms | seek 286980 | +3 s 289008 ms (error -912 ms), trace pts at +3 s 289673 ms (error -247 ms) | picture pts offset -10 ms, click→picture 0.06 s, old pictures first 0 | dropped 0, late 0 | reads while paused 314 (PCR (366633001, 372288001)), flushed events 0 | ignored none
+  3: land playPause  from playing | before 319008 ms | target shown 474969 ms | ending at 474969 ms | seek 474969 | +3 s 476976 ms (error -915 ms), trace pts at +3 s 477610 ms (error -281 ms) | picture pts offset -28 ms, click→picture 0.078 s, old pictures first 0 | dropped 1, late 0 | reads while paused 314 (PCR (320672001, 326293001)), flushed events 0 | ignored none
+  4: land playPause  from playing | before 506976 ms | target shown 428996 ms | ending at 428996 ms | seek 428996 | +3 s 431705 ms (error -201 ms), trace pts at +3 s 431648 ms (error -258 ms) | picture pts offset -17 ms, click→picture 0.09 s, old pictures first 1 | dropped 0, late 2 | reads while paused 314 (PCR (508672001, 514368001)), flushed events 0 | ignored none
+  5: cancel menu     from playing | before 461024 ms | target shown 616985 ms | ending at 616985 ms | seek None | +3 s 464280 ms (error 322 ms), trace pts at +3 s 464264 ms (error 306 ms) | picture pts offset 320 ms, click→picture 0.066 s, old pictures first 0 | dropped 0, late 0 | reads while paused 313 (PCR (462629001, 468320001)), flushed events 0 | ignored none
+  6: cancel menu     from playing | before 471279 ms | target shown 393299 ms | ending at 393299 ms | seek None | +3 s 474908 ms (error 696 ms), trace pts at +3 s 474891 ms (error 679 ms) | picture pts offset 693 ms, click→picture 0.067 s, old pictures first 0 | dropped 0, late 0 | reads while paused 0 (PCR None), flushed events 0 | ignored none
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-marlin1111-Xcode-Marlin-Media-TV/<UUID>/scratchpad/2c/scrub2c.py", line 22, in <module>
+    log = open(os.path.join(d, 'marlin-media-tv.log'), errors='replace').read().split('\n')
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'stargate-pause/marlin-media-tv.log'
+
+## scrub2c.py MD=1 — the report table rows
+| stargate-play | 1 | playing | fwd | click | 176991 | 332952 | 335635 (-244) | 335661 | -19 | 0.073 | 0 / 2 | 0 |
+| stargate-play | 2 | playing | back | click | 364960 | 286980 | 289673 (-247) | 289008 | -10 | 0.06 | 0 / 0 | 314 |
+| stargate-play | 3 | playing | fwd | Play/Pause | 319008 | 474969 | 477610 (-281) | 476976 | -28 | 0.078 | 1 / 0 | 314 |
+| stargate-play | 4 | playing | back | Play/Pause | 506976 | 428996 | 431648 (-258) | 431705 | -17 | 0.09 | 0 / 2 | 314 |
+| stargate-play | 5 | playing | fwd | Menu | 461024 | 616985 | 464264 (+306) | 464280 | +320 | 0.066 | 0 / 0 | 313 |
+| stargate-play | 6 | playing | back | Menu | 471279 | 393299 | 474891 (+679) | 474908 | +693 | 0.067 | 0 / 0 | 0 |
+| stargate-pause | 1 | paused | fwd | click | 177029 | 332990 | 335435 (-471) | 335488 | -24 | 0.084 | 0 / 2 | 0 |
+| stargate-pause | 2 | paused | back | click | 365120 | 287140 | 289673 (-349) | 289776 | -53 | 0.118 | 0 / 0 | 311 |
+| stargate-pause | 3 | paused | fwd | Play/Pause | 319366 | 475327 | 477944 (-315) | 477976 | -19 | 0.068 | 0 / 0 | 317 |
+| stargate-pause | 4 | paused | back | Play/Pause | 507623 | 429643 | 432098 (-480) | 432153 | -47 | 0.065 | 0 / 1 | 305 |
+| stargate-pause | 5 | paused | fwd | Menu | 461769 | 617730 | 461795 (+26) | 461769 | +26 | 0.007 | 0 / 1 | 318 |
+| stargate-pause | 6 | paused | back | Menu | 461769 | 383789 | 461795 (+26) | 461769 | +26 | 0.016 | 0 / 0 | 316 |
+| ww-play | 1 | playing | fwd | click | 176259 | 345783 | 348181 (-461) | 348241 | -21 | 0.141 | 0 / 1 | 0 |
+| ww-play | 2 | playing | back | click | 377786 | 293024 | 295462 (-434) | 295520 | +19 | 0.128 | 0 / 0 | 6923 |
+| ww-play | 3 | playing | fwd | Play/Pause | 325033 | 494557 | 497080 (-261) | 497126 | +104 | 0.216 | 0 / 0 | 7108 |
+| ww-play | 4 | playing | back | Play/Pause | 526560 | 441798 | 444361 (-288) | 444425 | +60 | 0.149 | 0 / 0 | 6979 |
+| ww-play | 5 | playing | fwd | Menu | 473813 | 643337 | 477060 (+363) | 477097 | +411 | 0.116 | 0 / 0 | 6955 |
+| ww-play | 6 | playing | back | Menu | 484098 | 399336 | 487737 (+732) | 487813 | +803 | 0.093 | 0 / 0 | 0 |
+| ww-pause | 1 | paused | fwd | click | 176519 | 346043 | 348181 (-726) | 348207 | -72 | 0.136 | 0 / 0 | 0 |
+| ww-pause | 2 | paused | back | click | 377913 | 293151 | 295504 (-522) | 295555 | +17 | 0.125 | 0 / 0 | 7164 |
+| ww-pause | 3 | paused | fwd | Play/Pause | 325255 | 494779 | 497080 (-532) | 497140 | +90 | 0.167 | 0 / 1 | 6961 |
+| ww-pause | 4 | paused | back | Play/Pause | 526831 | 442069 | 444611 (-281) | 444648 | +81 | 0.177 | 0 / 0 | 7105 |
+| ww-pause | 5 | paused | fwd | Menu | 474347 | 643871 | 474391 (+44) | 474347 | +44 | 0.046 | 0 / 0 | 7096 |
+| ww-pause | 6 | paused | back | Menu | 474347 | 389585 | 474391 (+44) | 474347 | +44 | 0.07 | 0 / 0 | 6865 |
+| divergent-play | 1 | playing | fwd | click | 174746 | 342333 | 344761 (-261) | 344818 | +9 | 0.311 | 0 / 0 | 0 |
+| divergent-play | 2 | playing | back | click | 374336 | 290543 | 292709 (-329) | 292750 | +39 | 0.505 | 0 / 0 | 679 |
+| divergent-play | 3 | playing | fwd | Play/Pause | 321751 | 489338 | 491700 (-293) | 491770 | -16 | 0.345 | 0 / 1 | 671 |
+| divergent-play | 4 | playing | back | Play/Pause | 521344 | 437551 | 439439 (-262) | 438557 | +11 | 0.85 | 0 / 0 | 668 |
+| divergent-play | 5 | playing | fwd | Menu | 468557 | 636144 | 472097 (+621) | 472141 | +662 | 0.081 | 0 / 0 | 669 |
+| divergent-play | 6 | playing | back | Menu | 479557 | 395764 | 482816 (+359) | 482825 | +381 | 0.1 | 0 / 0 | 0 |
+| divergent-pause | 1 | paused | fwd | click | 174258 | 341845 | 344177 (-446) | 344232 | -45 | 0.222 | 1 / 0 | 0 |
+| divergent-pause | 2 | paused | back | click | 373934 | 290141 | 292209 (-521) | 292277 | -18 | 0.411 | 0 / 1 | 671 |
+| divergent-pause | 3 | paused | fwd | Play/Pause | 321974 | 489561 | 491866 (-331) | 491918 | +53 | 0.364 | 1 / 0 | 676 |
+| divergent-pause | 4 | paused | back | Play/Pause | 521629 | 437836 | 439648 (-335) | 438845 | +18 | 0.853 | 0 / 0 | 676 |
+| divergent-pause | 5 | paused | fwd | Menu | 469400 | 636987 | 469469 (+69) | 469400 | +69 | 0.048 | 0 / 0 | 682 |
+| divergent-pause | 6 | paused | back | Menu | 469400 | 385607 | 469469 (+69) | 469400 | +69 | 0.019 | 0 / 0 | 675 |
+| magicians-play | 1 | playing | fwd | click | 175993 | 238564 | 241176 (-292) | 241186 | +10 | 0.096 | 0 / 0 | 0 |
+| magicians-play | 2 | playing | back | click | 270561 | 239276 | 241844 (-305) | 241865 | -1 | 0.127 | 0 / 0 | 403 |
+| magicians-play | 3 | playing | fwd | Play/Pause | 271258 | 333829 | 336238 (-295) | 336258 | -26 | 0.296 | 0 / 0 | 420 |
+| magicians-play | 4 | playing | back | Play/Pause | 365810 | 334525 | 337106 (-338) | 337141 | -22 | 0.081 | 0 / 0 | 0 |
+| magicians-play | 5 | playing | fwd | Menu | 366507 | 429078 | 369805 (+367) | 369836 | +396 | 0.069 | 0 / 0 | 421 |
+| magicians-play | 6 | playing | back | Menu | 377506 | 346221 | 380516 (+74) | 380552 | +107 | 0.064 | 0 / 0 | 0 |
+| magicians-pause | 1 | paused | fwd | click | 176298 | 238869 | 241310 (-439) | 241359 | -61 | 0.12 | 1 / 1 | 0 |
+| magicians-pause | 2 | paused | back | click | 271077 | 239792 | 242144 (-489) | 242188 | -16 | 0.159 | 0 / 0 | 421 |
+| magicians-pause | 3 | paused | fwd | Play/Pause | 271882 | 334453 | 336972 (-409) | 337012 | -16 | 0.072 | 0 / 0 | 420 |
+| magicians-pause | 4 | paused | back | Play/Pause | 366744 | 335459 | 337973 (-347) | 337994 | -21 | 0.139 | 0 / 1 | 420 |
+| magicians-pause | 5 | paused | fwd | Menu | 367713 | 430284 | 367736 (+23) | 367713 | +24 | 0.088 | 0 / 0 | 421 |
+| magicians-pause | 6 | paused | back | Menu | 367713 | 336428 | 367736 (+23) | 367713 | +24 | 0.071 | 0 / 0 | 422 |
+
+## paused2c.py — renders during each drag (picture held) and demux PCR per paused stretch
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-marlin1111-Xcode-Marlin-Media-TV/<UUID>/scratchpad/2c/paused2c.py", line 6, in <module>
+    log = open(os.path.join(d, 'marlin-media-tv.log'), errors='replace').read()
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'runs/stargate-play stargate-pause ww-play ww-pause divergent-play divergent-pause magicians-play magicians-pause/marlin-media-tv.log'
+
+## divergent-play landing 4 (click → picture 0.85 s): renders per second after the first picture, and VLC's log
+landing 4 (playPause) target 437551 ms: first picture +0.850 s pts 437562001 µs/1000
+  picture+0s: renders 30 pts 437562001..438438001 max gap 103 ms
+  picture+1s: renders 22 pts 438480001..439272001 max gap 86 ms
+  picture+2s: renders 24 pts 439314001..440273001 max gap 46 ms
+  picture+3s: renders 4 pts 440315001..440440001 max gap 41 ms
+8:24:43.382 AM [scrub] land playPause from 521344 ms at 437551 ms tick=516441923217
+8:24:43.382 AM [scrub] seek 437551 ms after play tick=516441923713
+[DBG] seek: preroll{ track: 1, pts: 429554000, fpos: 770615056 skip: 770615056} 
+8:24:43.391 AM [player] buffering 0.0
+[DBG] seek: preroll{ req: 437551001, start-pts: 429554001, start-fpos: 770615056} 
+8:24:43.416 AM [player] state Playing at 437551 ms
+8:24:43.432 AM [player] buffering 0.0
+
+## step 8 controls — skips, frame steps, panel (stargate-control2, ww-control, divergent-control, magicians-control)
+-- stargate-control2: Test Case '-[Marlin_Media_TVUITests.Diag2cUITests tStargateControl]' started.
+passed
+8:47:21.227 AM [skip] +30 s (click) before=32676 ms target=62676 ms
+8:47:21.747 AM [skip] after=62676 ms
+8:47:24.483 AM [skip] -10 s (click) before=65321 ms target=55321 ms
+8:47:24.995 AM [skip] after=55321 ms
+8:47:27.742 AM [player] pause (select) at 57632 ms
+8:47:30.993 AM [framestep] −1 gotoPreviousFrame before=58173 ms
+8:47:31.408 AM [framestep] −1 after(400 ms)=58191 ms
+8:47:34.239 AM [framestep] −1 gotoPreviousFrame before=58191 ms
+8:47:34.643 AM [framestep] −1 after(400 ms)=58141 ms
+8:47:37.493 AM [framestep] −1 gotoPreviousFrame before=58141 ms
+8:47:37.899 AM [framestep] −1 after(400 ms)=58108 ms
+8:47:40.748 AM [framestep] +1 gotoNextFrame before=58108 ms
+8:47:41.187 AM [framestep] +1 after(400 ms)=58141 ms
+8:47:43.993 AM [framestep] +1 gotoNextFrame before=58141 ms
+8:47:44.422 AM [framestep] +1 after(400 ms)=58191 ms
+8:47:47.243 AM [framestep] +1 gotoNextFrame before=58191 ms
+8:47:47.672 AM [framestep] +1 after(400 ms)=58225 ms
+8:47:50.839 AM [player] play (select) at 58225 ms
+8:47:58.598 AM [audio] panel opened: audio/2 English AC-3 5.1 ✓ | audio/3 English AC-3 2.0
+8:48:02.244 AM [player] panel closed
+8:48:04.901 AM [player] dismiss at 72763 ms, state Playing
+-- ww-control: Test Case '-[Marlin_Media_TVUITests.Diag2cUITests tWonderWomanControl]' started.
+passed
+8:49:16.756 AM [skip] +30 s (click) before=32674 ms target=62674 ms
+8:49:17.295 AM [skip] after=62674 ms
+8:49:20.012 AM [skip] -10 s (click) before=64953 ms target=54953 ms
+8:49:20.528 AM [skip] after=54953 ms
+8:49:23.253 AM [player] pause (select) at 56990 ms
+8:49:26.504 AM [framestep] −1 gotoPreviousFrame before=57594 ms
+8:49:26.921 AM [framestep] −1 after(400 ms)=57594 ms
+8:49:29.757 AM [framestep] −1 gotoPreviousFrame before=57641 ms
+8:49:30.176 AM [framestep] −1 after(400 ms)=57599 ms
+8:49:33.009 AM [framestep] −1 gotoPreviousFrame before=57599 ms
+8:49:33.424 AM [framestep] −1 after(400 ms)=57558 ms
+8:49:36.265 AM [framestep] +1 gotoNextFrame before=57558 ms
+8:49:36.697 AM [framestep] +1 after(400 ms)=57599 ms
+8:49:39.518 AM [framestep] +1 gotoNextFrame before=57599 ms
+8:49:39.924 AM [framestep] +1 after(400 ms)=57641 ms
+8:49:42.769 AM [framestep] +1 gotoNextFrame before=57641 ms
+8:49:43.199 AM [framestep] +1 after(400 ms)=57683 ms
+8:49:46.461 AM [player] play (select) at 57683 ms
+8:49:54.199 AM [audio] panel opened: audio/2 English TrueHD 7.1 ✓ | audio/3 English AC-3 5.1 | audio/4 English AC-3 5.1
+8:49:58.030 AM [player] panel closed
+8:50:00.705 AM [player] dismiss at 72263 ms, state Playing
+-- divergent-control: Test Case '-[Marlin_Media_TVUITests.Diag2cUITests tDivergentControl]' started.
+passed
+8:51:52.825 AM [skip] +30 s (click) before=32000 ms target=62000 ms
+8:51:53.364 AM [skip] after=62000 ms
+8:51:56.073 AM [skip] -10 s (click) before=64016 ms target=54016 ms
+8:51:56.596 AM [skip] after=54016 ms
+8:51:59.326 AM [player] pause (select) at 56016 ms
+8:52:02.584 AM [framestep] −1 gotoPreviousFrame before=56391 ms
+8:52:03.016 AM [framestep] −1 after(400 ms)=56390 ms
+8:52:05.832 AM [framestep] −1 gotoPreviousFrame before=56390 ms
+8:52:06.261 AM [framestep] −1 after(400 ms)=56390 ms
+8:52:09.085 AM [framestep] −1 gotoPreviousFrame before=56348 ms
+8:52:09.513 AM [framestep] −1 after(400 ms)=56306 ms
+8:52:12.340 AM [framestep] +1 gotoNextFrame before=56306 ms
+8:52:12.746 AM [framestep] +1 after(400 ms)=56348 ms
+8:52:15.585 AM [framestep] +1 gotoNextFrame before=56348 ms
+8:52:16.001 AM [framestep] +1 after(400 ms)=56390 ms
+8:52:18.831 AM [framestep] +1 gotoNextFrame before=56390 ms
+8:52:19.235 AM [framestep] +1 after(400 ms)=56431 ms
+8:52:22.526 AM [player] play (select) at 56431 ms
+8:52:30.274 AM [audio] panel opened: audio/2 English DTS 7.1 ✓
+8:52:34.090 AM [player] panel closed
+8:52:36.796 AM [player] dismiss at 70872 ms, state Playing
+-- magicians-control: Test Case '-[Marlin_Media_TVUITests.Diag2cUITests tMagiciansControl]' started.
+passed
+8:53:51.545 AM [skip] +30 s (click) before=32000 ms target=62000 ms
+8:53:52.081 AM [skip] after=62000 ms
+8:53:54.795 AM [skip] -10 s (click) before=64572 ms target=54572 ms
+8:53:55.331 AM [skip] after=54572 ms
+8:53:58.048 AM [player] pause (select) at 57007 ms
+8:54:01.310 AM [framestep] −1 gotoPreviousFrame before=57392 ms
+8:54:01.731 AM [framestep] −1 after(400 ms)=57393 ms
+8:54:04.557 AM [framestep] −1 gotoPreviousFrame before=57393 ms
+8:54:04.971 AM [framestep] −1 after(400 ms)=57359 ms
+8:54:07.812 AM [framestep] −1 gotoPreviousFrame before=57359 ms
+8:54:08.232 AM [framestep] −1 after(400 ms)=57326 ms
+8:54:11.062 AM [framestep] +1 gotoNextFrame before=57326 ms
+8:54:11.490 AM [framestep] +1 after(400 ms)=57359 ms
+8:54:14.315 AM [framestep] +1 gotoNextFrame before=57359 ms
+8:54:14.738 AM [framestep] +1 after(400 ms)=57393 ms
+8:54:17.566 AM [framestep] +1 gotoNextFrame before=57393 ms
+8:54:17.996 AM [framestep] +1 after(400 ms)=57426 ms
+8:54:21.305 AM [player] play (select) at 57426 ms
+8:54:29.056 AM [audio] panel opened: audio/2 Track 0 AAC 2.0 ✓
+8:54:32.905 AM [player] panel closed
+8:54:35.686 AM [player] dismiss at 71943 ms, state Playing
+
+## stargate-control (first attempt, failed): harness pressed Up once after the overlay had faded; Up only shows it (PlayerModel.handle .up: 'if overlayVisible { focus = .audio }'), so Select paused and Menu exited. Fixed in the harness (Up twice), re-run as stargate-control2.
+8:07:52.951 AM [skip] +30 s (click) before=32682 ms target=62682 ms
+8:07:53.493 AM [skip] after=62682 ms
+8:07:56.198 AM [skip] -10 s (click) before=65175 ms target=55175 ms
+8:07:56.734 AM [skip] after=55175 ms
+8:07:59.452 AM [player] pause (select) at 57380 ms
+8:08:22.549 AM [player] play (select) at 58058 ms
+8:08:29.046 AM [player] pause (select) at 65040 ms
+8:08:36.841 AM [player] dismiss at 65230 ms, state Paused
+Diag2cUITests.swift:131: error: -[Marlin_Media_TVUITests.Diag2cUITests tStargateControl] : XCTAssertTrue failed - the audio panel did not open
+Diag2cUITests.swift:134: error: -[Marlin_Media_TVUITests.Diag2cUITests tStargateControl] : XCTAssertTrue failed - Menu with the panel open closed the player
+Test Case '-[Marlin_Media_TVUITests.Diag2cUITests tStargateControl]' failed (105.179 seconds).
+Test Suite 'Diag2cUITests' failed at 2026-09-15 08:08:44.109.
+
+## step 9 screenshots — OCR of the full-size originals
+p2c-magicians-pause-02-back-click-a-mid-drag.png: 04:13 | -47:56
+p2c-magicians-pause-05-fwd-menu-b-after+3s.png: 11 | The Magicians | S1 E1 • Unauthorized Magic | 06:08 | II Paused | Audio | Subtitles | -46:01 | click: frame back | click | :frame forward
+p2c-stargate-play-01-fwd-click-a-mid-drag.png: 04:28 | -2:05:30
+p2c-stargate-play-05-fwd-menu-b-after+3s.png: Stargate | Extended • SD • AC-3 5.1 | 07:44 | • Playing | HIS DISCOVERY | WAS A FRAUD. | Audio | Subtitles | -2:02:14
+p2c-ww-play-01-fwd-click-b-after+3s.png: Wonder Woman | Wonder Woman (2017).mkv • 4K HDR • TrueHD 7.1 | 05:48 | • Playing | Audio | Subtitles | -2:15:28
+p2c-ww-play-03-fwd-playpause-b-after+3s.png: Wonder Woman | Wonder Woman (2017).mkv • 4K HDR • TrueHD 7.1 | 08:17 | • Playing | Audio | Subtitles | -2:12:59
+
+## scripts
+### scrub2c.py
+# scrub2c.py <run dir>...: pass 2c numbers per scrub (several scrubs per session; clean recipe build, no instrumentation).
+#   app log (from the last "[player] play() called"), in order per scrub:
+#     [scrub] begin at S ms playing=B tick=T         position before the drag
+#     [scrub] lift target=X ms tick=T                target shown when the thumb lifts
+#     [scrub] land (select|playPause) from S ms at X ms tick=T   /  [scrub] cancel (menu) at X ms, back to S ms playing=B tick=T
+#     [scrub] seek X ms after play tick=T            the one seek (landing only)
+#     [scrub] land|cancel +3 s time=N ms             position 3 s after the ending
+#   tick = CLOCK_MONOTONIC µs = VLC's vlc_tick_now(); tracer Timestamp = ns on the same clock.
+#   reads while paused    = DEMUX OUT events (every ES) from begin to the ending, with the demux PCR range; plus the
+#                           tracer's input/decoder 'flushed' events in that window (a seek flushes; none expected).
+#   picture               = first realtime video RENDER after the ending whose pts is within 2 s of the target
+#                           (landing) or of the start (cancel from playing). click → picture = its time − ending tick.
+#   landing offset        = that picture's pts − target.   +3 s error = time(+3 s) − (target + (3 s − click → picture)).
+#   old pictures          = realtime video RENDERs between the ending and that picture whose pts is not near the target.
+#   dropped / late        = video RENDER 'toolate' / 'late' from the picture to +30 s (or the next begin, if sooner).
+import json, re, sys, os
+
+def ms(ns): return round(ns / 1e6, 1)
+
+for d in sys.argv[1:]:
+    tag = os.path.basename(d.rstrip('/'))
+    log = open(os.path.join(d, 'marlin-media-tv.log'), errors='replace').read().split('\n')
+    st = [i for i, l in enumerate(log) if '[player] play() called' in l]; log = log[st[-1]:] if st else log
+    tr = [f for f in os.listdir(d) if f.startswith('vlc-trace-')]
+    ev = []
+    for line in open(os.path.join(d, tr[0]), errors='replace'):
+        try: o = json.loads(line)
+        except Exception: continue
+        b = o['Body']; b['_t'] = int(o['Timestamp']); ev.append(b)
+    ev.sort(key=lambda x: x['_t'])
+    vid = 'video/1'
+    scrubs, cur = [], None
+    for l in log:
+        m = re.search(r'\[scrub\] begin at (\d+) ms playing=(\w+) tick=(\d+)', l)
+        if m: cur = {'start': int(m.group(1)), 'playing': m.group(2) == 'true', 'tb': int(m.group(3)) * 1000}; scrubs.append(cur); continue
+        if cur is None: continue
+        m = re.search(r'\[scrub\] lift target=(\d+) ms tick=(\d+)', l)
+        if m: cur['lift'] = int(m.group(1)); continue
+        m = re.search(r'\[scrub\] land (\w+) from (\d+) ms at (\d+) ms tick=(\d+)', l)
+        if m: cur.update(kind='land ' + m.group(1), target=int(m.group(3)), te=int(m.group(4)) * 1000); continue
+        m = re.search(r'\[scrub\] cancel (\w+) at (\d+) ms, back to (\d+) ms playing=(\w+) tick=(\d+)', l)
+        if m: cur.update(kind='cancel ' + m.group(1), target=int(m.group(2)), te=int(m.group(5)) * 1000); continue
+        m = re.search(r'\[scrub\] seek (\d+) ms after play tick=(\d+)', l)
+        if m: cur['seek'] = (int(m.group(1)), int(m.group(2)) * 1000); continue
+        m = re.search(r'\[scrub\] (?:land|cancel) \+3 s time=(\d+) ms', l)
+        if m: cur['t3'] = int(m.group(1)); continue
+        if 'ignored while scrubbing' in l or 'drag not taken' in l: cur.setdefault('ignored', []).append(l.split('[scrub] ')[1])
+    print(f'== {tag}: {len(scrubs)} scrubs')
+    for n, s in enumerate(scrubs, 1):
+        if 'te' not in s: print(f'  {n}: begin at {s["start"]} ms, no ending line'); continue
+        nxt = scrubs[n]['tb'] if n < len(scrubs) else ev[-1]['_t']
+        w = [x for x in ev if s['tb'] <= x['_t'] <= s['te']]
+        reads = sum(1 for x in w if x.get('type') == 'DEMUX' and x.get('stream') == 'OUT')
+        pcr = [int(x['pcr']) // 1000 for x in w if x.get('type') == 'DEMUX' and x.get('id') == 'PCR']
+        flushed = sum(1 for x in w if x.get('event') == 'flushed')
+        land = s['kind'].startswith('land')
+        aim = s['target'] if land else s['start']
+        after = [x for x in ev if s['te'] <= x['_t'] < nxt and x.get('id') == vid and x.get('type') == 'RENDER' and x.get('mode') == 'realtime']
+        pic = next((x for x in after if abs(int(x['pts']) // 1000 - aim * 1000) <= 2_000_000), None)
+        old = sum(1 for x in after if pic is not None and x['_t'] < pic['_t'])
+        c2p = off = err3 = drops = lates = None
+        if pic is not None:
+            c2p = round((pic['_t'] - s['te']) / 1e9, 3)
+            off = round((int(pic['pts']) // 1000 - aim * 1000) / 1000)   # ms
+            end30 = min(pic['_t'] + 30e9, nxt)
+            win = [x for x in ev if pic['_t'] <= x['_t'] <= end30 and x.get('id') == vid]
+            drops = sum(1 for x in win if x.get('event') == 'toolate'); lates = sum(1 for x in win if x.get('event') == 'late')
+            if s.get('t3') is not None and (land or s['playing']):
+                err3 = s['t3'] - (aim + max(0, 3000 - int(c2p * 1000)))
+        if not land and not s['playing'] and s.get('t3') is not None:
+            err3 = s['t3'] - aim
+        # trace position at +3 s: pts of the last realtime video render at or before ending + 3.0 s (VLCKit's time can lag)
+        at3 = [x for x in after if x['_t'] <= s['te'] + 3e9]
+        pts3 = int(at3[-1]['pts']) // 1000000 if at3 else None
+        s['pts3'] = pts3
+        s['pts3err'] = (pts3 - (aim + max(0, 3000 - int(c2p * 1000)))) if (pts3 is not None and c2p is not None and (land or s['playing'])) else ((pts3 - aim) if pts3 is not None else None)
+        if os.environ.get('MD'):
+            ending = {'land select': 'click', 'land playPause': 'Play/Pause', 'cancel menu': 'Menu'}[s['kind']]
+            direction = 'fwd' if s.get('lift', 0) > s['start'] else 'back'
+            print(f"| {tag} | {n} | {'playing' if s['playing'] else 'paused'} | {direction} | {ending} | {s['start']} | {s.get('lift')} | "
+                  f"{s.get('pts3')} ({s.get('pts3err'):+d}) | {s.get('t3')} | {off:+d} | {c2p} | {drops} / {lates} | {reads} |")
+            continue
+        print(f"  {n}: {s['kind']:15s} from {'playing' if s['playing'] else 'paused '} | before {s['start']} ms | target shown {s.get('lift')} ms | "
+              f"ending at {s['target']} ms | seek {s.get('seek', (None,))[0]} | +3 s {s.get('t3')} ms (error {err3} ms), trace pts at +3 s {s.get('pts3')} ms (error {s.get('pts3err')} ms) | "
+              f"picture pts offset {off} ms, click→picture {c2p} s, old pictures first {old} | dropped {drops}, late {lates} | "
+              f"reads while paused {reads} (PCR {(pcr[0], pcr[-1]) if pcr else None}), flushed events {flushed} | ignored {s.get('ignored', 'none')}")
+### paused2c.py
+# paused2c.py <run dir>: (a) per scrub, realtime video RENDERs between begin + 0.3 s and the ending (0 = the picture held)
+# and their pts; (b) per paused stretch (vout 'paused' → next 'resumed'), the demux PCR at each 2 s of wall time, to see
+# whether the demuxer reads while paused and how fast (stream s per wall s).
+import json, re, sys, os
+d = sys.argv[1]
+log = open(os.path.join(d, 'marlin-media-tv.log'), errors='replace').read()
+ev = []
+for line in open(os.path.join(d, [f for f in os.listdir(d) if f.startswith('vlc-trace-')][0]), errors='replace'):
+    try: o = json.loads(line)
+    except Exception: continue
+    b = o['Body']; b['_t'] = int(o['Timestamp']); ev.append(b)
+ev.sort(key=lambda b: b['_t'])
+begins = [int(t) * 1000 for t in re.findall(r'\[scrub\] begin at \d+ ms playing=\w+ tick=(\d+)', log)]
+ends = [int(t) * 1000 for t in re.findall(r'\[scrub\] (?:land \w+ from \d+ ms at \d+ ms|cancel \w+ at \d+ ms, back to \d+ ms playing=\w+) tick=(\d+)', log)]
+print(f'== {os.path.basename(d.rstrip("/"))}')
+for n, (b, e) in enumerate(zip(begins, ends), 1):
+    r = [x for x in ev if b + 0.3e9 <= x['_t'] <= e and x.get('id') == 'video/1' and x.get('type') == 'RENDER' and x.get('mode') == 'realtime']
+    print(f'  scrub {n}: drag {(e-b)/1e9:.1f} s, realtime video renders during it: {len(r)}' + (f" pts {sorted(set(int(x['pts'])//1000 for x in r))[:5]}" if r else ''))
+pz = [x['_t'] for x in ev if x.get('id') == 'video/1' and x.get('event') == 'paused']
+rs = [x['_t'] for x in ev if x.get('id') == 'video/1' and x.get('event') == 'resumed']
+pcr = [(x['_t'], int(x['pcr']) // 1000) for x in ev if x.get('type') == 'DEMUX' and x.get('id') == 'PCR']
+for p in pz:
+    r = next((t for t in rs if t > p), ev[-1]['_t'])
+    w = [(t, v) for t, v in pcr if p <= t <= r]
+    if (r - p) < 3e9: continue
+    line = []
+    for k in range(0, int((r - p) // 2e9) + 1):
+        c = [v for t, v in w if p + k * 2e9 <= t < p + (k + 1) * 2e9]
+        line.append(f"+{2*k}s:{(c[-1] // 1000) if c else '-'}")
+    span = (w[-1][1] - w[0][1]) / 1e6 if len(w) > 1 else 0
+    last = (w[-1][0] - p) / 1e9 if w else None
+    print(f'  paused {(r-p)/1e9:.1f} s: PCR reads {len(w)}, stream {span:.1f} s, last read at +{last} s | PCR ms per 2 s: ' + ' '.join(line))
+### shots2c.py
+# shots2c.py <run dir>: screenshots named from the xcresult manifest -> png/ (symlinks, full size) and jpg/ (960 wide).
+import json, os, subprocess, sys
+R = sys.argv[1]
+os.makedirs(f'{R}/png', exist_ok=True); os.makedirs(f'{R}/jpg', exist_ok=True)
+for t in json.load(open(f'{R}/att/manifest.json')):
+    for a in t.get('attachments', []):
+        n = a.get('suggestedHumanReadableName', '')
+        if not n.startswith('p2c-'): continue
+        short = n.split('_0_')[0]; src = os.path.abspath(f"{R}/att/{a['exportedFileName']}")
+        if not os.path.exists(f'{R}/png/{short}.png'): os.symlink(src, f'{R}/png/{short}.png')
+        subprocess.run(['sips', '-s', 'format', 'jpeg', '-Z', '960', src, '--out', f'{R}/jpg/{short}.jpg'], capture_output=True)
+### runone2c.sh
+#!/bin/sh
+# runone2c.sh <test method> <run tag> — one traced attach-mode run on Home Theater (pass 2c; from pass 2a's runone.sh).
+# Console launch with VLCKit's tvOS defaults + JSON tracer into the app container, attach Diag2cUITests/<method>,
+# export attachments, copy the app log and the trace off, stop the app.
+S=/private/tmp/claude-501/-Users-marlin1111-Xcode-Marlin-Media-TV/<UUID>/scratchpad/2c
+REPO="$HOME/Xcode/Marlin Media TV"
+T="$1"; TAG="$2"; C=$(cat "$S/container.txt" 2>/dev/null)
+case "$C" in /private/var/mobile/Containers/Data/Application/*) ;; *) echo "no container path — stop" >&2; exit 3;; esac
+case "$T" in t[A-Z0-9]*) ;; *) echo "bad test name '$T' — stop" >&2; exit 4;; esac
+case "$TAG" in [a-z]*-[a-z]*) ;; *) echo "bad run tag '$TAG' — stop" >&2; exit 4;; esac
+OUT="$S/runs/$TAG"; [ -e "$OUT" ] && { echo "$OUT exists — stop" >&2; exit 5; }; mkdir -p "$OUT"
+P='("--no-color","--no-osd","--no-video-title-show","--no-snapshot-preview","--http-reconnect","--text-renderer=freetype","--avi-index=3","--audio-resampler=soxr","--tracer=json","--json-tracer-file='"$C"'/Library/Caches/vlc-trace-'"$TAG"'.json")'
+echo "launch $(date '+%H:%M:%S')" | tee "$OUT/run.txt"
+perl -e 'alarm 900; exec @ARGV' -- xcrun devicectl device process launch --console --terminate-existing --device "Home Theater" com.marlin1111.marlin-media-tv -VLCParams "$P" > "$OUT/console.out" 2>&1 &
+LPID=$!
+/bin/sleep 10
+cd "$REPO"
+xcodebuild test-without-building -project "Marlin Media TV.xcodeproj" -scheme "Marlin Media TV" \
+  -destination 'platform=tvOS,name=Home Theater' -derivedDataPath build/DerivedData \
+  -only-testing:"Marlin Media TVUITests/Diag2cUITests/$T" -resultBundlePath "$OUT/r.xcresult" > "$OUT/xcodebuild.out" 2>&1
+echo "test exit $? $(date '+%H:%M:%S')" | tee -a "$OUT/run.txt"
+grep -E "\[p2c\]|Test Case .*(passed|failed)|error:" "$OUT/xcodebuild.out" | sed -E 's/^.*\[p2c\] /[p2c] /' >> "$OUT/run.txt"
+xcrun xcresulttool export attachments --path "$OUT/r.xcresult" --output-path "$OUT/att" > /dev/null 2>&1
+for f in marlin-media-tv.log "vlc-trace-$TAG.json"; do
+  xcrun devicectl device copy from --device "Home Theater" --domain-type appDataContainer \
+    --domain-identifier com.marlin1111.marlin-media-tv --source "Library/Caches/$f" --destination "$OUT/$f" > /dev/null 2>&1 \
+    || echo "copy failed: $f" | tee -a "$OUT/run.txt"
+done
+kill $LPID 2>/dev/null; wait $LPID 2>/dev/null
+ls -la "$OUT" | awk '{print $5, $9}' | tee -a "$OUT/run.txt"
+grep -E "Test Case .*(passed|failed)" "$OUT/xcodebuild.out"
+### probe2c.sh
+#!/bin/zsh
+# probe2c.sh — console launch with the default tracer path (fails, but libvlc prints the container path), attach
+# Diag2cUITests/t0_Probe (Magicians: play 15 s, Page Up scripted drag, land), read the container path, copy the app log.
+S=/private/tmp/claude-501/-Users-marlin1111-Xcode-Marlin-Media-TV/<UUID>/scratchpad/2c
+BID=com.marlin1111.marlin-media-tv; DEV="Home Theater"
+OUT=$S/probe; [ -e $OUT ] && { echo "$OUT exists — stop" >&2; exit 5; }; mkdir -p $OUT
+cd ~/Xcode/"Marlin Media TV"
+perl -e 'alarm 200; exec @ARGV' -- xcrun devicectl device process launch --console --terminate-existing --device "$DEV" $BID -VLCParams '("--no-color","--no-osd","--no-video-title-show","--no-snapshot-preview","--http-reconnect","--text-renderer=freetype","--avi-index=3","--audio-resampler=soxr","--tracer=json","--verbose=2")' > $OUT/console.out 2>&1 &
+CPID=$!
+/bin/sleep 12
+xcodebuild test-without-building -project "Marlin Media TV.xcodeproj" -scheme "Marlin Media TV" -destination "platform=tvOS,name=$DEV" -derivedDataPath build/DerivedData -only-testing:"Marlin Media TVUITests/Diag2cUITests/t0_Probe" -resultBundlePath $OUT/r.xcresult > $OUT/xcodebuild.out 2>&1
+echo "test exit $?"
+grep -E 'Test Case.*(passed|failed)|error:' $OUT/xcodebuild.out | tail -3
+xcrun xcresulttool export attachments --path $OUT/r.xcresult --output-path $OUT/att > /dev/null 2>&1
+xcrun devicectl device copy from --device "$DEV" --domain-type appDataContainer --domain-identifier $BID --source Library/Caches/marlin-media-tv.log --destination $OUT/marlin-media-tv.log > /dev/null 2>&1 || echo "log copy failed"
+kill $CPID 2>/dev/null; wait $CPID 2>/dev/null
+C=$(grep -ao "opening logfile \`[^']*" $OUT/console.out | head -1 | sed -E 's/opening logfile `//; s#/Library/Logs/vlc-log.json##')
+[ -n "$C" ] && { printf '%s' "$C" > $S/container.txt; echo "container path read: $(echo $C | sed -E 's/[0-9A-F]{8}-[0-9A-F-]{27}/<UUID>/')"; } || echo "no container path in console output"
+grep -aE "\[harness\]|\[scrub\]" $OUT/marlin-media-tv.log | tail -20

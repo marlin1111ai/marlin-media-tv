@@ -5,7 +5,8 @@
 //  VLCKit playing the server's original file directly. The remote's meaning (DECISIONS.md D008):
 //  click = play/pause; Menu = back; while playing, left/right = −10 s / +30 s; while paused,
 //  a left/right click = one frame back / forward — through VLC's native previous-frame and
-//  next-frame (pass 1f). The overlay
+//  next-frame (pass 1f). A horizontal drag on the touch surface scrubs (D021): it pauses, the picture holds
+//  while the bar moves the target, click or Play/Pause lands there and plays, Menu restores the start. The overlay
 //  appears on touch and fades after 4 s while playing. Audio and Subtitles are reached with an
 //  up swipe from the surface; the panels list VLCKit's actual tracks and switch on selection.
 //
@@ -116,6 +117,21 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
     @ObservationIgnored private var skipTask: Task<Void, Never>?
     @ObservationIgnored private var frameTask: Task<Void, Never>?
     @ObservationIgnored private var hasPlayed = false
+
+    /// A touch-surface scrub (D021): where playback was when the drag began, the target the thumb has moved to,
+    /// and whether it was playing (a drag pauses; Menu restores that state). The picture holds on the frame the
+    /// drag began at: nothing seeks until the scrub lands.
+    struct Scrub: Equatable {
+        let startMs: Int
+        var targetMs: Int
+        let wasPlaying: Bool
+    }
+
+    /// One full width of the touch surface moves the target by this share of the running time.
+    static let scrubSpan = 0.25
+
+    private(set) var scrub: Scrub?
+    @ObservationIgnored private var scrubBaseMs = 0
     @ObservationIgnored private var dismissed = false
 
     // Display matching (D016): the parse-before-play step, the display request and its observers.
@@ -306,6 +322,17 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
     // MARK: remote
 
     func handle(_ input: RemoteInput) {
+        if scrub != nil {
+            // D021: while a scrub is up, click or Play/Pause lands and Menu cancels; nothing else acts.
+            switch input {
+            case .select: landScrub("select")
+            case .playPause: landScrub("playPause")
+            case .menu: cancelScrub()
+            case .touch: break
+            default: EvidenceLog.line("[scrub] \(input) ignored while scrubbing")
+            }
+            return
+        }
         switch input {
         case .touch:
             bumpOverlay()
@@ -354,6 +381,84 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
             } else if focus != .surface {
                 focus = .surface
                 bumpOverlay()
+            }
+        }
+    }
+
+    // MARK: scrub (D021)
+
+    /// VLC's `vlc_tick_now()` clock (CLOCK_MONOTONIC, µs), so a [scrub] line lines up with VLC's trace.
+    static func tick() -> UInt64 { clock_gettime_nsec_np(CLOCK_MONOTONIC) / 1000 }
+
+    /// A horizontal drag began (or began again on a scrub that is already up, which moves on from its target).
+    func scrubBegan() {
+        guard panel == nil, errorText == nil, lengthMs > 0, playbackStarted, !dismissed else {
+            EvidenceLog.line("[scrub] drag not taken: panel=\(panel != nil) error=\(errorText != nil) length=\(lengthMs) ms")
+            return
+        }
+        if let scrub {
+            scrubBaseMs = scrub.targetMs
+            EvidenceLog.line("[scrub] drag again from target \(scrub.targetMs) ms tick=\(Self.tick())")
+            return
+        }
+        let start = Int(player.time.intValue)
+        scrub = Scrub(startMs: start, targetMs: start, wasPlaying: isPlaying)
+        scrubBaseMs = start
+        focus = .surface
+        skipPill = nil
+        framePill = nil
+        EvidenceLog.line("[scrub] begin at \(start) ms playing=\(isPlaying) tick=\(Self.tick())")
+        if isPlaying { player.pause() }
+    }
+
+    /// The thumb's horizontal travel since the drag began, as a share of the surface's width.
+    func scrubMoved(fraction: Double) {
+        guard var s = scrub else { return }
+        let end = max(0, lengthMs - 1000)   // a target at the very end would stop the input and close the player
+        let target = min(max(0, scrubBaseMs + Int(fraction * Self.scrubSpan * Double(lengthMs))), end)
+        guard target != s.targetMs else { return }
+        s.targetMs = target
+        scrub = s
+    }
+
+    /// The thumb left the surface. Nothing seeks: the bar keeps the target until the scrub lands or is cancelled.
+    func scrubLifted() {
+        guard let s = scrub else { return }
+        EvidenceLog.line("[scrub] lift target=\(s.targetMs) ms tick=\(Self.tick())")
+    }
+
+    /// Click or Play/Pause: play, then the scrub's one seek, made once playback runs — a seek while paused reads
+    /// ahead of its target and plays from there (pass 2a).
+    private func landScrub(_ source: String) {
+        guard let s = scrub, !dismissed else { return }
+        EvidenceLog.line("[scrub] land \(source) from \(s.startMs) ms at \(s.targetMs) ms tick=\(Self.tick())")
+        scrub = nil
+        player.play()
+        if s.targetMs != s.startMs {
+            player.time = VLCTime(int: Int32(s.targetMs))
+            EvidenceLog.line("[scrub] seek \(s.targetMs) ms after play tick=\(Self.tick())")
+        }
+        bumpOverlay()
+        logAfterScrub("land", expected: s.targetMs)
+    }
+
+    /// Menu: nothing has seeked, so playback is still where the drag began; only the play state is restored.
+    private func cancelScrub() {
+        guard let s = scrub else { return }
+        EvidenceLog.line("[scrub] cancel menu at \(s.targetMs) ms, back to \(s.startMs) ms playing=\(s.wasPlaying) tick=\(Self.tick())")
+        scrub = nil
+        if s.wasPlaying { player.play() }
+        bumpOverlay()
+        logAfterScrub("cancel", expected: s.startMs)
+    }
+
+    private func logAfterScrub(_ what: String, expected: Int) {
+        Task { @MainActor [weak self] in
+            for (wait, mark) in [(1, 1), (2, 3)] {
+                try? await Task.sleep(for: .seconds(wait))
+                guard let self, !self.dismissed else { return }
+                self.timeMs = Int(self.player.time.intValue)
+                EvidenceLog.line("[scrub] \(what) +\(mark) s time=\(self.timeMs) ms (expected \(expected) ms) state \(self.stateName)")
             }
         }
     }
