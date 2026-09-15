@@ -1,0 +1,115 @@
+# Pass 2b — can VLC's fast seek be scoped to the scrub seeks? (2026-09-15). Read-only searches; nothing built or run.
+# libvlc tree: 9279ed3615 input: es_out: forward next-frame data requests only from the stepped ES  (the recipe's clean tree, 20 patches)
+
+$ grep -rn "input-fast-seek" src modules lib include   # every mention
+src/libvlc-module.c:1897:    add_bool( "input-fast-seek", false,
+src/input/var.c:87:        var_Create(obj, "input-fast-seek", VLC_VAR_BOOL|inherit_flag);
+modules/demux/mp4/mp4.c:1955:            !b_accurate ? "alignment" : "preroll (use input-fast-seek to avoid)", i_date );
+modules/gui/qt/dialogs/preferences/simple_preferences.cpp:659:            configBool( "input-fast-seek", ui.fastSeekBox );
+modules/gui/macosx/preferences/VLCSimplePrefsController.m:764:    [self setupButton:_input_fastSeekCheckbox forBoolValue: "input-fast-seek"];
+modules/gui/macosx/preferences/VLCSimplePrefsController.m:1066:        config_PutInt("input-fast-seek", [_input_fastSeekCheckbox state]);
+
+$ grep -rn "fast-seek\|SEEK_FAST\|seek_speed" src/player lib include/vlc_player.h   # where seek speed is decided
+src/player/player.h:486:                           enum vlc_player_seek_speed speed,
+src/player/player.h:491:                            enum vlc_player_seek_speed speed,
+src/player/input.c:109:vlc_player_assert_seek_params(enum vlc_player_seek_speed speed,
+src/player/input.c:113:        || speed == VLC_PLAYER_SEEK_FAST);
+src/player/input.c:121:                           enum vlc_player_seek_speed speed,
+src/player/input.c:149:            .pos.b_fast_seek = speed == VLC_PLAYER_SEEK_FAST,
+src/player/input.c:158:                            enum vlc_player_seek_speed speed,
+src/player/input.c:175:            .time.b_fast_seek = speed == VLC_PLAYER_SEEK_FAST,
+src/player/player.c:1514:                     enum vlc_player_seek_speed speed,
+src/player/player.c:1524:                      enum vlc_player_seek_speed speed,
+lib/media_player.c:1509:    enum vlc_player_seek_speed speed = b_fast ? VLC_PLAYER_SEEK_FAST
+lib/media_player.c:1537:    enum vlc_player_seek_speed speed = b_fast ? VLC_PLAYER_SEEK_FAST
+lib/parser.c:46:              VLC_THUMBNAILER_SEEK_FAST    == (int) libvlc_media_thumbnail_seek_fast,
+lib/parser.c:383:                         ? VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
+include/vlc_player.h:279:enum vlc_player_seek_speed
+include/vlc_player.h:284:    VLC_PLAYER_SEEK_FAST,
+include/vlc_player.h:724:                     enum vlc_player_seek_speed speed,
+include/vlc_player.h:742:                      enum vlc_player_seek_speed speed,
+include/vlc_player.h:761:    vlc_player_SeekByPos(player, position, VLC_PLAYER_SEEK_FAST,
+include/vlc_player.h:793:    vlc_player_SeekByTime(player, time, VLC_PLAYER_SEEK_FAST,
+
+$ sed -n 1500,1523p lib/media_player.c   # libvlc set_time: b_fast -> VLC_PLAYER_SEEK_FAST / PRECISE
+static int
+set_time( libvlc_media_player_t *p_mi, libvlc_time_t i_time, bool b_fast,
+          enum vlc_player_whence whence )
+{
+    vlc_tick_t tick = vlc_tick_from_libvlc_time(i_time);
+
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    enum vlc_player_seek_speed speed = b_fast ? VLC_PLAYER_SEEK_FAST
+                                              : VLC_PLAYER_SEEK_PRECISE;
+    vlc_player_SeekByTime(player, tick, speed, whence);
+
+    vlc_player_Unlock(player);
+
+    /* may not fail anymore, keep int not to break the API */
+    return 0;
+}
+
+int libvlc_media_player_set_time( libvlc_media_player_t *p_mi,
+                                  libvlc_time_t i_time, bool b_fast )
+{
+    return set_time( p_mi, i_time, b_fast, VLC_PLAYER_WHENCE_ABSOLUTE );
+}
+
+$ grep -n "b_fast_seek\|fast_seek" src/input/input.c   # the input passes !fast_seek to the demuxer as "precise"
+184:    param.time.b_fast_seek = b_fast;
+193:    param.pos.b_fast_seek = b_fast;
+1956:                           bool fast_seek )
+1962:                           !fast_seek );
+1971:                                       !fast_seek );
+1986:                               bool fast_seek )
+2000:    int i_ret = demux_SetPosition( priv->master->p_demux, val, !fast_seek );
+2110:                                            param.pos.b_fast_seek );
+2134:                                        param.time.b_fast_seek );
+
+$ sed -n 1030,1036p VLCKit Sources/Playback/VLCMediaPlayer.m   # VLCKit time setter: always b_fast = NO
+- (void)setTime:(VLCTime *)value
+{
+    // VLCTime is in milliseconds; libvlc_media_player_set_time expects microseconds
+    const libvlc_time_t time_us = value ? [[value value] longLongValue] * 1000 : 0;
+    libvlc_media_player_set_time(_playerInstance, time_us, NO);
+    [self timeChangeUpdate];
+}
+
+$ grep -rn "libvlc_media_player_set_time\|libvlc_media_player_set_position" VLCKit Sources
+~/vlckit-build/VLCKit/Sources/Playback/VLCMediaPlayer.m:1032:    // VLCTime is in milliseconds; libvlc_media_player_set_time expects microseconds
+~/vlckit-build/VLCKit/Sources/Playback/VLCMediaPlayer.m:1034:    libvlc_media_player_set_time(_playerInstance, time_us, NO);
+~/vlckit-build/VLCKit/Sources/Playback/VLCMediaPlayer.m:1688:    libvlc_media_player_set_position(_playerInstance, newPosition, NO);
+
+$ grep -rn -i "fast\|precise\|accurate" VLCKit public headers (VLCMediaPlayer.h, VLCMedia.h, VLCLibrary.h)
+VLCMediaPlayer.h:784: * Fast forwards through the feed at the standard 1x rate.
+VLCMediaPlayer.h:786:- (void)fastForward;
+VLCMediaPlayer.h:789: * Fast forwards through the feed at the rate specified.
+VLCMediaPlayer.h:790: * \param rate Rate at which the feed should be fast forwarded.
+VLCMediaPlayer.h:792:- (void)fastForwardAtRate:(float)rate;
+VLCMediaPlayer.h:801: * \param rate Rate at which the feed should be fast rewound.
+
+$ sed -n 123,127p VLCMediaPlayer.m; nm VLCKit | grep _playerInstance; nm -g VLCKit | grep set_time   # the private pointer and the exported C symbol
+@interface VLCMediaPlayer ()
+{
+    VLCLibrary *_privateLibrary;                ///< Internal
+    libvlc_media_player_t * _playerInstance;    ///< Internal
+    VLCMedia * _media;                          ///< Current media being played
+000000000031788c T _libvlc_media_player_set_time
+
+$ sed -n 1,11p Modules/module.modulemap   # libvlc_media_player.h ships but is excluded from the Swift module
+framework module VLCKit {
+  umbrella header "VLCKit.h"
+
+  exclude header "vlc/libvlc_dialog.h"
+  exclude header "vlc/libvlc_renderer_discoverer.h"
+  exclude header "vlc/libvlc_media.h"
+  exclude header "vlc/libvlc_media_list_player.h"
+  exclude header "vlc/libvlc_media_player.h"
+  exclude header "vlc/libvlc_media_track.h"
+  exclude header "vlc/vlc.h"
+  exclude header "vlc/libvlc_media_discoverer.h"
+
+$ git apply --check reports/logs/2a-harness-app.diff  (on copies of HEAD 1324f17's three player files)
+harness diff applies cleanly to HEAD's three files (it is 2a-scrub-app.diff + the 19-line Page Up/Down hook; 0 lines removed)
