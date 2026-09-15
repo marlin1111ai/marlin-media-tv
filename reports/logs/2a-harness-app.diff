@@ -1,0 +1,367 @@
+diff --git a/Marlin Media TV/PlayerHost.swift b/Marlin Media TV/PlayerHost.swift
+index 435f06a..146e9bc 100644
+--- a/Marlin Media TV/PlayerHost.swift	
++++ b/Marlin Media TV/PlayerHost.swift	
+@@ -8,6 +8,8 @@
+ //  swipe its recognizers. Learned from Marlin DVR TV's PlayerHost (Passes 28/29): an edge
+ //  *click* on the remote is a `UIPress` (.leftArrow/.rightArrow); a swipe is not a press at
+ //  all, only touches — so click and swipe are told apart here and handed to the model as such.
++//  A slower horizontal drag is neither: a pan recognizer that waits for the side swipes to fail
++//  hands it to the model as a scrub (pass 2a).
+ //
+ 
+ import SwiftUI
+@@ -43,13 +45,23 @@ final class PlayerHostController: UIViewController {
+         surface.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+         surface.backgroundColor = .black
+         view.addSubview(surface)
++        var sideSwipes: [UISwipeGestureRecognizer] = []
+         for (direction, name) in [(UISwipeGestureRecognizer.Direction.left, "left"), (.right, "right"), (.up, "up"), (.down, "down")] {
+             let swipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped(_:)))
+             swipe.direction = direction
+             swipe.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirect.rawValue)]
+             swipe.name = name
+             surface.addGestureRecognizer(swipe)
++            if direction == .left || direction == .right { sideSwipes.append(swipe) }
+         }
++        // Pass 2a: a horizontal drag scrubs. A flick stays a swipe (D008's skips), so the drag waits for the left
++        // and right swipes to fail; a mostly vertical drag never begins one (see gestureRecognizerShouldBegin).
++        let pan = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
++        pan.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirect.rawValue)]
++        pan.name = "scrub"
++        pan.delegate = self
++        for swipe in sideSwipes { pan.require(toFail: swipe) }
++        surface.addGestureRecognizer(pan)
+         model.attach(drawable: surface)
+     }
+ 
+@@ -76,6 +88,22 @@ final class PlayerHostController: UIViewController {
+         }
+     }
+ 
++    /// Pass 2a: the drag's horizontal travel as a share of the surface's width.
++    @objc private func panned(_ pan: UIPanGestureRecognizer) {
++        let fraction = pan.translation(in: surface).x / max(1, surface.bounds.width)
++        switch pan.state {
++        case .began:
++            model.scrubBegan()
++            model.scrubMoved(fraction: fraction)
++        case .changed:
++            model.scrubMoved(fraction: fraction)
++        case .ended, .cancelled:
++            model.scrubMoved(fraction: fraction)
++            model.scrubLifted()
++        default: break
++        }
++    }
++
+     override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+         var handled = false
+         for press in presses {
+@@ -87,19 +115,45 @@ final class PlayerHostController: UIViewController {
+             case .rightArrow: model.handle(.right(source: "click")); handled = true
+             case .upArrow: model.handle(.up); handled = true
+             case .downArrow: model.handle(.down); handled = true
++            // PASS 2a HARNESS ONLY — NOT COMMITTED. XCUIRemote cannot touch the surface; Page Up / Page Down play a
++            // scripted 2 s drag (+0.08 / −0.04 of the surface width) through the same model calls as `panned`.
++            case .pageUp: scriptedDrag(0.08); handled = true
++            case .pageDown: scriptedDrag(-0.04); handled = true
+             default: break
+             }
+         }
+         if !handled { super.pressesBegan(presses, with: event) }
+     }
+ 
++    // PASS 2a HARNESS ONLY — NOT COMMITTED.
++    private func scriptedDrag(_ fraction: Double) {
++        EvidenceLog.line("[harness] scripted drag \(fraction) of the width over 2 s tick=\(PlayerModel.tick())")
++        model.scrubBegan()
++        Task { @MainActor [model] in
++            for i in 1...120 {
++                try? await Task.sleep(for: .milliseconds(16))
++                model.scrubMoved(fraction: fraction * Double(i) / 120)
++            }
++            model.scrubLifted()
++        }
++    }
++
+     override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+-        let ours: Set<UIPress.PressType> = [.select, .playPause, .menu, .leftArrow, .rightArrow, .upArrow, .downArrow]
++        let ours: Set<UIPress.PressType> = [.select, .playPause, .menu, .leftArrow, .rightArrow, .upArrow, .downArrow, .pageUp, .pageDown]
+         if presses.contains(where: { ours.contains($0.type) }) { return }
+         super.pressesEnded(presses, with: event)
+     }
+ }
+ 
++extension PlayerHostController: UIGestureRecognizerDelegate {
++    /// Pass 2a: the scrub pan begins only for a drag that has travelled more across than up or down.
++    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
++        guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return true }
++        let t = pan.translation(in: pan.view)
++        return abs(t.x) > abs(t.y)
++    }
++}
++
+ /// The focusable view VLCKit draws into (it satisfies VLCDrawable: `addSubview` and `bounds`).
+ final class SurfaceView: UIView {
+     private let model: PlayerModel
+diff --git a/Marlin Media TV/PlayerModel.swift b/Marlin Media TV/PlayerModel.swift
+index 149d433..c1cdbe4 100644
+--- a/Marlin Media TV/PlayerModel.swift	
++++ b/Marlin Media TV/PlayerModel.swift	
+@@ -5,7 +5,8 @@
+ //  VLCKit playing the server's original file directly. The remote's meaning (DECISIONS.md D008):
+ //  click = play/pause; Menu = back; while playing, left/right = −10 s / +30 s; while paused,
+ //  a left/right click = one frame back / forward — through VLC's native previous-frame and
+-//  next-frame (pass 1f). The overlay
++//  next-frame (pass 1f). A horizontal drag on the touch surface scrubs (pass 2a): it pauses, the picture
++//  follows the target, click lands and plays, Menu returns to where the drag began. The overlay
+ //  appears on touch and fades after 4 s while playing. Audio and Subtitles are reached with an
+ //  up swipe from the surface; the panels list VLCKit's actual tracks and switch on selection.
+ //
+@@ -116,6 +117,25 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
+     @ObservationIgnored private var skipTask: Task<Void, Never>?
+     @ObservationIgnored private var frameTask: Task<Void, Never>?
+     @ObservationIgnored private var hasPlayed = false
++
++    /// A touch-surface scrub (pass 2a): where playback was when the drag began, the target the thumb has moved to,
++    /// and whether it was playing (a drag pauses; Menu restores that state).
++    struct Scrub: Equatable {
++        let startMs: Int
++        var targetMs: Int
++        let wasPlaying: Bool
++    }
++
++    /// One full width of the touch surface moves the target by this share of the running time.
++    static let scrubSpan = 0.25
++    /// The picture follows the target with at most one seek per interval while the thumb moves, and one on lift.
++    static let scrubSeekInterval: Duration = .milliseconds(250)
++
++    private(set) var scrub: Scrub?
++    @ObservationIgnored private var scrubBaseMs = 0
++    @ObservationIgnored private var scrubSeekTask: Task<Void, Never>?
++    @ObservationIgnored private var scrubLastSeekMs: Int?
++    @ObservationIgnored private var scrubLastSeekAt: ContinuousClock.Instant?
+     @ObservationIgnored private var dismissed = false
+ 
+     // Display matching (D016): the parse-before-play step, the display request and its observers.
+@@ -306,6 +326,16 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
+     // MARK: remote
+ 
+     func handle(_ input: RemoteInput) {
++        if scrub != nil {
++            // Pass 2a: while a scrub is up, click lands and Menu cancels; nothing else acts.
++            switch input {
++            case .select: landScrub()
++            case .menu: cancelScrub()
++            case .touch: break
++            default: EvidenceLog.line("[scrub] \(input) ignored while scrubbing")
++            }
++            return
++        }
+         switch input {
+         case .touch:
+             bumpOverlay()
+@@ -358,6 +388,107 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
+         }
+     }
+ 
++    // MARK: scrub (pass 2a)
++
++    /// VLC's `vlc_tick_now()` clock (CLOCK_MONOTONIC, µs), so a [scrub] line lines up with VLC's trace.
++    static func tick() -> UInt64 { clock_gettime_nsec_np(CLOCK_MONOTONIC) / 1000 }
++
++    /// A horizontal drag began (or began again on a scrub that is already up, which moves on from its target).
++    func scrubBegan() {
++        guard panel == nil, errorText == nil, lengthMs > 0, playbackStarted, !dismissed else {
++            EvidenceLog.line("[scrub] drag not taken: panel=\(panel != nil) error=\(errorText != nil) length=\(lengthMs) ms")
++            return
++        }
++        if let scrub {
++            scrubBaseMs = scrub.targetMs
++            EvidenceLog.line("[scrub] drag again from target \(scrub.targetMs) ms tick=\(Self.tick())")
++            return
++        }
++        let start = Int(player.time.intValue)
++        scrub = Scrub(startMs: start, targetMs: start, wasPlaying: isPlaying)
++        scrubBaseMs = start
++        scrubLastSeekMs = nil
++        scrubLastSeekAt = nil
++        focus = .surface
++        skipPill = nil
++        framePill = nil
++        EvidenceLog.line("[scrub] begin at \(start) ms playing=\(isPlaying) tick=\(Self.tick())")
++        if isPlaying { player.pause() }
++    }
++
++    /// The thumb's horizontal travel since the drag began, as a share of the surface's width.
++    func scrubMoved(fraction: Double) {
++        guard var s = scrub else { return }
++        let end = max(0, lengthMs - 1000)   // a target at the very end would stop the input and close the player
++        let target = min(max(0, scrubBaseMs + Int(fraction * Self.scrubSpan * Double(lengthMs))), end)
++        guard target != s.targetMs else { return }
++        s.targetMs = target
++        scrub = s
++        scheduleScrubSeek()
++    }
++
++    /// The thumb left the surface: the picture goes to the exact target; the bar stays until click or Menu.
++    func scrubLifted() {
++        guard let s = scrub else { return }
++        EvidenceLog.line("[scrub] lift target=\(s.targetMs) ms tick=\(Self.tick())")
++        seekScrubTarget()
++    }
++
++    private func scheduleScrubSeek() {
++        guard scrubSeekTask == nil else { return }   // the pending seek reads the latest target when it runs
++        let wait = scrubLastSeekAt.map { max(.zero, Self.scrubSeekInterval - (ContinuousClock.now - $0)) } ?? .zero
++        if wait == .zero { seekScrubTarget(); return }
++        scrubSeekTask = Task { @MainActor [weak self] in
++            try? await Task.sleep(for: wait)
++            guard let self, !Task.isCancelled else { return }
++            self.scrubSeekTask = nil
++            self.seekScrubTarget()
++        }
++    }
++
++    private func seekScrubTarget() {
++        scrubSeekTask?.cancel()
++        scrubSeekTask = nil
++        guard !dismissed, let s = scrub, s.targetMs != scrubLastSeekMs else { return }
++        player.time = VLCTime(int: Int32(s.targetMs))
++        scrubLastSeekMs = s.targetMs
++        scrubLastSeekAt = .now
++        EvidenceLog.line("[scrub] seek \(s.targetMs) ms tick=\(Self.tick())")
++    }
++
++    private func landScrub() {
++        guard let s = scrub else { return }
++        EvidenceLog.line("[scrub] land from \(s.startMs) ms at \(s.targetMs) ms tick=\(Self.tick())")
++        seekScrubTarget()
++        scrub = nil
++        player.play()
++        bumpOverlay()
++        logAfterScrub("land", expected: s.targetMs)
++    }
++
++    private func cancelScrub() {
++        guard let s = scrub else { return }
++        EvidenceLog.line("[scrub] cancel at \(s.targetMs) ms, back to \(s.startMs) ms playing=\(s.wasPlaying) tick=\(Self.tick())")
++        scrubSeekTask?.cancel()
++        scrubSeekTask = nil
++        scrub = nil
++        if scrubLastSeekMs != nil { player.time = VLCTime(int: Int32(s.startMs)) }
++        if s.wasPlaying { player.play() }
++        bumpOverlay()
++        logAfterScrub("cancel", expected: s.startMs)
++    }
++
++    private func logAfterScrub(_ what: String, expected: Int) {
++        Task { @MainActor [weak self] in
++            for (wait, mark) in [(1, 1), (2, 3)] {
++                try? await Task.sleep(for: .seconds(wait))
++                guard let self, !self.dismissed else { return }
++                self.timeMs = Int(self.player.time.intValue)
++                EvidenceLog.line("[scrub] \(what) +\(mark) s time=\(self.timeMs) ms (expected \(expected) ms) state \(self.stateName)")
++            }
++        }
++    }
++
+     private func togglePlayPause(source: String) {
+         framePill = nil
+         if isPlaying {
+diff --git a/Marlin Media TV/PlayerScreen.swift b/Marlin Media TV/PlayerScreen.swift
+index 82550b3..e3310b3 100644
+--- a/Marlin Media TV/PlayerScreen.swift	
++++ b/Marlin Media TV/PlayerScreen.swift	
+@@ -3,7 +3,7 @@
+ //  Marlin Media TV
+ //
+ //  Frames 10 (overlay), 11 (audio panel), 12 (subtitle panel), 13 (paused + frame step),
+-//  14/15 (skip feedback). Nothing here is focusable: the UIKit surface underneath owns the
++//  14/15 (skip feedback), and the scrub bar (pass 2a). Nothing here is focusable: the UIKit surface underneath owns the
+ //  remote and the model tells this view what to draw.
+ //
+ 
+@@ -21,9 +21,10 @@ struct PlayerScreen: View {
+             Nocturne.playerBg
+             PlayerHost(model: model)
+             ZStack {
+-                if let pill = model.skipPill { SkipFeedback(text: pill.text, forward: pill.forward) }
+-                if !model.isPlaying, model.errorText == nil { PausedCenter(framePill: model.framePill) }
+-                if model.overlayVisible || model.panel != nil { overlay }
++                if let pill = model.skipPill, model.scrub == nil { SkipFeedback(text: pill.text, forward: pill.forward) }
++                if !model.isPlaying, model.errorText == nil, model.scrub == nil { PausedCenter(framePill: model.framePill) }
++                if model.scrub == nil, model.overlayVisible || model.panel != nil { overlay }
++                if let scrub = model.scrub { ScrubOverlay(scrub: scrub, lengthMs: model.lengthMs) }
+                 if let panel = model.panel { TrackPanel(model: model, panel: panel) }
+                 if let error = model.errorText { PlaybackError(text: error) }
+             }
+@@ -135,9 +136,11 @@ private struct PanelButton: View {
+     }
+ }
+ 
+-/// Frame 10's scrubber: 8 px track, accent fill, a white knob with a glow.
++/// Frame 10's scrubber: 8 px track, accent fill, a white knob with a glow. While scrubbing (pass 2a) the knob is the
++/// target and `mark` is where playback was when the drag began.
+ private struct Scrubber: View {
+     let progress: Double
++    var mark: Double? = nil
+ 
+     var body: some View {
+         GeometryReader { geo in
+@@ -145,6 +148,12 @@ private struct Scrubber: View {
+             ZStack(alignment: .leading) {
+                 Capsule().fill(Nocturne.text.opacity(0.22)).frame(height: 8)
+                 Capsule().fill(Nocturne.accent).frame(width: max(0, x), height: 8)
++                if let mark {
++                    RoundedRectangle(cornerRadius: 2)
++                        .fill(Nocturne.neutral300)
++                        .frame(width: 4, height: 20)
++                        .offset(x: geo.size.width * mark - 2)
++                }
+                 RoundedRectangle(cornerRadius: 5)
+                     .fill(Nocturne.accent100)
+                     .frame(width: 10, height: 34)
+@@ -157,6 +166,41 @@ private struct Scrubber: View {
+     }
+ }
+ 
++/// Pass 2a: the scrub bar — frame 10's timeline row (type, widths, 26 pt spacing) in frames 14/15's place, the bar
++/// alone 78 pt above the bottom edge over frame 10's shade. Elapsed and remaining are the target's.
++private struct ScrubOverlay: View {
++    let scrub: PlayerModel.Scrub
++    let lengthMs: Int
++
++    private func share(_ ms: Int) -> Double { lengthMs > 0 ? min(1, max(0, Double(ms) / Double(lengthMs))) : 0 }
++
++    var body: some View {
++        VStack {
++            Spacer()
++            ZStack(alignment: .bottom) {
++                LinearGradient(stops: [.init(color: Nocturne.playerBg.opacity(0), location: 0),
++                                       .init(color: Nocturne.playerBg.opacity(0.55), location: 0.5),
++                                       .init(color: Nocturne.playerBg.opacity(0.92), location: 1)],
++                               startPoint: .top, endPoint: .bottom)
++                    .frame(height: 1080 * 0.52)
++                HStack(spacing: 26) {
++                    Text(Format.clock(Double(scrub.targetMs) / 1000))
++                        .font(.nocturne(30, .medium)).monospacedDigit()
++                        .foregroundStyle(Nocturne.text)
++                        .frame(width: 130, alignment: .leading)
++                    Scrubber(progress: share(scrub.targetMs), mark: share(scrub.startMs))
++                    Text("−" + Format.clock(Double(max(0, lengthMs - scrub.targetMs)) / 1000))
++                        .font(.nocturne(30, .medium)).monospacedDigit()
++                        .foregroundStyle(Nocturne.neutral400)
++                        .frame(width: 130, alignment: .trailing)
++                }
++                .padding(.horizontal, 80)
++                .padding(.bottom, 78)
++            }
++        }
++    }
++}
++
+ /// Frames 14 and 15.
+ private struct SkipFeedback: View {
+     let text: String
