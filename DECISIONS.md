@@ -102,3 +102,72 @@ marlin1111ai/marlin-media (DECISIONS.md there) and are referenced by their numbe
   **Observed, not decided** (as in pass 2c): a pause after a landing lets the demuxer read at 1× while paused, up to ~36 s of stream.
 
   Evidence: `reports/2026-09-15-pass2d-owner-flow.md`, `reports/logs/2d-analysis.txt`.
+
+## 2026-09-15 — pass 2g
+
+- **D022** **VLCKit patch 0021 was tried and dropped; the recipe stays at 20 patches.** 0021
+  (`src/input/es_out.c:3661`, one condition: no late-PCR compensation while es_out is paused) was
+  written in pass 2f to let the picture follow the thumb during a paused scrub. It did end the
+  paused-seek laps — 0 `PCR is called late` lines in 20 drags on four films, every landing within
+  −81…+305 ms of its target — but it was dropped because the picture did not actually track and one
+  film's clock broke:
+  - **The picture tracked on Stargate only** (MPEG-2/avcodec): 7–8 of 8–9 drag seeks shown, in
+    84–181 ms. On the HEVC films decoded by VideoToolbox each paused seek needed 0.2–1.1 s to show
+    a picture, so the 250 ms seek cadence cancelled most of them: **Wonder Woman 1–5 of 8–9,
+    Divergent 1–4 of 8–9**. During a drag the screen held the first seek's picture and then jumped
+    to the lift target.
+  - **Magicians S1E1 (the one MP4):** every one of the five endings logged
+    `clock gap, unexpected stream discontinuity`, and after **4 of 5** VLCKit's reported time froze,
+    so the overlay clock and the next drag's start were stale. HEAD's pass 2d sessions logged 0
+    clock gaps. The gap is exposed rather than created by 0021 (a non-lapping paused seek produced
+    one in pass 2e's 20-patch build too), and why the time freezes after some gaps and not others
+    was never established.
+  - **Stargate scrub 4** dropped 7 pictures at landing, against 1 in pass 2d's HEAD run of it.
+  - **Dropped, not parked:** `tools/vlckit-truehd/0021-*.diff`, its `build.sh` step 2c'' and its
+    README line are removed, and the framework is rebuilt at 20 patches (20 `Applying:` lines,
+    libvlc tip = 0020, `es_out.c:3661` back to `p_pgrm != p_sys->p_pgrm || p_sys->p_next_frame_es
+    != NULL`). The patch text survives only as pass 2f's evidence copy,
+    `reports/logs/2f-0021-es_out-no-late-pcr-compensation-while-paused.diff.txt`.
+  - **What replaces it:** the picture holds during the drag (D021, unchanged) and the server's
+    timeline stills show the target instead — D021's thumbnail below. Evidence:
+    `reports/2026-09-15-pass2f-scrub-live-picture.md` (§4 and its table),
+    `reports/logs/2f-analysis.txt`, `reports/2026-09-15-pass2g-scrub-thumbnails.md`.
+
+- **D021 (revised again)** the scrub carries a **timeline thumbnail**. The pass 2d flow above is
+  unchanged in every other respect — a scrub only from paused, the picture holds during the drag,
+  click or Play/Pause lands and plays, Menu cancels and leaves it paused, 25% of the running time
+  per surface width, the target stopping 1 s short of the end; frame step, skips and the panels are
+  untouched.
+
+  **What shows.** During a paused scrub, one still above the bar: the server's still nearest the
+  target, changing as the target moves (`PlayerScreen.swift`, `ScrubOverlay.still`). It appears with
+  the bar once the target first moves and stays until the scrub lands or is cancelled, as the bar
+  does. **Where the server has no still for the target there is nothing above the bar** — no
+  placeholder, no held image, no message (`ThumbStrip.draw`).
+
+  **Where the stills come from.** `GET /api/files/{fileId}/thumbs` (the index) and
+  `GET /api/thumbs/{fileId}/{n}.jpg` (a 6 × 5 row-major sprite sheet), both new in the server's
+  image 0.3.0 and written out in COLD-START.md. A still's number is
+  `round(target ÷ interval)` clamped to `count − 1`; its sheet is `number ÷ per_sheet` and its tile
+  `number − sheet.first_still`, row-major (`ThumbIndex.still(nearestMs:)`, `.place(still:)`).
+
+  **When it is fetched.** The index is asked for **once, when a detail screen opens**, for the file
+  that would play, and is never polled and never re-fetched (`MovieDetailScreen.loadThumbs`,
+  `ShowDetailScreen.load`, `VideoDetailScreen.loadThumbs`). Because the first index request is what
+  starts generation on the server, a file whose stills do not exist yet shows none this time round;
+  the next visit has them. Sheets are fetched as they are needed for display and kept for the rest
+  of the player's life (`ThumbStrip`, `Frameworks`-independent, `URLSession.shared`); while a sheet
+  is still downloading nothing is drawn above the bar.
+
+  **Which file "would play".** One index per screen means one file: the **first edition** of a
+  movie (Play on a multi-edition movie opens the picker, so there is no single file until the owner
+  chooses), the **first episode of the first season** of a show, and its one file for a video. A
+  request carries the index only when the index's `fileId` is the file being played
+  (`PlayRequest.matching`), so any other edition or episode simply plays with no thumbnail rather
+  than the wrong one. Flagged as the open question of pass 2g.
+
+  **Placement and styling** (Nocturne tokens and the overlay's own spacing): the server's tile size
+  (320 × 214) at 1×, 26 pt above the bar row — the row's own gap — inside the same 80 pt side
+  padding, carried over the target's place on the track with the bar row's 130 pt time columns as
+  its margins and stopped at either end of the track; 8 pt corners, a `neutral700` hairline and a
+  soft drop shadow. Nothing focusable, nothing else added.

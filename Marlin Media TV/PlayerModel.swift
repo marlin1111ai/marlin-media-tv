@@ -6,7 +6,8 @@
 //  click = play/pause; Menu = back; while playing, left/right = −10 s / +30 s; while paused,
 //  a left/right click = one frame back / forward — through VLC's native previous-frame and
 //  next-frame (pass 1f). While paused, a horizontal swipe or drag on the touch surface scrubs (D021): the picture
-//  holds while the bar moves the target, click or Play/Pause lands there and plays, Menu drops it and stays paused;
+//  holds while the bar moves the target and the server's still nearest the target shows above the bar (pass 2g),
+//  click or Play/Pause lands there and plays, Menu drops it and stays paused;
 //  while playing a drag does nothing. The overlay
 //  appears on touch and fades after 4 s while playing. Audio and Subtitles are reached with an
 //  up swipe from the surface; the panels list VLCKit's actual tracks and switch on selection.
@@ -131,6 +132,9 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
 
     private(set) var scrub: Scrub?
     @ObservationIgnored private var scrubBaseMs = 0
+    /// Pass 2g: the server's timeline stills for this file, when the detail screen had an index for
+    /// it. Set once, before playback starts; the strip itself is observable.
+    @ObservationIgnored private(set) var thumbStrip: ThumbStrip?
     /// A paused drag that has not moved the target yet: no scrub shows until it does.
     @ObservationIgnored private var dragStartMs: Int?
     @ObservationIgnored private var dismissed = false
@@ -160,6 +164,11 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         player.delegate = self
         EvidenceLog.line("[player] request \(request.title) — \(request.subtitle) — \(request.url.absoluteString)")
         EvidenceLog.line("[player] file \(request.file.path) \(request.file.resolution ?? "?") hdr=\(request.file.hdr) video=\(request.file.videoCodec ?? "?") audio=\(request.file.audioTracks.map { "\($0.codec) \($0.layout)" }.joined(separator: ", "))")
+        if let thumbs = request.thumbs {
+            thumbStrip = ThumbStrip(thumbs)
+        } else {
+            EvidenceLog.line("[thumbs] no index for this file; the scrub shows no thumbnail")
+        }
     }
 
     // MARK: lifecycle
@@ -421,6 +430,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
             guard target != s.targetMs else { return }
             s.targetMs = target
             scrub = s
+            thumbStrip?.show(ms: target)
         } else if let start = dragStartMs, target != start {
             dragStartMs = nil
             scrub = Scrub(startMs: start, targetMs: target)
@@ -428,6 +438,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
             skipPill = nil
             framePill = nil
             EvidenceLog.line("[scrub] begin at \(start) ms tick=\(Self.tick())")
+            thumbStrip?.show(ms: target)
         }
     }
 
@@ -444,6 +455,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         guard let s = scrub, !dismissed else { return }
         EvidenceLog.line("[scrub] land \(source) from \(s.startMs) ms at \(s.targetMs) ms tick=\(Self.tick())")
         scrub = nil
+        thumbStrip?.clear()
         player.play()
         if s.targetMs != s.startMs {
             player.time = VLCTime(int: Int32(s.targetMs))
@@ -458,6 +470,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         guard let s = scrub else { return }
         EvidenceLog.line("[scrub] cancel menu at \(s.targetMs) ms, back to \(s.startMs) ms tick=\(Self.tick())")
         scrub = nil
+        thumbStrip?.clear()
         bumpOverlay()
         logAfterScrub("cancel", expected: s.startMs)
     }

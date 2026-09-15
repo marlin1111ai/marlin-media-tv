@@ -10,10 +10,22 @@ import SwiftUI
 
 struct VideoDetailScreen: View {
     let video: Video
+    let api: APIClient
     let play: (PlayRequest) -> Void
 
     @State private var playError: String?
+    @State private var thumbs: FileThumbs?
     @FocusState private var playFocused: Bool
+
+    /// Pass 2g: the timeline stills of the one file this screen plays, asked once on open.
+    private func loadThumbs() async {
+        guard thumbs == nil else { return }
+        do {
+            thumbs = try await api.thumbs(fileId: video.file.fileId)
+        } catch {
+            print("[thumbs] \(video.title): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
+        }
+    }
 
     private var spec: String {
         var parts = [video.file.resolutionLabel, video.file.videoCodec.map(Format.videoCodec)].compactMap { $0 }
@@ -53,7 +65,7 @@ struct VideoDetailScreen: View {
                 Text("Added \(Format.addedDate(video.added)) · \(video.file.directory)")
                     .font(.nocturne(22)).foregroundStyle(Nocturne.neutral600).padding(.top, 8)
                 Button {
-                    guard let request = PlayRequest.video(video) else {
+                    guard let request = PlayRequest.video(video, thumbs: thumbs) else {
                         playError = "The server gave no usable stream URL: \(video.file.stream)"
                         return
                     }
@@ -76,5 +88,6 @@ struct VideoDetailScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .onAppear { playFocused = true }
+        .task { await loadThumbs() }
     }
 }

@@ -12,10 +12,12 @@ import SwiftUI
 
 struct MovieDetailScreen: View {
     let movie: Movie
+    let api: APIClient
     let play: (PlayRequest) -> Void
 
     @State private var pickerOpen = false
     @State private var playError: String?
+    @State private var thumbs: FileThumbs?
     @FocusState private var playFocused: Bool
     @FocusState private var pickerFocus: Int?
 
@@ -40,6 +42,7 @@ struct MovieDetailScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .onAppear { playFocused = true }
+        .task { await loadThumbs() }
         .onChange(of: pickerOpen) { _, open in
             if open {
                 Task { @MainActor in
@@ -167,6 +170,19 @@ struct MovieDetailScreen: View {
         .onExitCommand { pickerOpen = false }
     }
 
+    /// Pass 2g: the timeline stills of the file that would play, asked once when the screen opens
+    /// and never polled or re-fetched. On a multi-edition movie Play opens the picker, so the file
+    /// that would play is taken to be the first edition's; another edition then plays without
+    /// thumbnails (the scrub simply shows none).
+    private func loadThumbs() async {
+        guard thumbs == nil, let file = movie.editions.first?.file else { return }
+        do {
+            thumbs = try await api.thumbs(fileId: file.fileId)
+        } catch {
+            print("[thumbs] \(movie.title): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
+        }
+    }
+
     private func pressPlay() {
         if movie.editions.count > 1 {
             pickerOpen = true
@@ -178,7 +194,7 @@ struct MovieDetailScreen: View {
     }
 
     private func start(_ edition: Edition) {
-        guard let request = PlayRequest.movie(movie, edition: edition) else {
+        guard let request = PlayRequest.movie(movie, edition: edition, thumbs: thumbs) else {
             playError = "The server gave no usable stream URL for \(edition.displayName): \(edition.file.stream)"
             return
         }

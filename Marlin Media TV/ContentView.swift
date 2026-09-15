@@ -25,11 +25,11 @@ struct ContentView: View {
                 .navigationDestination(for: Destination.self) { destination in
                     switch destination {
                     case let .movie(movie):
-                        MovieDetailScreen(movie: movie) { playRequest = $0 }
+                        MovieDetailScreen(movie: movie, api: library.api) { playRequest = $0 }
                     case let .show(show):
                         ShowDetailScreen(show: show, api: library.api) { playRequest = $0 }
                     case let .video(video):
-                        VideoDetailScreen(video: video) { playRequest = $0 }
+                        VideoDetailScreen(video: video, api: library.api) { playRequest = $0 }
                     }
                 }
         }

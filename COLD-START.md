@@ -14,7 +14,18 @@ the file bytes with HTTP Range support at `/stream/{fileId}`.
 
 - **Server:** `http://192.168.1.250:8093`, fixed in `ServerConfig.baseURL` (D007: no settings
   screen). Never the marlinpc dev copy. Endpoints used: `/api/movies`, `/api/movies/{id}`,
-  `/api/shows`, `/api/shows/{id}`, `/api/videos`, `/api/artwork/…`, `/stream/{fileId}`.
+  `/api/shows`, `/api/shows/{id}`, `/api/videos`, `/api/artwork/…`, `/stream/{fileId}`, and the
+  timeline stills of image 0.3.0 (pass 2g):
+  - `GET /api/files/{fileId}/thumbs` — the index: `interval` (10 s), `tile_width` (320),
+    `tile_height` (214 on the films measured), `columns` (6), `rows` (5), `per_sheet` (30),
+    `count`, `state` (`none` | `generating` | `complete` | `failed`) and `sheets`, an array of the
+    sheets that exist **at that moment**, each `{index, first_still, url}`. Generation starts on
+    the first index request, so the first caller usually gets `generating` with `sheets: []`; a
+    file with no usable duration returns `none`, and `failed` re-queues on request. An unknown
+    file id is `404 {"error":"file not found"}`.
+  - `GET /api/thumbs/{fileId}/{n}.jpg` — one sprite sheet, 6 × 5 tiles, row-major and
+    chronological (1920 × 1070 for a 320 × 214 tile, ~90 KB, `Cache-Control: max-age=86400`).
+    The index's `sheet.url` carries a `?v=` cache-buster.
 - **Repo:** https://github.com/marlin1111ai/marlin-media-tv (branch `main`).
 - **Working folder:** `~/Xcode/Marlin Media TV`. `Marlin DVR TV` next to it is read-only prior
   art (same owner, same device, same team); nothing else under `~/Xcode` is touched.
@@ -230,5 +241,11 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 - **What still works.** HEAD's landing (play, then one seek) lands on the target even after laps. But during the hold the picture drifts forward while the bar shows the target.
 - **Candidates.** C1 (`es_out.c:3661`, skip late compensation while es_out is paused) is the narrowest; not implemented. No decision.
 - **State.** libvlc clean, and `Frameworks/` rebuilt by the full recipe (20 patches; both slices `MinimumOSVersion 26.0`, `minos 26.0 sdk 27.0`; `_ff_truehd_decoder`; no trace strings). The app is at HEAD and installed on Home Theater. Committed locally, not pushed.
+
+**Pass 2g (2026-09-15): 0021 dropped, the scrub gained timeline thumbnails — done.** Report `reports/2026-09-15-pass2g-scrub-thumbnails.md`, evidence `reports/logs/2g-*`, screenshots `reports/screenshots/2g/`.
+- **0021 is gone** (D022): the patch file, its `build.sh` step and its README line are removed, the app is back at HEAD's scrub, and the full recipe rebuilt `Frameworks/` at **20 patches** (20 `Applying:` lines, `ARCHIVE SUCCEEDED` ×2, libvlc clean at `6d623583` with `es_out.c:3661` back to its HEAD condition; both slices `MinimumOSVersion 26.0`, `minos 26.0 sdk 27.0`, `_ff_truehd_decoder`, no instrumentation strings). A stale `0021-….patch` was still sitting in `~/vlckit-build/VLCKit/libvlc/patches/` and had to be deleted first, or the recipe would have re-applied it.
+- **The thumbnail** (D021 revised again): during a paused drag the server's still nearest the target shows above the bar and changes with it; where no still exists, nothing shows. `ThumbStrip.swift` is new; the index is fetched once per detail screen (never polled, never re-fetched) and sheets as needed.
+- **On Home Theater** (Stargate Extended, one session, 191.5 s, passed): one index line, two sheet fetches (185/115 ms) for four targets, the thumbnail tracking 03:59 → 05:32 → 08:08 → 06:50, exact drag rates, landing 0 ms from the target, Menu cancel 0 ms back at the drag's start and still paused, and five frame steps retraced to pixel-identical screenshots.
+- **Still open:** the owner's own swipe on the real remote (the push gate, as since pass 2c); which file a multi-edition movie or multi-episode show should fetch an index for; and that a file's **first** visit shows no thumbnails, because that first request is what starts generation.
 
 **Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.

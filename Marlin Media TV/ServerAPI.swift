@@ -64,6 +64,12 @@ struct APIClient: Sendable {
     func show(id: Int) async throws -> Show { try await get("/api/shows/\(id)") }
     func videos() async throws -> [Video] { try await get("/api/videos") }
 
+    /// The file's timeline stills (pass 2g). The first request starts generation on the server, so
+    /// this is asked once per detail screen and never polled (the index is a snapshot).
+    func thumbs(fileId: Int) async throws -> FileThumbs {
+        FileThumbs(fileId: fileId, index: try await get("/api/files/\(fileId)/thumbs"))
+    }
+
     private func get<T: Decodable>(_ path: String) async throws -> T {
         let url = ServerConfig.baseURL.appending(path: path)
         let data: Data

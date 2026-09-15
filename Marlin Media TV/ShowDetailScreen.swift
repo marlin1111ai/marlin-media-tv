@@ -18,6 +18,7 @@ struct ShowDetailScreen: View {
     @State private var phase: Phase = .loading
     @State private var seasonId: Int?
     @State private var playError: String?
+    @State private var thumbs: FileThumbs?
     @FocusState private var focusedSeason: Int?
 
     var body: some View {
@@ -63,6 +64,15 @@ struct ShowDetailScreen: View {
             seasonId = detail.seasons?.first?.id
             phase = .loaded(detail)
             print("[show] loaded \(detail.title): \(detail.seasons?.count ?? 0) seasons")
+            // Pass 2g: one index request per screen, for the file that would play — the first
+            // episode of the first season. Any other episode plays without thumbnails.
+            if let file = detail.seasons?.first?.episodes.first?.file {
+                do {
+                    thumbs = try await api.thumbs(fileId: file.fileId)
+                } catch {
+                    print("[thumbs] \(show.title): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
+                }
+            }
         } catch {
             let message = (error as? APIError)?.localizedDescription ?? String(describing: error)
             print("[show] failed: \(message)")
@@ -131,7 +141,7 @@ struct ShowDetailScreen: View {
         return VStack(spacing: 8) {
             ForEach(season?.episodes ?? []) { episode in
                 Button {
-                    guard let request = PlayRequest.episode(episode, of: show) else {
+                    guard let request = PlayRequest.episode(episode, of: show, thumbs: thumbs) else {
                         playError = "The server gave no usable stream URL for E\(episode.number): \(episode.file.stream)"
                         return
                     }

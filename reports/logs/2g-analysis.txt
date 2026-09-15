@@ -1,0 +1,87 @@
+== app lines: 128 ==
+
+== thumbs ==
+  7:09:41.326  [thumbs] file 2: 780 stills every 10.0 s, 26 of 26 sheets, state complete
+  index lines: 1 (must be 1 — the index is fetched once and never re-fetched)
+  sheet fetches: 2
+    7:10:45.395  [thumbs] sheet 0 loaded 1920x1070 in 185 ms
+    7:10:46.885  [thumbs] sheet 1 loaded 1920x1070 in 115 ms
+  failed sheet fetches: 0
+
+== scrubs ==
+  7:10:45.190  [harness] scripted drag 0.08 of the width over 2 s tick=555203634942
+  7:10:45.209  [scrub] begin at 176339 ms tick=555203653002
+  7:10:47.256  [scrub] lift target=332300 ms tick=555205700126
+  7:10:50.144  [harness] scripted drag 0.08 of the width over 2 s tick=555208588413
+  7:10:50.145  [scrub] drag again from target 332300 ms tick=555208589163
+  7:10:52.207  [scrub] lift target=488261 ms tick=555210651237
+  7:10:55.081  [harness] scripted drag -0.04 of the width over 2 s tick=555213525837
+  7:10:55.082  [scrub] drag again from target 488261 ms tick=555213526182
+  7:10:57.150  [scrub] lift target=410281 ms tick=555215594502
+  7:11:00.014  [scrub] land select from 176339 ms at 410281 ms tick=555218458811
+  7:11:00.015  [scrub] seek 410281 ms after play tick=555218459590
+  7:11:01.048  [scrub] land +1 s time=410281 ms (expected 410281 ms) state Playing
+  7:11:03.060  [scrub] land +3 s time=412755 ms (expected 410281 ms) state Playing
+  7:11:26.857  [harness] scripted drag 0.08 of the width over 2 s tick=555245301503
+  7:11:26.875  [scrub] begin at 433329 ms tick=555245319269
+  7:11:28.923  [scrub] lift target=589290 ms tick=555247367575
+  7:11:30.770  [scrub] cancel menu at 589290 ms, back to 433329 ms tick=555249214329
+  7:11:31.794  [scrub] cancel +1 s time=433329 ms (expected 433329 ms) state Paused
+  7:11:33.920  [scrub] cancel +3 s time=433329 ms (expected 433329 ms) state Paused
+
+== frame steps ==
+  7:11:34.399  [framestep] −1 gotoPreviousFrame before=433329 ms
+  7:11:34.606  [framestep] previousFrameStepped result=0 time=433329 ms
+  7:11:34.812  [framestep] −1 after(400 ms)=433350 ms
+  7:11:39.233  [framestep] −1 gotoPreviousFrame before=433350 ms
+  7:11:39.284  [framestep] previousFrameStepped result=0 time=433350 ms
+  7:11:39.644  [framestep] −1 after(400 ms)=433316 ms
+  7:11:44.073  [framestep] −1 gotoPreviousFrame before=433316 ms
+  7:11:44.144  [framestep] previousFrameStepped result=0 time=433316 ms
+  7:11:44.508  [framestep] −1 after(400 ms)=433266 ms
+  7:11:48.911  [framestep] −1 gotoPreviousFrame before=433266 ms
+  7:11:48.973  [framestep] previousFrameStepped result=0 time=433266 ms
+  7:11:49.324  [framestep] −1 after(400 ms)=433233 ms
+  7:11:53.754  [framestep] −1 gotoPreviousFrame before=433233 ms
+  7:11:53.821  [framestep] previousFrameStepped result=0 time=433233 ms
+  7:11:54.168  [framestep] −1 after(400 ms)=433183 ms
+  7:11:58.593  [framestep] +1 gotoNextFrame before=433183 ms
+  7:11:58.602  [framestep] nextFrameStepped result=0 time=433233 ms
+  7:11:59.007  [framestep] +1 after(400 ms)=433233 ms
+  7:12:03.427  [framestep] +1 gotoNextFrame before=433233 ms
+  7:12:03.436  [framestep] nextFrameStepped result=0 time=433266 ms
+  7:12:03.863  [framestep] +1 after(400 ms)=433266 ms
+  7:12:08.268  [framestep] +1 gotoNextFrame before=433266 ms
+  7:12:08.277  [framestep] nextFrameStepped result=0 time=433266 ms
+  7:12:08.703  [framestep] +1 after(400 ms)=433316 ms
+  7:12:13.104  [framestep] +1 gotoNextFrame before=433316 ms
+  7:12:13.114  [framestep] nextFrameStepped result=0 time=433350 ms
+  7:12:13.541  [framestep] +1 after(400 ms)=433350 ms
+  7:12:17.951  [framestep] +1 gotoNextFrame before=433350 ms
+  7:12:17.960  [framestep] nextFrameStepped result=0 time=433350 ms
+  7:12:18.377  [framestep] +1 after(400 ms)=433400 ms
+
+== player state / skips ==
+  7:09:41.536  [player] play() called
+  7:09:41.537  [player] state Opening at 0 ms
+  7:09:41.659  [player] length 7798056 ms
+  7:09:41.678  [player] state Playing at 0 ms
+  7:10:14.623  [skip] +30 s (click) before=32000 ms target=62000 ms
+  7:10:15.154  [skip] after=62000 ms
+  7:10:16.363  [skip] +30 s (click) before=63016 ms target=93016 ms
+  7:10:16.904  [skip] after=93016 ms
+  7:10:18.109  [skip] +30 s (click) before=94024 ms target=124024 ms
+  7:10:18.643  [skip] after=124024 ms
+  7:10:19.841  [skip] +30 s (click) before=125032 ms target=155032 ms
+  7:10:20.380  [skip] after=155032 ms
+  7:10:41.593  [player] pause (playPause button) at 176040 ms
+  7:10:41.615  [player] state Paused at 176339 ms
+  7:11:00.053  [player] state Playing at 410281 ms
+  7:11:23.617  [player] pause (playPause button) at 433304 ms
+  7:11:23.635  [player] state Paused at 433329 ms
+  7:12:22.806  [player] dismiss at 433400 ms, state Paused
+  7:12:22.809  [player] state Stopping at 433400 ms
+  7:12:22.823  [player] state Stopped at 433400 ms
+
+== anything that reads like a failure ==
+  (none)

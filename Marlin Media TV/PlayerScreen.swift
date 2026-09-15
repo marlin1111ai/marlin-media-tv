@@ -24,7 +24,10 @@ struct PlayerScreen: View {
                 if let pill = model.skipPill, model.scrub == nil { SkipFeedback(text: pill.text, forward: pill.forward) }
                 if !model.isPlaying, model.errorText == nil, model.scrub == nil { PausedCenter(framePill: model.framePill) }
                 if model.scrub == nil, model.overlayVisible || model.panel != nil { overlay }
-                if let scrub = model.scrub { ScrubOverlay(scrub: scrub, lengthMs: model.lengthMs) }
+                if let scrub = model.scrub {
+                    ScrubOverlay(scrub: scrub, lengthMs: model.lengthMs,
+                                 thumb: model.thumbStrip?.tile, tileSize: model.thumbStrip?.tileSize ?? .zero)
+                }
                 if let panel = model.panel { TrackPanel(model: model, panel: panel) }
                 if let error = model.errorText { PlaybackError(text: error) }
             }
@@ -168,9 +171,13 @@ private struct Scrubber: View {
 
 /// Pass 2a: the scrub bar — frame 10's timeline row (type, widths, 26 pt spacing) in frames 14/15's place, the bar
 /// alone 78 pt above the bottom edge over frame 10's shade. Elapsed and remaining are the target's.
+/// Pass 2g: above the bar, the server's still nearest the target (`thumb`), over the target's place on the track.
+/// When the server has no still there yet, nothing is drawn above the bar.
 private struct ScrubOverlay: View {
     let scrub: PlayerModel.Scrub
     let lengthMs: Int
+    let thumb: CGImage?
+    let tileSize: CGSize
 
     private func share(_ ms: Int) -> Double { lengthMs > 0 ? min(1, max(0, Double(ms) / Double(lengthMs))) : 0 }
 
@@ -183,20 +190,43 @@ private struct ScrubOverlay: View {
                                        .init(color: Nocturne.playerBg.opacity(0.92), location: 1)],
                                startPoint: .top, endPoint: .bottom)
                     .frame(height: 1080 * 0.52)
-                HStack(spacing: 26) {
-                    Text(Format.clock(Double(scrub.targetMs) / 1000))
-                        .font(.nocturne(30, .medium)).monospacedDigit()
-                        .foregroundStyle(Nocturne.text)
-                        .frame(width: 130, alignment: .leading)
-                    Scrubber(progress: share(scrub.targetMs), mark: share(scrub.startMs))
-                    Text("−" + Format.clock(Double(max(0, lengthMs - scrub.targetMs)) / 1000))
-                        .font(.nocturne(30, .medium)).monospacedDigit()
-                        .foregroundStyle(Nocturne.neutral400)
-                        .frame(width: 130, alignment: .trailing)
+                VStack(spacing: 26) {
+                    if let thumb, tileSize.width > 0, tileSize.height > 0 { still(thumb) }
+                    HStack(spacing: 26) {
+                        Text(Format.clock(Double(scrub.targetMs) / 1000))
+                            .font(.nocturne(30, .medium)).monospacedDigit()
+                            .foregroundStyle(Nocturne.text)
+                            .frame(width: 130, alignment: .leading)
+                        Scrubber(progress: share(scrub.targetMs), mark: share(scrub.startMs))
+                        Text("−" + Format.clock(Double(max(0, lengthMs - scrub.targetMs)) / 1000))
+                            .font(.nocturne(30, .medium)).monospacedDigit()
+                            .foregroundStyle(Nocturne.neutral400)
+                            .frame(width: 130, alignment: .trailing)
+                    }
                 }
                 .padding(.horizontal, 80)
                 .padding(.bottom, 78)
             }
+        }
+    }
+
+    /// The still, carried over the knob: the same 130 pt time columns and 26 pt gaps as the bar row, so the width it
+    /// travels is the track's own. It stops at either end of the track rather than leaving it.
+    private func still(_ image: CGImage) -> some View {
+        HStack(spacing: 26) {
+            Color.clear.frame(width: 130, height: 1)
+            GeometryReader { geo in
+                Image(decorative: image, scale: 1)
+                    .resizable()
+                    .frame(width: tileSize.width, height: tileSize.height)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Nocturne.neutral700, lineWidth: 1))
+                    .shadow(color: .black.opacity(0.55), radius: 24, y: 14)
+                    .offset(x: min(max(0, geo.size.width * share(scrub.targetMs) - tileSize.width / 2),
+                                   max(0, geo.size.width - tileSize.width)))
+            }
+            .frame(height: tileSize.height)
+            Color.clear.frame(width: 130, height: 1)
         }
     }
 }
