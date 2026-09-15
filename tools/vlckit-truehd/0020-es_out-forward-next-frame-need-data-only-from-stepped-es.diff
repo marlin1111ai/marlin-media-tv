@@ -1,0 +1,45 @@
+From 3357f7769edbeb6fb28446f8dbcb1e5a43db8e4a Mon Sep 17 00:00:00 2001
+From: marlin1111ai <marlin1111ai@gmail.com>
+Date: Mon, 14 Sep 2026 22:38:14 -0400
+Subject: [PATCH] input: es_out: forward next-frame data requests only from the
+ stepped ES
+
+While frame stepping, es_out drops every block that is not for the stepped
+video ES. A subtitle decoder flushed while paused (the previous-frame seek
+flushes all decoders) gets frames_countdown = 1 and asks for data when its
+fifo is empty; that request can never be met, so next_frame_need_data stays
+true until Play, and the input keeps demuxing while paused. With the clock
+anchored at the pause date it reads the whole pause's worth of stream into
+the video fifo, and resume plays those pictures late.
+
+Forward the request only from the stepped ES while frame stepping, and clear
+a request left standing from before stepping when frame stepping starts.
+Paused seeks outside frame stepping are unchanged.
+---
+ src/input/es_out.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/input/es_out.c b/src/input/es_out.c
+index db2ff9083e..4657e4969f 100644
+--- a/src/input/es_out.c
++++ b/src/input/es_out.c
+@@ -536,7 +536,7 @@ decoder_frame_next_need_data(vlc_input_decoder_t *decoder, bool need_data,
+     struct vlc_input_es_out *out = id->out;
+     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+ 
+-    if (!p_sys->p_input)
++    if (!p_sys->p_input || (p_sys->p_next_frame_es != NULL && p_sys->p_next_frame_es != id))
+         return;
+ 
+     vlc_value_t val = { .b_bool = need_data };
+@@ -1385,6 +1385,7 @@ static void EsOutFrameNext(es_out_sys_t *p_sys, bool previous)
+             msg_Warn( p_sys->p_input, "No video track selected, ignoring 'frame next'" );
+             return;
+         }
++        input_ControlPushHelper( p_sys->p_input, INPUT_CONTROL_NEED_DATA_FRAME_NEXT, &(vlc_value_t){ .b_bool = false } );
+     }
+ 
+     if( previous )
+-- 
+2.54.0
+

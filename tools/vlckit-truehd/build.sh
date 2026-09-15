@@ -77,6 +77,12 @@ echo "patch 0018 installed"
 cp "$REPO/tools/vlckit-truehd/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arriving-picture.diff" \
    "$BUILD_DIR/VLCKit/libvlc/patches/0019-videotoolbox-dpb-no-latency-bump-ahead-of-arriving-picture.patch"
 echo "patch 0019 installed"
+
+# Step 2c' — pass 1i (D019): es_out forwards next-frame data requests only from the stepped video ES, as VLCKit patch
+# 0020, applied by git am after 0019. Same form and install path as 0019. Idempotent copy.
+cp "$REPO/tools/vlckit-truehd/0020-es_out-forward-next-frame-need-data-only-from-stepped-es.diff" \
+   "$BUILD_DIR/VLCKit/libvlc/patches/0020-es_out-forward-next-frame-need-data-only-from-stepped-es.patch"
+echo "patch 0020 installed"
 fi # PACKAGE_ONLY
 
 # Step 2d — pass 1e rerun 3 (D018): Xcode 27 refuses to archive VLCKit.xcodeproj with its tvOS deployment target 11.0

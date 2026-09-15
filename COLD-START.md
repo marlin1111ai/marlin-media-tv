@@ -128,12 +128,12 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   - Stargate (MPEG-2, avcodec): 2 dropped / 5 shown late, as in pass 1d.
   - Seek: resumes in 0.393 s. Stargate frame step: unchanged.
 - **Where it is written up.** `reports/2026-09-14-pass1e-reorder-fix.md` (rerun 4).
-- **Still open.**
+- **Owner-accepted.** TrueHD audibility and the TV's 24 Hz/HDR indication, the owner's checks, are accepted.
+- **Still open after pass 1e.**
   - A single late picture at audio start / display mode switch (Wonder Woman, Magicians, after a seek).
-  - The paused frame-back step (D008).
-  - TrueHD audibility and the TV's 24 Hz/HDR indication (the owner's checks).
+  - The paused frame-back step (D008; passes 1f–1i).
   - An upstream report to VideoLAN.
-- **Not pushed** — the owner tests first.
+- **Pushed.** Pass 1e's HEAD `b22f9c9` is on `origin/main`; the passes after it are local until the owner tests.
 
 
 **Pass 1f (2026-09-14): STOPPED at item 3.**
@@ -165,3 +165,10 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   - `Frameworks/VLCKit.xcframework` is again the full recipe's own build (21:55–21:58; both slices `MinimumOSVersion 26.0`, `minos 26.0 sdk 27.0`; `_ff_truehd_decoder` on the device slice).
   - libvlc is at `51f8302c27`, the same tree as `e50d9ac36a` (the recipe's `git am` rewrites hashes).
   - `PlayerModel.swift` is at HEAD, and Home Theater runs that build. D008 unchanged. Not pushed.
+
+**Pass 1i (2026-09-14): STOPPED at step 8.**
+- **Patch 0020** (`tools/vlckit-truehd/0020-es_out-forward-next-frame-need-data-only-from-stepped-es.diff`, design B1, 2 lines in `src/input/es_out.c`): while frame stepping, only the stepped video ES's need-data request reaches the input, and a request standing when stepping starts is cleared. `build.sh` installs it after 0019. VLC's player tests: 19/20 before and after (the one failure, `attachments`, is the host test build's missing BMP encoder).
+- **Framework.** Full recipe, 22:43–22:46, 20 patches, libvlc `03632d2eb8`. Both slices `MinimumOSVersion 26.0` and `minos 26.0 sdk 27.0`; `_ff_truehd_decoder` on the device slice; no instrumentation strings.
+- **What 0020 fixes.** An instrumented Stargate run logged the flag directly: never set while paused, reads only inside each step's own rebuffer. The clean runs show 0 reads while paused outside a step, against 22 700 in pass 1h, and the clock at Play+60 s is 01:34, not 03:36.
+- **Why it stopped.** Stargate after five back steps drops 21 pictures and starts audio 1 477 ms after the first picture. After five forward steps: 26 dropped, 1 361 ms. The no-step control in the same session: 0 dropped, 176 ms. Play re-anchors the clock at the first PCR read after resume (~1 s past the displayed picture) while the video fifo still starts at the displayed picture. Wonder Woman, Divergent, Magicians, Food That Built America, step 7, step 9 and step 11 were not run.
+- **State.** `PlayerModel.swift` carries the 1f native back step, **uncommitted**; Home Theater runs that build with the clean recipe framework. D008 unchanged, no new decision. Report: `reports/2026-09-14-pass1i-frame-back-fix.md`. Not pushed.

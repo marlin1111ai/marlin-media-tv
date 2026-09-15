@@ -1,0 +1,231 @@
+# pass 1i — instrumented flag run: libvlc with 0020 + reports/logs/1h-libvlc-instrumentation-combined.diff (device slice relinked, PACKAGE_ONLY), app with the 1f diff
+# Stargate Extended, Diag1iUITests/tStargateBack, Home Theater, 22:43:29–22:47:48; trace 6.0 MB off-repo
+
+## harness notes
+[p1i] attached at 22:43:42.504
+[p1i] stargate-back: player up at 22:44:06.393
+[p1i] stargate-back: pause at 22:44:37.648
+[p1i] stargate-back: click 1 L at 22:45:58.289
+[p1i] stargate-back: click 2 L at 22:46:02.532
+[p1i] stargate-back: click 3 L at 22:46:06.779
+[p1i] stargate-back: click 4 L at 22:46:11.015
+[p1i] stargate-back: click 5 L at 22:46:15.256
+[p1i] stargate-back: wait after steps from 22:46:19.495
+[p1i] stargate-back: play at 22:46:39.889
+[p1i] stargate-back: play+60s shot at 22:47:41.140, player exists true
+
+## flagcheck.py
+  app: 10:44:37.685 PM [player] pause (select) at 33205 ms
+  app: 10:45:58.333 PM [framestep] −1 gotoPreviousFrame before=33473 ms
+    setter 0 -> 0 now=481716905682
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+      decoder notifies since: {'need_data=1 countdown=1': 5}
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+  app: 10:45:58.426 PM [framestep] previousFrameStepped result=0 time=33473 ms
+  app: 10:45:58.757 PM [framestep] −1 after(400 ms)=33500 ms
+  app: 10:46:02.572 PM [framestep] −1 gotoPreviousFrame before=33500 ms
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+      decoder notifies since: {'need_data=1 countdown=1': 3}
+  app: 10:46:02.634 PM [framestep] previousFrameStepped result=0 time=33500 ms
+      decoder notifies since: {'need_data=1 countdown=1': 17}
+  app: 10:46:03.002 PM [framestep] −1 after(400 ms)=33450 ms
+  app: 10:46:06.826 PM [framestep] −1 gotoPreviousFrame before=33450 ms
+      decoder notifies since: {'need_data=1 countdown=1': 2}
+      decoder notifies since: {'need_data=1 countdown=1': 6}
+  app: 10:46:06.872 PM [framestep] previousFrameStepped result=0 time=33450 ms
+      decoder notifies since: {'need_data=1 countdown=1': 21}
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+  app: 10:46:07.237 PM [framestep] −1 after(400 ms)=33417 ms
+  app: 10:46:11.056 PM [framestep] −1 gotoPreviousFrame before=33417 ms
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+      decoder notifies since: {'need_data=1 countdown=1': 3}
+  app: 10:46:11.120 PM [framestep] previousFrameStepped result=0 time=33417 ms
+      decoder notifies since: {'need_data=1 countdown=1': 19}
+  app: 10:46:11.477 PM [framestep] −1 after(400 ms)=33367 ms
+  app: 10:46:15.302 PM [framestep] −1 gotoPreviousFrame before=33367 ms
+      decoder notifies since: {'need_data=1 countdown=1': 2}
+      decoder notifies since: {'need_data=1 countdown=1': 7}
+  app: 10:46:15.371 PM [framestep] previousFrameStepped result=0 time=33367 ms
+      decoder notifies since: {'need_data=1 countdown=1': 17}
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+  app: 10:46:15.711 PM [framestep] −1 after(400 ms)=33333 ms
+  app: 10:46:39.900 PM [player] play (select) at 33333 ms
+    setter 0 -> 1 now=481758473383
+      decoder notifies since: {'need_data=1 countdown=1': 1}
+pause segment from [10:44:37.685 PM [player] pause (select) at 33205 ms]: check1 (GetBuffering, b_eof, need_data, demux_allowed) -> {('0', '0', '0', '0'): 6, ('1', '0', '0', '1'): 374}
+
+## gatecheck.py
+line 1065: GetBuffering=0 b_eof=0 need_data=0 -> demux_allowed=0   [after: 10:44:37.692 PM [player] state Paused at 33473 ms]
+   … held 1 evaluations (log lines 1065..1111)
+line 1112: GetBuffering=1 b_eof=0 need_data=0 -> demux_allowed=1   [after: 10:45:58.338 PM [player] buffering 0.0]
+   … held 118 evaluations (log lines 1112..1544)
+line 1545: GetBuffering=0 b_eof=0 need_data=0 -> demux_allowed=0   [after: 10:45:58.423 PM [player] buffering 1.0]
+   … held 1 evaluations (log lines 1545..1585)
+line 1586: GetBuffering=1 b_eof=0 need_data=0 -> demux_allowed=1   [after: 10:46:02.580 PM [player] buffering 0.0]
+   … held 67 evaluations (log lines 1586..1844)
+line 1845: GetBuffering=0 b_eof=0 need_data=0 -> demux_allowed=0   [after: 10:46:02.655 PM [player] buffering 1.0]
+   … held 1 evaluations (log lines 1845..1885)
+line 1886: GetBuffering=1 b_eof=0 need_data=0 -> demux_allowed=1   [after: 10:46:06.829 PM [player] buffering 0.0]
+   … held 65 evaluations (log lines 1886..2144)
+line 2145: GetBuffering=0 b_eof=0 need_data=0 -> demux_allowed=0   [after: 10:46:06.896 PM [player] buffering 1.0]
+   … held 1 evaluations (log lines 2145..2184)
+line 2185: GetBuffering=1 b_eof=0 need_data=0 -> demux_allowed=1   [after: 10:46:11.059 PM [player] buffering 0.0]
+   … held 63 evaluations (log lines 2185..2430)
+line 2431: GetBuffering=0 b_eof=0 need_data=0 -> demux_allowed=0   [after: 10:46:11.135 PM [player] buffering 1.0]
+   … held 1 evaluations (log lines 2431..2471)
+line 2472: GetBuffering=1 b_eof=0 need_data=0 -> demux_allowed=1   [after: 10:46:15.305 PM [player] buffering 0.0]
+   … held 61 evaluations (log lines 2472..2712)
+line 2713: GetBuffering=0 b_eof=0 need_data=0 -> demux_allowed=0   [after: 10:46:15.390 PM [player] buffering 1.0]
+   … held 1 evaluations (to end)
+totals (GetBuffering, b_eof, need_data, demux_allowed): {('0', '0', '0', '0'): 6, ('1', '0', '0', '1'): 374}
+
+## pausereads.py (trace)
+video/1: paused at trace t0; resumed at +122.14 s; last PCR before pause 35335001 ms
++  0s  PCR -                                  demux out -
++  5s  PCR -                                  demux out -
++ 10s  PCR -                                  demux out -
++ 15s  PCR -                                  demux out -
++ 20s  PCR -                                  demux out -
++ 25s  PCR -                                  demux out -
++ 30s  PCR -                                  demux out -
++ 35s  PCR -                                  demux out -
++ 40s  PCR -                                  demux out -
++ 45s  PCR -                                  demux out -
++ 50s  PCR -                                  demux out -
++ 55s  PCR -                                  demux out -
++ 60s  PCR -                                  demux out -
++ 65s  PCR -                                  demux out -
++ 70s  PCR -                                  demux out -
++ 75s  PCR -                                  demux out -
++ 80s  PCR 33116000..34418001 ms (87)         demux out {'video/1': 96, 'audio/2': 99}
++ 85s  PCR 33116000..34367367 ms (30)         demux out {'video/1': 35, 'audio/2': 35}
++ 90s  PCR 33116000..34334001 ms (29)         demux out {'video/1': 33, 'audio/2': 35}
++ 95s  PCR 33116000..34284001 ms (28)         demux out {'video/1': 33, 'audio/2': 35}
++100s  PCR -                                  demux out -
++105s  PCR -                                  demux out -
++110s  PCR -                                  demux out -
++115s  PCR -                                  demux out -
++120s  PCR 34304001..34304001 ms (1)          demux out -
++125s  PCR -                                  demux out -
+totals while paused: demux out {'video/1': 197, 'audio/2': 204}; highest PCR read 34451001 ms; read-ahead -884.000 s
+
+## resume60.py (trace)
+dropped 22 per 20 s [22, 0, 0] | late 2 per 20 s [2, 0, 0] | first video render +7.2 ms drift 102.1 ms | first audio render +1511.5 ms drift 0.0 ms | first audio DEC OUT +6.6 ms | audio − video first render 1504.2 ms
+
+## log at Play (1h check/wait lines omitted)
+10:46:39.900 PM [player] play (select) at 33333 ms
+[DBG] 1g: input control_unpause date=481758471969 now=481758471974
+[DBG] 1g: es_out change_pause paused=0 date=481758471969 now=481758472101 was_paused=1 old_pause_date=481636256804 buffering=0 extra_initial=0
+10:46:39.901 PM [player] state Playing at 33333 ms
+[DBG] 1g: es_out change_position now=481758472198 paused=1 pause_date=481636256804 buffering=0 next_frame_es=1
+10:46:39.901 PM [player] buffering 0.0
+[WARN] 1g: main_change_pause paused=0 date=481758471969 now=481758472353 pause_date=0 last.system=0 first_pcr.system=481635105802 start_time.system=0 wait_sync_ref.system=481734103846
+[WARN] 1g: main_change_pause resume: pause_date INVALID, no delay applied
+[DBG] 1h: decoder notify need_data=1 frames_countdown=1 now=481758472498
+[DBG] 1h: INPUT_CONTROL_NEED_DATA_FRAME_NEXT 0 -> 1 now=481758473383
+[DBG] 1g: vout change_pause paused=0 date=481758471969 now=481758473540
+10:46:39.903 PM [player] buffering 0.0
+[DBG] picture displayed late (missing 24376 ms)
+[DBG] Stream buffering done (1031 ms in 10 ms)
+10:46:39.913 PM [player] buffering 1.0
+[DBG] 1g: es_out stop_buffering now=481758484581 paused=0 pause_date=481758471969 current_date=481758484577 buffering_duration=1000000 update=481757484577 stream_start=34304001
+[WARN] 1g: main_reset now=481758484635 paused=0 pause_date=0 first_pcr.system=481635105802 last.system=0
+[WARN] 1g: main_reset now=481758484714 paused=0 pause_date=0 first_pcr.system=0 last.system=0
+[WARN] 1g: set_first_pcr now=481758484765 system=481757484577 ts=34304001 paused=0 pause_date=0
+[DBG] started
+[WARN] picture is too late to be displayed (missing 925 ms)
+[WARN] picture is too late to be displayed (missing 892 ms)
+[WARN] picture is too late to be displayed (missing 842 ms)
+[WARN] picture is too late to be displayed (missing 808 ms)
+[WARN] picture is too late to be displayed (missing 758 ms)
+[WARN] picture is too late to be displayed (missing 725 ms)
+[WARN] picture is too late to be displayed (missing 675 ms)
+[WARN] picture is too late to be displayed (missing 642 ms)
+[WARN] picture is too late to be displayed (missing 592 ms)
+[WARN] picture is too late to be displayed (missing 558 ms)
+[WARN] picture is too late to be displayed (missing 508 ms)
+[WARN] picture is too late to be displayed (missing 475 ms)
+[WARN] picture is too late to be displayed (missing 426 ms)
+[WARN] picture is too late to be displayed (missing 392 ms)
+[WARN] picture is too late to be displayed (missing 344 ms)
+[WARN] picture is too late to be displayed (missing 312 ms)
+[WARN] picture is too late to be displayed (missing 263 ms)
+[WARN] picture is too late to be displayed (missing 231 ms)
+[WARN] picture is too late to be displayed (missing 182 ms)
+[WARN] picture is too late to be displayed (missing 149 ms)
+[WARN] picture is too late to be displayed (missing 100 ms)
+[WARN] picture is too late to be displayed (missing 68 ms)
+[DBG] picture displayed late (missing 24 ms)
+10:47:42.451 PM [player] dismiss at 95824 ms, state Playing
+10:47:42.454 PM [player] state Stopping at 96374 ms
+
+## scripts
+### flagcheck.py
+# flagcheck.py <app log>: last player session of an instrumented (1h lines) run. Timeline of every write of
+# next_frame_need_data as the input sees it (setter old -> new, clears by control), with the nearest preceding app line;
+# decoder notify counts per segment between app lines; and check1 tuple totals per pause segment
+# (from each "[player] pause" / "state Paused" to the next "[player] play").
+import re, sys, collections
+lines = open(sys.argv[1], errors='replace').read().split('\n')
+st = [i for i, l in enumerate(lines) if '[player] play() called' in l]
+lines = lines[st[-1]:] if st else lines
+app = re.compile(r'^\d+:\d\d:\d\d\.\d\d\d.*\[(player|framestep)\]')
+last_app = ''
+notify = collections.Counter()
+seg = None; segs = []
+for i, l in enumerate(lines):
+    if app.match(l):
+        if notify:
+            print(f'      decoder notifies since: {dict(notify)}'); notify.clear()
+        last_app = l.strip()[:100]
+        if '[player] pause (' in l: seg = {'start': last_app, 'check1': collections.Counter()}; segs.append(seg)
+        if '[player] play (' in l: seg = None
+        if '[framestep]' in l or '[player] pause (' in l or '[player] play (' in l: print(f'  app: {last_app}')
+        continue
+    m = re.search(r'1h: INPUT_CONTROL_NEED_DATA_FRAME_NEXT (\d) -> (\d) now=(\d+)', l)
+    if m: print(f'    setter {m.group(1)} -> {m.group(2)} now={m.group(3)}')
+    m = re.search(r'1h: next_frame_need_data cleared by control (\d+) now=(\d+)', l)
+    if m: print(f'    cleared by control {m.group(1)} now={m.group(2)}')
+    m = re.search(r'1h: decoder notify need_data=(\d) frames_countdown=(-?\d+)', l)
+    if m: notify[f'need_data={m.group(1)} countdown={m.group(2)}'] += 1
+    m = re.search(r'1h: check1 .* es_out_GetBuffering=(\d) b_eof=(\d) next_frame_need_data=(\d) -> demux_allowed=(\d)', l)
+    if m and seg is not None: seg['check1'][m.group(1, 2, 3, 4)] += 1
+if notify: print(f'      decoder notifies since: {dict(notify)}')
+for s in segs:
+    print(f'pause segment from [{s["start"]}]: check1 (GetBuffering, b_eof, need_data, demux_allowed) -> {dict(s["check1"])}')
+### pausereads.py
+# pausereads.py <trace.json> [video id]: last session. Between the last vout 'paused' event and the next 'resumed':
+# per 5 s bucket, the demux PCR range and DEMUX OUT counts per stream; then the totals, the highest PCR read while
+# paused, the last PCR before the pause and the read-ahead (highest PCR while paused − last PCR before the pause).
+# The input demuxes while paused only when es_out is buffering or next_frame_need_data is set (input.c:668–669), so a
+# bucket with reads and no step in it marks the flag.
+import json, sys, collections
+vid = sys.argv[2] if len(sys.argv) > 2 else None
+ev = []
+for line in open(sys.argv[1], errors='replace'):
+    try: o = json.loads(line)
+    except Exception: continue
+    b = o['Body']; b['_t'] = int(o['Timestamp']); ev.append(b)
+ev.sort(key=lambda b: b['_t'])
+if vid is None:
+    vid = next((b['id'] for b in reversed(ev) if str(b.get('id', '')).startswith('video') and b.get('event') == 'paused'), 'video/1')
+pz = max(i for i, b in enumerate(ev) if b.get('id') == vid and b.get('event') == 'paused')
+rs = next((i for i in range(pz, len(ev)) if ev[i].get('id') == vid and ev[i].get('event') == 'resumed'), len(ev) - 1)
+t0 = ev[pz]['_t']; tr = ev[rs]['_t']
+pre = [int(b['pcr']) for b in ev[:pz] if b.get('type') == 'DEMUX' and b.get('id') == 'PCR']
+print(f'{vid}: paused at trace t0; resumed at +{(tr - t0) / 1e9:.2f} s; last PCR before pause {pre[-1] // 1000 if pre else None} ms')
+B = collections.OrderedDict(); tot = collections.Counter(); pcr_max = None
+for b in ev[pz:rs]:
+    k = int((b['_t'] - t0) // 5e9) * 5
+    d = B.setdefault(k, {'pcr': [], 'out': collections.Counter()})
+    if b.get('type') == 'DEMUX' and b.get('id') == 'PCR':
+        p = int(b['pcr']); d['pcr'].append(p // 1000); pcr_max = p if pcr_max is None else max(pcr_max, p)
+    if b.get('type') == 'DEMUX' and b.get('stream') == 'OUT':
+        d['out'][str(b.get('id'))] += 1; tot[str(b.get('id'))] += 1
+for k in range(0, int((tr - t0) / 1e9) + 5, 5):
+    d = B.get(k, {'pcr': [], 'out': collections.Counter()})
+    pr = f"{d['pcr'][0]}..{d['pcr'][-1]} ms ({len(d['pcr'])})" if d['pcr'] else '-'
+    print(f'+{k:3d}s  PCR {pr:34s} demux out {dict(d["out"]) if d["out"] else "-"}')
+print(f'totals while paused: demux out {dict(tot)}; highest PCR read {pcr_max // 1000 if pcr_max else None} ms; '
+      f'read-ahead {(pcr_max - pre[-1]) / 1e6 if pcr_max and pre else 0:.3f} s')
