@@ -8,8 +8,8 @@
 //  swipe its recognizers. Learned from Marlin DVR TV's PlayerHost (Passes 28/29): an edge
 //  *click* on the remote is a `UIPress` (.leftArrow/.rightArrow); a swipe is not a press at
 //  all, only touches — so click and swipe are told apart here and handed to the model as such.
-//  A slower horizontal drag is neither: a pan recognizer that waits for the side swipes to fail
-//  hands it to the model as a scrub (pass 2a).
+//  While paused, a horizontal swipe or drag is also a scrub (D021): a pan recognizer that runs
+//  alongside the swipes and begins only while paused hands it to the model.
 //
 
 import SwiftUI
@@ -45,22 +45,21 @@ final class PlayerHostController: UIViewController {
         surface.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         surface.backgroundColor = .black
         view.addSubview(surface)
-        var sideSwipes: [UISwipeGestureRecognizer] = []
         for (direction, name) in [(UISwipeGestureRecognizer.Direction.left, "left"), (.right, "right"), (.up, "up"), (.down, "down")] {
             let swipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped(_:)))
             swipe.direction = direction
             swipe.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirect.rawValue)]
             swipe.name = name
             surface.addGestureRecognizer(swipe)
-            if direction == .left || direction == .right { sideSwipes.append(swipe) }
         }
-        // Pass 2a: a horizontal drag scrubs. A flick stays a swipe (D008's skips), so the drag waits for the left
-        // and right swipes to fail; a mostly vertical drag never begins one (see gestureRecognizerShouldBegin).
+        // D021: while paused, a horizontal swipe or drag scrubs. The pan runs alongside the swipes rather than waiting
+        // for them to fail — waiting let every paused flick end as a swipe with no scrub (pass 2d). It begins only
+        // while paused and for a drag that travels more across than up or down, so while playing the swipes keep
+        // D008's skips (see gestureRecognizerShouldBegin).
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
         pan.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirect.rawValue)]
         pan.name = "scrub"
         pan.delegate = self
-        for swipe in sideSwipes { pan.require(toFail: swipe) }
         surface.addGestureRecognizer(pan)
         model.attach(drawable: surface)
     }
@@ -129,11 +128,22 @@ final class PlayerHostController: UIViewController {
 }
 
 extension PlayerHostController: UIGestureRecognizerDelegate {
-    /// Pass 2a: the scrub pan begins only for a drag that has travelled more across than up or down.
+    /// D021: the scrub pan begins only while paused, for a drag that has travelled more across than up or down.
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return true }
         let t = pan.translation(in: pan.view)
-        return abs(t.x) > abs(t.y)
+        guard abs(t.x) > abs(t.y) else { return false }
+        if model.isPlaying {
+            EvidenceLog.line("[scrub] drag while playing: no action")
+            return false
+        }
+        return true
+    }
+
+    /// The pan and the swipes recognize together, so a paused swipe also scrubs and neither blocks the other.
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
+        gestureRecognizer is UIPanGestureRecognizer || other is UIPanGestureRecognizer
     }
 }
 

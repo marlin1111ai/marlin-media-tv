@@ -51,7 +51,7 @@ marlin1111ai/marlin-media (DECISIONS.md there) and are referenced by their numbe
 
 ## 2026-09-15 — pass 2c
 
-- **D021** touch-surface scrub with a preview playhead. **The interaction:**
+- **D021** touch-surface scrub with a preview playhead. **Revised in pass 2d (below) to the owner's flow: the pass 2c interaction here is superseded** — a drag no longer pauses playback, Menu no longer restores a playing state, and the pan no longer waits for the swipes to fail. The pass 2c interaction, kept for the record:
   - **The drag.** A horizontal drag on the Siri Remote's touch surface pauses playback and shows the scrub bar. The pan waits for the left/right swipes to fail and begins only when mostly horizontal (`PlayerHost.swift`). The bar is frame 10's timeline row in frames 14/15's place: the target's elapsed and remaining time, and a mark where the drag began (`PlayerScreen.swift`).
   - **The rate.** One surface width moves the target by **25% of the running time**. The target stops 1 s short of the end.
   - **The picture holds.** Nothing seeks during the drag or on lift: the picture stays on the frame the drag began at, and only the bar, the target and the times move.
@@ -70,3 +70,35 @@ marlin1111ai/marlin-media (DECISIONS.md there) and are referenced by their numbe
   **Observed, not decided:** a pause after a landing lets the demuxer read at 1× while paused until resume, up to ~36 s of stream. It happened on all four films, with or without a subtitle track. No seek is involved and no landing moved.
 
   Evidence: `reports/2026-09-15-pass2a-scrubbing.md`, `reports/2026-09-15-pass2b-fast-seek.md`, `reports/2026-09-15-pass2c-scrub-preview.md`, `reports/logs/2a-analysis.txt`, `reports/logs/2c-analysis.txt`.
+
+## 2026-09-15 — pass 2d
+
+- **D021 (revised)** touch-surface scrub: **the owner's flow**. Supersedes the pass 2c interaction above.
+
+  **The flow:**
+  1. **Play/Pause pauses** the film (D008).
+  2. **Paused, a swipe or drag scrubs.** The scrub bar appears once the drag moves the target (frame 10's timeline row in frames 14/15's place; `PlayerScreen.swift`). The picture holds; nothing seeks during the drag or on lift.
+     - **The pan** on the touch surface runs **alongside** the swipe recognizers (it no longer waits for them to fail). It begins only **while paused**, for a drag that travels more across than up or down (`PlayerHost.swift`).
+     - **The rate.** One surface width moves the target by **25% of the running time**; the target stops 1 s short of the end.
+  3. **Paused, a left/right click steps back/forward one frame** (D008) whenever no scrub is up. A touch that comes with a click moves no target, so it shows no bar and holds back no click. A press also ends a drag that has not moved the target (`PlayerModel.swift`).
+  4. **Play/Pause, or a click on the touch surface, lands** at the target and plays: `play()`, then one seek.
+  5. **Menu cancels** with no seek. The film stays paused where the drag began.
+  6. **While playing, a drag does nothing** (`[scrub] drag while playing: no action`). Swipes and clicks keep D008's −10 s / +30 s.
+  7. **While a scrub is up,** arrows, swipes and up/down do nothing (logged).
+
+  **Why the pass 2c pan changed.** From the owner's session on the real remote (`reports/logs/2d-owner-remote-session.log.gz`): because the pan waited for the side swipes to fail, a paused flick was recognized as a swipe and dropped by D008's paused rule. That showed as `right swipe while paused: no action (frame step is on click)` 19 times, with only 4 `[scrub] begin` in the same session. Touches around a click, or after swipe skips, also started scrubs while playing (`[scrub] begin at 1023072 ms playing=true` right after a click landing).
+
+  **Still rejected:** seeking during the drag (pass 2a) and VLC's fast seek (pass 2b), as above.
+
+  **Measured** (pass 2d, Home Theater, drags scripted through the model; the recognizer is the owner's hand test):
+  - **Scope:** 24 paused scrubs on Stargate, Wonder Woman, Divergent and Magicians S1E1.
+  - **16 landings** (8 Play/Pause, 8 click): first picture −74 to +94 ms from the target, 0.06–0.94 s after the press, at most 1 dropped and 1 late in 30 s.
+  - **8 Menu cancels:** paused at the start (0 ms).
+  - **The held picture:** one PTS through every drag.
+  - **8 drags while playing:** refused, no pause.
+  - **Skips:** exact.
+  - **Frame steps:** 5 left + 5 right clicks were one picture each on all four films (pixel comparison: the right clicks retrace the left ones with a difference of 0).
+
+  **Observed, not decided** (as in pass 2c): a pause after a landing lets the demuxer read at 1× while paused, up to ~36 s of stream.
+
+  Evidence: `reports/2026-09-15-pass2d-owner-flow.md`, `reports/logs/2d-analysis.txt`.
