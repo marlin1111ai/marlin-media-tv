@@ -1,0 +1,509 @@
+# pass 1k — native frame-back close-out, Home Theater, 2026-09-14 23:44 → 2026-09-15 01:02
+# build: HEAD 0b4bbff + reports/logs/1f-playermodel-native-prevframe.diff (committed in pass 1k); Frameworks/ = full recipe, 20 patches (libvlc 9279ed3615), 0 trace strings
+# harness: temporary Diag1kUITests (pass 1j's Diag1jUITests renamed); each run = console launch with VLCKit's tvOS defaults + JSON tracer, attach test
+#   step 2 run: play 30 s, pause, hold 77 s, five clicks ~4.2 s apart (L / R / none), 20 s, Play, 60 s (screenshots at Play+3 s / +60 s)
+#   step 3 run (pass 1f pattern): play 60 s, pause, 5 × L, 5 × R, 5 × L (4.2 s apart, screenshot 3 s after each), Play, 20 s
+# logs: reports/logs/1k-<run>.log.gz (redacted); traces off-repo; screenshots reports/screenshots/1k-exact/, 1k-clock/, 1k-<run>-{06,07}*.jpg
+
+## chain
+chain start 23:44:29
+1f diff applied: yes
+** TEST BUILD SUCCEEDED **
+app framework trace strings: 0
+App installed:
+Test Case '-[Marlin_Media_TVUITests.Diag1kUITests t0_AttachAndPlay]' passed (48.601 seconds).
+container chars       85
+stargate-exact passed 23:48:56
+divergent-exact passed 23:52:12
+ww-exact passed 23:55:33
+stargate-none passed 23:59:54
+stargate-back passed 00:04:15
+stargate-fwd passed 00:08:36
+ww-none passed 00:13:02
+ww-back passed 00:17:29
+ww-fwd passed 00:21:56
+divergent-none passed 00:26:15
+divergent-back passed 00:30:35
+divergent-fwd passed 00:34:56
+magicians-none passed 00:39:25
+magicians-back passed 00:43:58
+magicians-fwd passed 00:48:26
+food-none passed 00:52:58
+food-back passed 00:57:31
+food-fwd passed 01:02:06
+chain end 01:02:06
+
+[exited with code 0]
+
+## step 2 — matrix1k.py (audio start NOT measured; 'scheduled' = first audio DEC OUT pts through an on-time picture; n/a for no-step runs, whose renderer was not flushed)
+stargate-none: spu ['spu/4'] | steps back 0 fwd 0 | pause at 33954 ms, Play at 33954 ms, paused 121.0 s | 60 s after resume: dropped 0, late 1 | first picture +43.8 ms pts 34001.0 drift -3.7 | first audio DEC OUT +40.9 ms pts 35392.0; scheduled 1394.7 ms after the first picture (via on-time picture pts 34001.0)
+stargate-back: spu ['spu/4'] | steps back 5 fwd 0 | pause at 33974 ms, Play at 33834 ms, paused 122.2 s | 60 s after resume: dropped 21, late 2 | first picture +9.8 ms pts 33834.0 drift -952.9 | first audio DEC OUT +1.3 ms pts 34912.0; scheduled 130.1 ms after the first picture (via on-time picture pts 34868.0)
+stargate-fwd: spu ['spu/4'] | steps back 0 fwd 5 | pause at 33975 ms, Play at 34251 ms, paused 122.2 s | 60 s after resume: dropped 26, late 1 | first picture +89.6 ms pts 34251.0 drift -1170.0 | first audio DEC OUT +1.0 ms pts 35424.0; scheduled 5.8 ms after the first picture (via on-time picture pts 35452.0)
+ww-none: spu none | steps back 0 fwd 0 | pause at 34060 ms, Play at 34060 ms, paused 121.2 s | 60 s after resume: dropped 0, late 0 | first picture +93.7 ms pts 34159.0 drift 7.2 | first audio DEC OUT +59.3 ms pts 35500.5; scheduled 1351.0 ms after the first picture (via on-time picture pts 34201.0)
+ww-back: spu none | steps back 5 fwd 0 | pause at 34024 ms, Play at 33867 ms, paused 122.4 s | 60 s after resume: dropped 21, late 2 | first picture +1.0 ms pts 33867.0 drift -24297.8 | first audio DEC OUT +5.1 ms pts 34773.0; scheduled 127.2 ms after the first picture (via on-time picture pts 34952.0)
+ww-fwd: spu none | steps back 0 fwd 5 | pause at 34027 ms, Play at 34326 ms, paused 122.4 s | 60 s after resume: dropped 29, late 1 | first picture +89.1 ms pts 34326.0 drift -1166.6 | first audio DEC OUT +3.4 ms pts 35518.8; scheduled 30.8 ms after the first picture (via on-time picture pts 35661.0)
+divergent-none: spu none | steps back 0 fwd 0 | pause at 33851 ms, Play at 33860 ms, paused 121.5 s | 60 s after resume: dropped 0, late 0 | first picture +53.8 ms pts 33909.0 drift -4.6 | first audio DEC OUT +150.0 ms pts 35456.3; scheduled 1551.9 ms after the first picture (via on-time picture pts 33909.0)
+divergent-back: spu none | steps back 5 fwd 0 | pause at 33878 ms, Play at 33742 ms, paused 122.6 s | 60 s after resume: dropped 25, late 1 | first picture +5.8 ms pts 33742.0 drift -8.4 | first audio DEC OUT +0.8 ms pts 34933.0; scheduled 193.7 ms after the first picture (via on-time picture pts 34910.0)
+divergent-fwd: spu none | steps back 0 fwd 5 | pause at 33967 ms, Play at 34243 ms, paused 122.7 s | 60 s after resume: dropped 29, late 1 | first picture +87.1 ms pts 34243.0 drift -1210.6 | first audio DEC OUT +9.8 ms pts 35466.7; scheduled 15.7 ms after the first picture (via on-time picture pts 35619.0)
+magicians-none: spu none | steps back 0 fwd 0 | pause at 33832 ms, Play at 33838 ms, paused 121.7 s | 60 s after resume: dropped 0, late 2 | first picture +83.3 ms pts 33869.8 drift -45.3 | first audio DEC OUT +96.2 ms pts 35294.4; scheduled 1384.7 ms after the first picture (via on-time picture pts 34036.6)
+magicians-back: spu none | steps back 5 fwd 0 | pause at 33599 ms, Play at 33469 ms, paused 122.9 s | 60 s after resume: dropped 29, late 2 | first picture +11.8 ms pts 33469.4 drift -1004.1 | first audio DEC OUT +9.7 ms pts 34574.5; scheduled 110.4 ms after the first picture (via on-time picture pts 34537.1)
+magicians-fwd: spu none | steps back 0 fwd 5 | pause at 33570 ms, Play at 33769 ms, paused 123.0 s | 60 s after resume: dropped 45, late 2 | first picture +89.3 ms pts 33769.7 drift -1527.1 | first audio DEC OUT +0.4 ms pts 35294.3; scheduled 0.6 ms after the first picture (via on-time picture pts 35371.3)
+food-none: spu none | steps back 0 fwd 0 | pause at 33632 ms, Play at 33632 ms, paused 121.1 s | 60 s after resume: dropped 0, late 0 | first picture +35.9 ms pts 33667.0 drift -5.1 | first audio DEC OUT +50.8 ms pts 35252.9; scheduled 1588.9 ms after the first picture (via on-time picture pts 33700.3)
+food-back: spu none | steps back 5 fwd 0 | pause at 33635 ms, Play at 33500 ms, paused 122.4 s | 60 s after resume: dropped 28, late 2 | first picture +10.7 ms pts 33500.1 drift -977.0 | first audio DEC OUT +10.0 ms pts 34579.5; scheduled 102.9 ms after the first picture (via on-time picture pts 34534.5)
+food-fwd: spu none | steps back 0 fwd 5 | pause at 33645 ms, Play at 33867 ms, paused 122.3 s | 60 s after resume: dropped 41, late 1 | first picture +99.6 ms pts 33867.2 drift -1396.9 | first audio DEC OUT +0.5 ms pts 35252.9; scheduled -7.8 ms after the first picture (via on-time picture pts 35335.3)
+
+## step 2 — late / too-late lines after Play in the no-step controls (app log) and trace 'late' events
+-- stargate-none
+  [DBG] picture displayed late (missing 3 ms)   [after: 11:58:43.089 PM [player] state Playing at 33954 ms]
+  displayed late 1, too late 0
+-- ww-none
+  displayed late 0, too late 0
+-- divergent-none
+  displayed late 0, too late 0
+-- magicians-none
+  [DBG] picture displayed late (missing 44 ms)   [after: 12:38:06.428 AM [player] state Playing at 33838 ms]
+  [DBG] picture displayed late (missing 14 ms)   [after: 12:38:06.428 AM [player] state Playing at 33838 ms]
+  displayed late 2, too late 0
+-- food-none
+  displayed late 0, too late 0
+-- pass 1i stargate-none (reports/logs/1i-clean-stargate-none.log): displayed late 0, too late 0
+
+## step 2 — ww-back resume (first picture 24 s late)
+12:16:11.283 AM [player] play (select) at 33867 ms
+12:16:11.284 AM [player] state Playing at 33867 ms
+12:16:11.284 AM [player] buffering 0.0
+[DBG] picture displayed late (missing 24297 ms)
+[WARN] picture is too late to be displayed (missing 24257 ms)
+[WARN] picture is too late to be displayed (missing 24215 ms)
+12:16:11.299 AM [player] buffering 0.0
+
+## step 2 — on-screen clock (Vision OCR of the clock crop, reports/screenshots/1k-clock/)
+divergent-back-06-play+3s.png: 00:37 | Playing
+divergent-back-07-play+60s.png: 01:34 | Playing
+divergent-fwd-06-play+3s.png: 00:38 | Playing
+divergent-fwd-07-play+60s.png: 01:35 | Playing
+divergent-none-06-play+3s.png: 00:37 | Playing
+divergent-none-07-play+60s.png: 01:34 | Playing
+food-back-06-play+3s.png: 00:37 | Playing
+food-back-07-play+60s.png: 01:34 | Playing
+food-fwd-06-play+3s.png: 00:38 | Playing
+food-fwd-07-play+60s.png: 01:35 | Playing
+food-none-06-play+3s.png: 00:36 | Playing
+food-none-07-play+60s.png: 01:33 | Playing
+magicians-back-06-play+3s.png: 00:37 | Playing
+magicians-back-07-play+60s.png: 01:34 | Playing
+magicians-fwd-06-play+3s.png: 00:38 | Playing
+magicians-fwd-07-play+60s.png: 01:35 | Playing
+magicians-none-06-play+3s.png: 00:37 | • | Playing
+magicians-none-07-play+60s.png: 01:34 | Playing
+stargate-back-06-play+3s.png: 00:37 | Playing
+stargate-back-07-play+60s.png: 01:34 | Playing
+stargate-fwd-06-play+3s.png: 00:38 | Playing
+stargate-fwd-07-play+60s.png: 01:35 | Playing
+stargate-none-06-play+3s.png: 00:37 | Playing
+stargate-none-07-play+60s.png: 01:34 | Playing
+ww-back-06-play+3s.png: 00:37 | Playing
+ww-back-07-play+60s.png: 01:34 | Playing
+ww-fwd-06-play+3s.png: 00:38 | Playing
+ww-fwd-07-play+60s.png: 01:35 | Playing
+ww-none-06-play+3s.png: 00:37 | Playing
+ww-none-07-play+60s.png: 01:34 | Playing
+
+## step 3 — decode runs grouped by > 1 s gaps, VLC previous-frame rule (second-to-last OUT), with the app's per-click lines (stepgap.py)
+== stargate-exact
+group  1 +  3.69 s: n=  10 pts 63647..64031 last3 [63947, 63981, 64031] -> back step shows 63981
+group  2 +  7.78 s: n=  10 pts 63647..64064 last3 [63897, 63947, 63981] -> back step shows 63947 step -34 ms
+group  3 + 12.05 s: n=  18 pts 63647..64031 last3 [63864, 63897, 63947] -> back step shows 63897 step -50 ms
+group  4 + 16.31 s: n=   7 pts 63647..63897 last3 [63814, 63864, 63897] -> back step shows 63864 step -33 ms
+group  5 + 20.53 s: n=   6 pts 63647..63864 last3 [63780, 63814, 63864] -> back step shows 63814 step -50 ms
+group  6 + 28.97 s: n=   1 pts 63897..63897 last3 [63897] (refill / forward)
+group  7 + 33.21 s: n=   1 pts 63947..63947 last3 [63947] (refill / forward)
+group  8 + 37.44 s: n=   1 pts 63981..63981 last3 [63981] (refill / forward)
+group  9 + 41.69 s: n=   1 pts 64031..64031 last3 [64031] (refill / forward)
+group 10 + 45.95 s: n=  10 pts 63647..64031 last3 [63947, 63981, 64031] -> back step shows 63981 step +167 ms
+group 11 + 50.16 s: n=  10 pts 63647..64064 last3 [63897, 63947, 63981] -> back step shows 63947 step -34 ms
+group 12 + 54.40 s: n=  18 pts 63647..64031 last3 [63864, 63897, 63947] -> back step shows 63897 step -50 ms
+group 13 + 58.63 s: n=   8 pts 63647..63981 last3 [63814, 63864, 63897] -> back step shows 63864 step -33 ms
+group 14 + 62.90 s: n=   6 pts 63647..63864 last3 [63780, 63814, 63864] -> back step shows 63814 step -50 ms
+11:47:21.904 −1 gotoPreviousFrame before=63974 ms	11:47:22.312 −1 after(400 ms)=63981 ms
+11:47:26.149 −1 gotoPreviousFrame before=63981 ms	11:47:26.569 −1 after(400 ms)=63947 ms
+11:47:30.390 −1 gotoPreviousFrame before=63947 ms	11:47:30.808 −1 after(400 ms)=63897 ms
+11:47:34.626 −1 gotoPreviousFrame before=63897 ms	11:47:35.062 −1 after(400 ms)=63864 ms
+11:47:38.855 −1 gotoPreviousFrame before=63864 ms	11:47:39.266 −1 after(400 ms)=63814 ms
+11:47:43.096 +1 gotoNextFrame before=63814 ms	11:47:43.500 +1 after(400 ms)=63864 ms
+11:47:47.340 +1 gotoNextFrame before=63864 ms	11:47:47.751 +1 after(400 ms)=63897 ms
+11:47:51.577 +1 gotoNextFrame before=63897 ms	11:47:52.013 +1 after(400 ms)=63947 ms
+11:47:55.812 +1 gotoNextFrame before=63947 ms	11:47:56.222 +1 after(400 ms)=63981 ms
+11:48:00.063 +1 gotoNextFrame before=63981 ms	11:48:00.470 +1 after(400 ms)=64031 ms
+11:48:04.290 −1 gotoPreviousFrame before=64031 ms	11:48:04.701 −1 after(400 ms)=63981 ms
+11:48:08.536 −1 gotoPreviousFrame before=63981 ms	11:48:08.962 −1 after(400 ms)=63947 ms
+11:48:12.768 −1 gotoPreviousFrame before=63947 ms	11:48:13.194 −1 after(400 ms)=63897 ms
+11:48:17.005 −1 gotoPreviousFrame before=63897 ms	11:48:17.433 −1 after(400 ms)=63864 ms
+11:48:21.234 −1 gotoPreviousFrame before=63864 ms	11:48:21.654 −1 after(400 ms)=63814 ms
+
+== divergent-exact
+group  1 +  3.71 s: n= 440 pts 54763..63897 last3 [63814, 63855, 63897] -> back step shows 63855
+group  2 +  7.85 s: n= 221 pts 54763..63981 last3 [63772, 63814, 63855] -> back step shows 63814 step -41 ms
+group  3 + 12.15 s: n= 220 pts 54763..63939 last3 [63730, 63772, 63814] -> back step shows 63772 step -42 ms
+group  4 + 16.46 s: n= 219 pts 54763..63897 last3 [63689, 63730, 63772] -> back step shows 63730 step -42 ms
+group  5 + 20.76 s: n= 218 pts 54763..63855 last3 [63647, 63689, 63730] -> back step shows 63689 step -41 ms
+group  6 + 25.04 s: n=   3 pts 63772..63855 last3 [63772, 63814, 63855] (refill / forward)
+group  7 + 42.23 s: n=   4 pts 63897..64022 last3 [63939, 63981, 64022] -> back step shows 63981 step +292 ms
+group  8 + 46.57 s: n= 440 pts 54763..63897 last3 [63814, 63855, 63897] -> back step shows 63855 step -126 ms
+group  9 + 50.79 s: n= 221 pts 54763..63981 last3 [63772, 63814, 63855] -> back step shows 63814 step -41 ms
+group 10 + 55.08 s: n= 220 pts 54763..63939 last3 [63730, 63772, 63814] -> back step shows 63772 step -42 ms
+group 11 + 59.40 s: n= 219 pts 54763..63897 last3 [63689, 63730, 63772] -> back step shows 63730 step -42 ms
+group 12 + 63.70 s: n= 218 pts 54763..63855 last3 [63647, 63689, 63730] -> back step shows 63689 step -41 ms
+group 13 + 68.01 s: n=   2 pts 63772..63814 last3 [63772, 63814] (refill / forward)
+11:50:34.550 −1 gotoPreviousFrame before=63866 ms	11:50:34.975 −1 after(400 ms)=63866 ms
+11:50:38.835 −1 gotoPreviousFrame before=63855 ms	11:50:39.247 −1 after(400 ms)=63855 ms
+11:50:43.135 −1 gotoPreviousFrame before=63814 ms	11:50:43.557 −1 after(400 ms)=63814 ms
+11:50:47.446 −1 gotoPreviousFrame before=63772 ms	11:50:47.869 −1 after(400 ms)=63772 ms
+11:50:51.744 −1 gotoPreviousFrame before=63730 ms	11:50:52.174 −1 after(400 ms)=63730 ms
+11:50:56.021 +1 gotoNextFrame before=63689 ms	11:50:56.453 +1 after(400 ms)=63730 ms
+11:51:00.313 +1 gotoNextFrame before=63730 ms	11:51:00.735 +1 after(400 ms)=63772 ms
+11:51:04.603 +1 gotoNextFrame before=63772 ms	11:51:05.017 +1 after(400 ms)=63814 ms
+11:51:08.905 +1 gotoNextFrame before=63814 ms	11:51:09.322 +1 after(400 ms)=63855 ms
+11:51:13.205 +1 gotoNextFrame before=63855 ms	11:51:13.621 +1 after(400 ms)=63897 ms
+11:51:17.496 −1 gotoPreviousFrame before=63897 ms	11:51:17.929 −1 after(400 ms)=63897 ms
+11:51:21.781 −1 gotoPreviousFrame before=63855 ms	11:51:22.199 −1 after(400 ms)=63855 ms
+11:51:26.069 −1 gotoPreviousFrame before=63814 ms	11:51:26.490 −1 after(400 ms)=63814 ms
+11:51:30.385 −1 gotoPreviousFrame before=63772 ms	11:51:30.807 −1 after(400 ms)=63772 ms
+11:51:34.685 −1 gotoPreviousFrame before=63730 ms	11:51:35.093 −1 after(400 ms)=63730 ms
+
+== ww-exact
+group  1 +  0.01 s: n=   2 pts 64147..64189 last3 [64147, 64189] (refill / forward)
+group  2 +  4.03 s: n=  75 pts 62771..63772 last3 [63689, 63730, 63772] -> back step shows 63730
+group  3 +  7.90 s: n=  29 pts 62771..63981 last3 [63647, 63689, 63730] -> back step shows 63689 step -41 ms
+group  4 + 12.25 s: n=  23 pts 62771..63689 last3 [63605, 63647, 63689] -> back step shows 63647 step -42 ms
+group  5 + 16.45 s: n=  23 pts 62771..63730 last3 [63564, 63605, 63647] -> back step shows 63605 step -42 ms
+group  6 + 20.75 s: n=  23 pts 62771..63730 last3 [63522, 63564, 63605] -> back step shows 63564 step -41 ms
+group  7 + 29.35 s: n=   3 pts 63647..63730 last3 [63647, 63689, 63730] (refill / forward)
+group  8 + 42.23 s: n=   6 pts 63772..63981 last3 [63897, 63939, 63981] -> back step shows 63939 step +375 ms
+group  9 + 46.60 s: n=  78 pts 62771..63897 last3 [63689, 63730, 63772] -> back step shows 63730 step -209 ms
+group 10 + 50.79 s: n=  29 pts 62771..63981 last3 [63647, 63689, 63730] -> back step shows 63689 step -41 ms
+group 11 + 55.16 s: n=  23 pts 62771..63689 last3 [63605, 63647, 63689] -> back step shows 63647 step -42 ms
+group 12 + 59.38 s: n=  23 pts 62771..63730 last3 [63564, 63605, 63647] -> back step shows 63605 step -42 ms
+group 13 + 63.65 s: n=  23 pts 62771..63730 last3 [63522, 63564, 63605] -> back step shows 63564 step -41 ms
+11:53:52.278 −1 gotoPreviousFrame before=63732 ms	11:53:52.693 −1 after(400 ms)=63732 ms
+11:53:56.575 −1 gotoPreviousFrame before=63730 ms	11:53:57.000 −1 after(400 ms)=63689 ms
+11:54:00.862 −1 gotoPreviousFrame before=63689 ms	11:54:01.283 −1 after(400 ms)=63647 ms
+11:54:05.129 −1 gotoPreviousFrame before=63647 ms	11:54:05.548 −1 after(400 ms)=63605 ms
+11:54:09.426 −1 gotoPreviousFrame before=63605 ms	11:54:09.841 −1 after(400 ms)=63564 ms
+11:54:13.724 +1 gotoNextFrame before=63564 ms	11:54:14.157 +1 after(400 ms)=63605 ms
+11:54:18.019 +1 gotoNextFrame before=63605 ms	11:54:18.433 +1 after(400 ms)=63647 ms
+11:54:22.310 +1 gotoNextFrame before=63647 ms	11:54:22.743 +1 after(400 ms)=63689 ms
+11:54:26.611 +1 gotoNextFrame before=63689 ms	11:54:27.035 +1 after(400 ms)=63730 ms
+11:54:30.893 +1 gotoNextFrame before=63730 ms	11:54:31.308 +1 after(400 ms)=63772 ms
+11:54:35.191 −1 gotoPreviousFrame before=63772 ms	11:54:35.620 −1 after(400 ms)=63772 ms
+11:54:39.474 −1 gotoPreviousFrame before=63730 ms	11:54:39.888 −1 after(400 ms)=63689 ms
+11:54:43.760 −1 gotoPreviousFrame before=63689 ms	11:54:44.170 −1 after(400 ms)=63647 ms
+11:54:48.058 −1 gotoPreviousFrame before=63647 ms	11:54:48.468 −1 after(400 ms)=63605 ms
+11:54:52.331 −1 gotoPreviousFrame before=63605 ms	11:54:52.750 −1 after(400 ms)=63564 ms
+
+
+## step 3 — screenshot MAD matrices (exact1k.py)
+stargate-exact   MAD ×10 (0 = same picture):
+        00-pau   01-L   02-L   03-L   04-L   05-L   06-R   07-R   08-R   09-R   10-R   11-L   12-L   13-L   14-L   15-L
+  00-pau      0     12     22     29     36     40     36     29     22     12      0     12     22     29     36     40
+    01-L     12      0     15     24     32     37     32     24     15      0     12      0     15     24     32     37
+    02-L     22     15      0     14     25     31     25     14      0     15     22     15      0     14     25     31
+    03-L     29     24     14      0     16     24     16      0     14     24     29     24     14      0     16     24
+    04-L     36     32     25     16      0     13      0     16     25     32     36     32     25     16      0     13
+    05-L     40     37     31     24     13      0     13     24     31     37     40     37     31     24     13      0
+    06-R     36     32     25     16      0     13      0     16     25     32     36     32     25     16      0     13
+    07-R     29     24     14      0     16     24     16      0     14     24     29     24     14      0     16     24
+    08-R     22     15      0     14     25     31     25     14      0     15     22     15      0     14     25     31
+    09-R     12      0     15     24     32     37     32     24     15      0     12      0     15     24     32     37
+    10-R      0     12     22     29     36     40     36     29     22     12      0     12     22     29     36     40
+    11-L     12      0     15     24     32     37     32     24     15      0     12      0     15     24     32     37
+    12-L     22     15      0     14     25     31     25     14      0     15     22     15      0     14     25     31
+    13-L     29     24     14      0     16     24     16      0     14     24     29     24     14      0     16     24
+    14-L     36     32     25     16      0     13      0     16     25     32     36     32     25     16      0     13
+    15-L     40     37     31     24     13      0     13     24     31     37     40     37     31     24     13      0
+divergent-exact   MAD ×10 (0 = same picture):
+        00-pau   01-L   02-L   03-L   04-L   05-L   06-R   07-R   08-R   09-R   10-R   11-L   12-L   13-L   14-L   15-L
+  00-pau      0      7     11     14     16     17     16     14     11      7      0      7     11     14     16     17
+    01-L      7      0      6     11     14     16     14     11      6      0      7      0      6     11     14     16
+    02-L     11      6      0      7     11     14     11      7      0      6     11      6      0      7     11     14
+    03-L     14     11      7      0      7     11      7      0      7     11     14     11      7      0      7     11
+    04-L     16     14     11      7      0      7      0      7     11     14     16     14     11      7      0      7
+    05-L     17     16     14     11      7      0      7     11     14     16     17     16     14     11      7      0
+    06-R     16     14     11      7      0      7      0      7     11     14     16     14     11      7      0      7
+    07-R     14     11      7      0      7     11      7      0      7     11     14     11      7      0      7     11
+    08-R     11      6      0      7     11     14     11      7      0      6     11      6      0      7     11     14
+    09-R      7      0      6     11     14     16     14     11      6      0      7      0      6     11     14     16
+    10-R      0      7     11     14     16     17     16     14     11      7      0      7     11     14     16     17
+    11-L      7      0      6     11     14     16     14     11      6      0      7      0      6     11     14     16
+    12-L     11      6      0      7     11     14     11      7      0      6     11      6      0      7     11     14
+    13-L     14     11      7      0      7     11      7      0      7     11     14     11      7      0      7     11
+    14-L     16     14     11      7      0      7      0      7     11     14     16     14     11      7      0      7
+    15-L     17     16     14     11      7      0      7     11     14     16     17     16     14     11      7      0
+ww-exact   MAD ×10 (0 = same picture):
+        00-pau   01-L   02-L   03-L   04-L   05-L   06-R   07-R   08-R   09-R   10-R   11-L   12-L   13-L   14-L   15-L
+  00-pau      0    137    213    263    291    311    291    263    213    137      0    137    213    263    291    311
+    01-L    137      0    143    219    264    289    264    219    143      0    137      0    143    219    264    289
+    02-L    213    143      0    146    220    264    220    146      0    143    213    143      0    146    220    264
+    03-L    263    219    146      0    148    218    148      0    146    219    263    219    146      0    148    218
+    04-L    291    264    220    148      0    149      0    148    220    264    291    264    220    148      0    149
+    05-L    311    289    264    218    149      0    149    218    264    289    311    289    264    218    149      0
+    06-R    291    264    220    148      0    149      0    148    220    264    291    264    220    148      0    149
+    07-R    263    219    146      0    148    218    148      0    146    219    263    219    146      0    148    218
+    08-R    213    143      0    146    220    264    220    146      0    143    213    143      0    146    220    264
+    09-R    137      0    143    219    264    289    264    219    143      0    137      0    143    219    264    289
+    10-R      0    137    213    263    291    311    291    263    213    137      0    137    213    263    291    311
+    11-L    137      0    143    219    264    289    264    219    143      0    137      0    143    219    264    289
+    12-L    213    143      0    146    220    264    220    146      0    143    213    143      0    146    220    264
+    13-L    263    219    146      0    148    218    148      0    146    219    263    219    146      0    148    218
+    14-L    291    264    220    148      0    149      0    148    220    264    291    264    220    148      0    149
+    15-L    311    289    264    218    149      0    149    218    264    289    311    289    264    218    149      0
+
+## step 3 — per-click window attempts (not used for the result; they misattribute VideoToolbox decode runs)
+stargate-exact:
+  paused picture pts 63981 ms (click 1 run ends there)
+  click  1 L at 11:47:21.904  before 63974  after(400 ms) 63981 | trace: 2 run(s), last run ends [63897, 63947, 63981]; picture pts 63947 ms; grid positions moved -1
+  click  2 L at 11:47:26.149  before 63981  after(400 ms) 63947 | trace: 2 run(s), last run ends [63864, 63897, 63947]; picture pts 63897 ms; grid positions moved -1
+  click  3 L at 11:47:30.390  before 63947  after(400 ms) 63897 | trace: 1 run(s), last run ends [63814, 63864, 63897]; picture pts 63864 ms; grid positions moved -1
+  (full output in scratch; see report §3)
+
+## scripts
+### matrix1k.py
+# matrix1k.py <run dir>...: pass 1k step 2 numbers per run (clean recipe build, no instrumentation).
+#   position at pause  = app "[player] state Paused at N ms" after the last "[player] pause (" line
+#   position at Play   = app "[player] play (select) at N ms"
+#   paused             = trace time from the video 'paused' event to the video 'resumed' event
+#   dropped / late     = video RENDER 'toolate' / 'late' events in the 60 s after the video 'resumed' event
+#   first picture      = the first realtime video RENDER after 'resumed': time (ms from resume), pts, drift
+#   audio start        = NOT MEASURED (no timestamped audio-start event in the clean build; pass 1j §3, pass 1k §2).
+#   traced instead     = the first audio DEC OUT after 'resumed' (timestamped decoder event): its time and pts, and the
+#                        wall time that pts is scheduled for, through the first realtime video RENDER with |drift| < 5 ms:
+#                        sched(pts_a) = t(render) − drift + (pts_a − pts_render); reported relative to the first picture.
+#                        For a no-step run the audio renderer was not flushed, so blocks queued before the pause play
+#                        first; the first DEC OUT is then a later block, and this figure is not the start of sound.
+#   stepping           = count of "[framestep]" gotoPreviousFrame / gotoNextFrame lines
+import json, re, sys, os
+
+def ms(x): return None if x is None else round(x / 1e6, 1)
+
+for d in sys.argv[1:]:
+    tag = os.path.basename(d.rstrip('/'))
+    log = open(os.path.join(d, 'marlin-media-tv.log'), errors='replace').read().split('\n')
+    st = [i for i, l in enumerate(log) if '[player] play() called' in l]; log = log[st[-1]:] if st else log
+    pz = [i for i, l in enumerate(log) if '[player] pause (' in l]
+    pause_ms = next((re.search(r'state Paused at (\d+)', l).group(1) for l in log[pz[-1]:] if 'state Paused at' in l), None) if pz else None
+    pl = [l for l in log if '[player] play (select) at' in l]
+    play_ms = re.search(r'at (\d+) ms', pl[-1]).group(1) if pl else None
+    back = sum(1 for l in log if '[framestep] −1 gotoPreviousFrame' in l)
+    fwd = sum(1 for l in log if '[framestep] +1 gotoNextFrame' in l)
+    spu = sorted(set(re.findall(r"ES track selected: '(spu/\d+)'", '\n'.join(log))))
+
+    tr = [f for f in os.listdir(d) if f.startswith('vlc-trace-')][0]
+    ev = []
+    for line in open(os.path.join(d, tr), errors='replace'):
+        try: o = json.loads(line)
+        except Exception: continue
+        b = o['Body']; b['_t'] = int(o['Timestamp']); ev.append(b)
+    ev.sort(key=lambda b: b['_t'])
+    vid = next((b['id'] for b in reversed(ev) if str(b.get('id', '')).startswith('video') and b.get('event') == 'resumed'), 'video/1')
+    aid = next((b['id'] for b in ev if b.get('type') == 'DEC' and str(b.get('id', '')).startswith('audio')), None)
+    ip = max(i for i, b in enumerate(ev) if b.get('id') == vid and b.get('event') == 'paused')
+    ir = max(i for i, b in enumerate(ev) if b.get('id') == vid and b.get('event') == 'resumed')
+    t0 = ev[ir]['_t']
+    win = [b for b in ev[ir:] if b['_t'] <= t0 + 60e9]
+    tl = sum(1 for b in win if b.get('id') == vid and b.get('event') == 'toolate')
+    lt = sum(1 for b in win if b.get('id') == vid and b.get('event') == 'late')
+    renders = [b for b in win if b.get('id') == vid and b.get('type') == 'RENDER' and b.get('mode') == 'realtime']
+    fv = renders[0] if renders else None
+    ontime = next((b for b in renders if abs(int(b.get('drift', 0))) < 5e6), None)
+    fa = next((b for b in win if b.get('id') == aid and b.get('type') == 'DEC' and b.get('stream') == 'OUT'), None)
+    sched = None
+    if fa is not None and ontime is not None and fv is not None:
+        t_sched = ontime['_t'] - int(ontime.get('drift', 0)) + (int(fa['pts']) - int(ontime['pts']))
+        sched = ms(t_sched - fv['_t'])
+    print(f'{tag}: spu {spu or "none"} | steps back {back} fwd {fwd} | pause at {pause_ms} ms, Play at {play_ms} ms, '
+          f'paused {(t0 - ev[ip]["_t"]) / 1e9:.1f} s | 60 s after resume: dropped {tl}, late {lt} | '
+          f'first picture +{ms(fv["_t"] - t0) if fv else None} ms pts {ms(int(fv["pts"])) if fv else None} drift {ms(int(fv.get("drift", 0))) if fv else None} | '
+          f'first audio DEC OUT +{ms(fa["_t"] - t0) if fa else None} ms pts {ms(int(fa["pts"])) if fa else None}; '
+          f'scheduled {sched} ms after the first picture (via on-time picture pts {ms(int(ontime["pts"])) if ontime else None})')
+### stepgap.py
+# stepgap.py <trace.json>: pass 1f's stepcheck2 rule without its early stop. Last session: video DEC OUT between the
+# last vout 'paused' and the next 'resumed', grouped by gaps > 1 s in DEC OUT time (clicks are ~4.3 s apart).
+# Per group: time from the pause, output count, PTS span, the last three PTS, and — for a back step — the displayed
+# picture by VLC's previous-frame rule: the second-to-last OUT of the group (the stored picture released when a PTS
+# >= pf_pts arrives). A group of 1–10 OUT with no earlier PTS is a forward step's refill.
+import json, sys
+ev = []
+for line in open(sys.argv[1], errors='replace'):
+    try: o = json.loads(line)
+    except Exception: continue
+    b = o['Body']
+    if not str(b.get('id', '')).startswith('video'): continue
+    b['_t'] = int(o['Timestamp']); ev.append(b)
+ev.sort(key=lambda b: b['_t'])
+ip = max(i for i, b in enumerate(ev) if b.get('event') == 'paused'); ir = next(i for i in range(ip, len(ev)) if ev[i].get('event') == 'resumed')
+t0 = ev[ip]['_t']
+outs = [b for b in ev[ip:ir] if b.get('type') == 'DEC' and b.get('stream') == 'OUT']
+groups = []
+for b in outs:
+    if not groups or b['_t'] - groups[-1][-1]['_t'] > 1e9: groups.append([])
+    groups[-1].append(b)
+prev = None
+for k, g in enumerate(groups, 1):
+    pts = [int(b['pts']) // 1000000 for b in g]
+    back = len(pts) >= 2 and min(pts) < pts[-1] - 100
+    shown = pts[-2] if back else None
+    step = '' if shown is None or prev is None else f' step {shown - prev:+d} ms'
+    print(f'group {k:2d} +{(g[0]["_t"] - t0) / 1e9:6.2f} s: n={len(pts):4d} pts {min(pts)}..{max(pts)} last3 {pts[-3:]}'
+          + (f' -> back step shows {shown}{step}' if back else ' (refill / forward)'))
+    if shown is not None: prev = shown
+### exact1k.py
+# exact1k.py <run dir>: pass 1k step 3 — one run of pass 1f's pattern (pause, 5 × L, 5 × R, 5 × L, 3.6 s apart).
+# Per click, from the app log: key, before, callback time, after(400 ms). From the trace (video DEC OUT after the pause,
+# grouped by gaps > 1 s): the picture shown per click by VLC's rules —
+#   back step:    the decode run started by that click's seek; the picture displayed is the last DEC OUT whose PTS is
+#                 below the previously displayed PTS (decoder_prevframe_AddPic);
+#   forward step: the next picture in PTS order after the displayed one (already decoded, no new DEC OUT needed).
+# The paused picture's PTS is taken as the first back step's pf_pts (the PTS its run ends at).
+# Screenshots: mean absolute difference over the video area of every paused screenshot pair, 3840×2160 PNGs scaled to
+# 960×540 by sips, crop x 130..830, y 120..380, excluding the pause glyph x 440..520, y 145..220 (pass 1f's picdiff.py).
+import json, re, sys, os, subprocess, struct, itertools, collections
+
+d = sys.argv[1]; tag = os.path.basename(d.rstrip('/'))
+log = open(os.path.join(d, 'marlin-media-tv.log'), errors='replace').read().split('\n')
+st = [i for i, l in enumerate(log) if '[player] play() called' in l]; log = log[st[-1]:] if st else log
+clicks = []
+for l in log:
+    m = re.search(r'\[framestep\] (−1 gotoPreviousFrame|\+1 gotoNextFrame) before=(\d+) ms', l)
+    if m: clicks.append({'key': 'L' if m.group(1).startswith('−') else 'R', 'before': int(m.group(2))}); continue
+    m = re.search(r'\[framestep\] (previousFrameStepped|nextFrameStepped) result=(-?\d+) time=(\d+) ms', l)
+    if m and clicks: clicks[-1]['cb'] = f'{m.group(2)}/{m.group(3)}'; continue
+    m = re.search(r'\[framestep\] [−+]1 after(?:\(400 ms\))?=(\d+) ms', l)
+    if m and clicks: clicks[-1]['after'] = int(m.group(1))
+
+tr = [f for f in os.listdir(d) if f.startswith('vlc-trace-')][0]
+ev = []
+for line in open(os.path.join(d, tr), errors='replace'):
+    try: o = json.loads(line)
+    except Exception: continue
+    b = o['Body']
+    if not str(b.get('id', '')).startswith('video'): continue
+    b['_t'] = int(o['Timestamp']); ev.append(b)
+ev.sort(key=lambda b: b['_t'])
+vid = next((b['id'] for b in reversed(ev) if b.get('event') == 'paused'), 'video/1')
+ev = [b for b in ev if b.get('id') == vid]
+ip = max(i for i, b in enumerate(ev) if b.get('event') == 'paused')
+ir = next((i for i in range(ip, len(ev)) if ev[i].get('event') == 'resumed'), len(ev))
+outs = [b for b in ev[:ir] if b.get('type') == 'DEC' and b.get('stream') == 'OUT']
+grid_ms = sorted(set(int(b['pts']) // 1000000 for b in outs))   # every decoded picture PTS (ms) before resume
+after_pause = [b for b in ev[ip:ir] if b.get('type') == 'DEC' and b.get('stream') == 'OUT']
+# align app wall clock to trace time through the pause: app "[player] pause (" line  <->  trace vout 'paused' event
+def appsec(l):
+    m = re.match(r'^(\d+):(\d\d):(\d\d\.\d\d\d) ?\s*(AM|PM)', l)
+    if not m: return None
+    h = int(m.group(1)) % 12 + (12 if m.group(4) == 'PM' else 0)
+    return h * 3600 + int(m.group(2)) * 60 + float(m.group(3))
+pause_app = next(appsec(l) for l in log if '[player] pause (' in l)
+click_t = [ev[ip]['_t'] + (appsec(l) - pause_app) * 1e9 for l in log
+           if re.search(r'\[framestep\] (−1 gotoPreviousFrame|\+1 gotoNextFrame) before=', l)]
+print(f'{tag}: {len(clicks)} clicks ({len(click_t)} timed); {len(after_pause)} video DEC OUT between pause and resume')
+shown = None
+rows = []
+for n, c in enumerate(clicks, 1):
+    lo = click_t[n - 1]; hi = click_t[n] if n < len(click_t) else ev[ir - 1]['_t'] + 1
+    pts = [int(b['pts']) // 1000000 for b in after_pause if lo <= b['_t'] < hi]   # ms
+    if c['key'] == 'L':
+        if shown is None and pts:
+            shown = max(pts)                                       # the first back run decodes up to the paused picture
+            rows.append((0, 'paused', None, None, None, shown, None, None))
+        below = [p for p in pts if p < shown]
+        new = max(below) if below else None
+    else:
+        later = [p for p in grid_ms if shown is not None and p > shown]
+        new = min(later) if later else None
+    step = None if new is None or shown is None else new - shown
+    rows.append((n, c['key'], c['before'], c.get('cb'), c.get('after'), new, step, len(pts)))
+    if new is not None: shown = new
+for r in rows:
+    if r[1] == 'paused': print(f'  paused picture pts {r[5]} ms'); continue
+    s = f'{r[6]:+d} ms' if r[6] is not None else '?'
+    pos = grid_ms.index(r[5]) - grid_ms.index(r[5] - r[6]) if r[6] is not None and r[5] in grid_ms and (r[5] - r[6]) in grid_ms else None
+    print(f'  click {r[0]:2d} {r[1]}  before {r[2]}  callback {r[3]}  after(400 ms) {r[4]}  | trace: {r[7]} DEC OUT in window, picture pts {r[5]} ms, step {s}, grid positions moved {pos}')
+steps = [r for r in rows if r[1] != 'paused']
+print(f'  every click moved exactly one decoded picture (grid positions ±1): '
+      f'{all(r[6] is not None and r[5] in grid_ms and (r[5] - r[6]) in grid_ms and abs(grid_ms.index(r[5]) - grid_ms.index(r[5] - r[6])) == 1 and (r[6] < 0) == (r[1] == "L") for r in steps)}')
+
+# screenshots
+att = os.path.join(d, 'att'); m = json.load(open(os.path.join(att, 'manifest.json')))
+shots = {}
+for t in m:
+    for a in t.get('attachments', []):
+        n = a.get('suggestedHumanReadableName', ''); f = a.get('exportedFileName', '')
+        if f.endswith('.png') and '-exact-' in n and 'play' not in n:
+            shots[n.split('_0_')[0].replace('.png', '')] = os.path.join(att, f)
+px = {}
+for name in sorted(shots):
+    bmp = os.path.join(d, name + '.bmp')
+    subprocess.run(['sips', '-z', '540', '960', '-s', 'format', 'bmp', shots[name], '--out', bmp], capture_output=True)
+    data = open(bmp, 'rb').read()
+    off = struct.unpack_from('<I', data, 10)[0]; w, h = struct.unpack_from('<ii', data, 18); bpp = struct.unpack_from('<H', data, 28)[0] // 8
+    row = (w * bpp + 3) & ~3
+    vals = []
+    for y in range(120, 380, 2):
+        for x in range(130, 830, 2):
+            if 440 <= x < 520 and 145 <= y < 220: continue
+            o = off + (abs(h) - 1 - y) * row + x * bpp if h > 0 else off + y * row + x * bpp
+            vals.append(sum(data[o:o + 3]))
+    px[name] = vals
+names = sorted(px)
+short = [re.sub(r'^p1k-.*-exact-', '', n) for n in names]
+print('  MAD ×10 (0 = same picture):')
+print('        ' + ' '.join(f'{s[:6]:>6}' for s in short))
+for i, a in enumerate(names):
+    print(f'  {short[i][:6]:>6} ' + ' '.join(f'{round(10 * sum(abs(x - y) for x, y in zip(px[a], px[b])) / (3 * len(px[a]))):6d}' for b in names))
+### ocr.swift
+import Foundation
+import Vision
+import AppKit
+let dir = CommandLine.arguments[1]
+let files = try! FileManager.default.contentsOfDirectory(atPath: dir).filter { $0.hasSuffix(".png") }.sorted()
+for f in files {
+    guard let img = NSImage(contentsOfFile: dir + "/" + f), let cg = img.cgImage(forProposedRect: nil, context: nil, hints: nil) else { print(f, "load failed"); continue }
+    let req = VNRecognizeTextRequest()
+    req.recognitionLevel = .accurate
+    req.usesLanguageCorrection = false
+    try? VNImageRequestHandler(cgImage: cg, options: [:]).perform([req])
+    let text = (req.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: " | ")
+    print("\(f): \(text)")
+}
+### runone.sh
+#!/bin/sh
+# runone.sh <test method> <run tag> — one traced attach-mode run on Home Theater (pass 1i).
+# Console launch with VLCKit's tvOS defaults + JSON tracer into the app container, attach Diag1kUITests/<method>,
+# export attachments, copy the app log and the trace off, stop the app.
+S=<scratch>
+REPO="$HOME/Xcode/Marlin Media TV"
+T="$1"; TAG="$2"; C=$(cat "$S/container.txt")
+case "$C" in /private/var/mobile/Containers/Data/Application/*) ;; *) echo "no container path — stop" >&2; exit 3;; esac
+case "$T" in t[A-Z]*) ;; *) echo "bad test name '$T' — stop" >&2; exit 4;; esac
+case "$TAG" in [a-z]*-[a-z]*) ;; *) echo "bad run tag '$TAG' — stop" >&2; exit 4;; esac
+OUT="$S/runs/$TAG"; [ -e "$OUT" ] && { echo "$OUT exists — stop" >&2; exit 5; }; mkdir -p "$OUT"
+P='("--no-color","--no-osd","--no-video-title-show","--no-snapshot-preview","--http-reconnect","--text-renderer=freetype","--avi-index=3","--audio-resampler=soxr","--tracer=json","--json-tracer-file='"$C"'/Library/Caches/vlc-trace-'"$TAG"'.json")'
+echo "launch $(date '+%H:%M:%S')" | tee "$OUT/run.txt"
+perl -e 'alarm 900; exec @ARGV' -- xcrun devicectl device process launch --console --terminate-existing --device "Home Theater" com.marlin1111.marlin-media-tv -VLCParams "$P" > "$OUT/console.out" 2>&1 &
+LPID=$!
+/bin/sleep 10
+cd "$REPO"
+xcodebuild test-without-building -project "Marlin Media TV.xcodeproj" -scheme "Marlin Media TV" \
+  -destination 'platform=tvOS,name=Home Theater' -derivedDataPath build/DerivedData \
+  -only-testing:"Marlin Media TVUITests/Diag1kUITests/$T" -resultBundlePath "$OUT/r.xcresult" > "$OUT/xcodebuild.out" 2>&1
+echo "test exit $? $(date '+%H:%M:%S')" | tee -a "$OUT/run.txt"
+grep -E "\[p1i\]|Test Case .*(passed|failed)|error:" "$OUT/xcodebuild.out" | sed -E 's/^.*\[p1i\] /[p1i] /' >> "$OUT/run.txt"
+xcrun xcresulttool export attachments --path "$OUT/r.xcresult" --output-path "$OUT/att" > /dev/null 2>&1
+for f in marlin-media-tv.log "vlc-trace-$TAG.json"; do
+  xcrun devicectl device copy from --device "Home Theater" --domain-type appDataContainer \
+    --domain-identifier com.marlin1111.marlin-media-tv --source "Library/Caches/$f" --destination "$OUT/$f" > /dev/null 2>&1 \
+    || echo "copy failed: $f" | tee -a "$OUT/run.txt"
+done
+kill $LPID 2>/dev/null; wait $LPID 2>/dev/null
+ls -la "$OUT" | awk '{print $5, $9}' | tee -a "$OUT/run.txt"
+grep -E "Test Case .*(passed|failed)" "$OUT/xcodebuild.out"

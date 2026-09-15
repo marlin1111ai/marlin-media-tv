@@ -4,8 +4,8 @@
 //
 //  VLCKit playing the server's original file directly. The remote's meaning (DECISIONS.md D008):
 //  click = play/pause; Menu = back; while playing, left/right = −10 s / +30 s; while paused,
-//  a left/right click = one frame back / forward — forward through VLC's native next-frame,
-//  back as a seek of one frame's duration (approximate, the recorded decision). The overlay
+//  a left/right click = one frame back / forward — through VLC's native previous-frame and
+//  next-frame (pass 1f). The overlay
 //  appears on touch and fades after 4 s while playing. Audio and Subtitles are reached with an
 //  up swipe from the surface; the panels list VLCKit's actual tracks and switch on selection.
 //
@@ -390,16 +390,6 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         bumpOverlay()
     }
 
-    /// Frame duration from VLC's video track (frameRate / frameRateDenominator), else 1/24 s.
-    private var frameDurationMs: (ms: Int, source: String) {
-        if let v = player.videoTracks.first?.video, v.frameRate > 0 {
-            let den = max(1, Int(v.frameRateDenominator))
-            let ms = (1000.0 * Double(den) / Double(v.frameRate)).rounded()
-            return (Int(ms), "\(v.frameRate)/\(den) fps")
-        }
-        return (42, "fallback 24 fps")
-    }
-
     private func frameStep(_ direction: Int) {
         guard !isPlaying else { return }
         let before = Int(player.time.intValue)
@@ -415,17 +405,15 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
                 EvidenceLog.line("[framestep] +1 after(400 ms)=\(self.timeMs) ms")
             }
         } else {
-            let frame = frameDurationMs
-            let target = max(0, before - frame.ms)
-            EvidenceLog.line("[framestep] −1 seek before=\(before) ms frame=\(frame.ms) ms (\(frame.source)) target=\(target) ms")
-            player.time = VLCTime(int: Int32(target))
+            EvidenceLog.line("[framestep] −1 gotoPreviousFrame before=\(before) ms")
+            player.gotoPreviousFrame()
             framePill = "Frame −1"
             frameTask?.cancel()
             frameTask = Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .milliseconds(400))
                 guard let self, !Task.isCancelled else { return }
                 self.timeMs = Int(self.player.time.intValue)
-                EvidenceLog.line("[framestep] −1 after=\(self.timeMs) ms")
+                EvidenceLog.line("[framestep] −1 after(400 ms)=\(self.timeMs) ms")
             }
         }
         scheduleFramePillClear()
@@ -572,6 +560,13 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         Task { @MainActor in
             self.timeMs = Int(self.player.time.intValue)
             EvidenceLog.line("[framestep] nextFrameStepped result=\(result.rawValue) time=\(self.timeMs) ms")
+        }
+    }
+
+    nonisolated func mediaPlayer(_ player: VLCMediaPlayer, previousFrameSteppedWith result: VLCMediaPlayerFrameStepResult) {
+        Task { @MainActor in
+            self.timeMs = Int(self.player.time.intValue)
+            EvidenceLog.line("[framestep] previousFrameStepped result=\(result.rawValue) time=\(self.timeMs) ms")
         }
     }
 

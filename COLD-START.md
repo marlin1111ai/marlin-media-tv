@@ -33,9 +33,10 @@ the file bytes with HTTP Range support at `/stream/{fileId}`.
   (D012). It lives at `Frameworks/VLCKit.xcframework` (git-ignored, 725 MB; tvOS device arm64 +
   simulator arm64/x86_64 slices) and the Xcode project links and embeds it by path — the Swift package
   is gone (D013). Built by `tools/vlckit-truehd/build.sh` at `~/vlckit-build` (VideoLAN's scripts cannot
-  take spaces in paths) from libvlc master 5dd4aebda + 19 patches: VLCKit's 17 (0007 minus its mlp hunk),
-  **0018** (TrueHD/MLP decoder frames coalesced into 20 ms blocks, D015) and **0019** (VideoToolbox
-  picture-reorder fix, D017). Current framework (2026-09-14 18:42): contribs and libvlc compiled clean on
+  take spaces in paths) from libvlc master 5dd4aebda + 20 patches: VLCKit's 17 (0007 minus its mlp hunk),
+  **0018** (TrueHD/MLP decoder frames coalesced into 20 ms blocks, D015), **0019** (VideoToolbox
+  picture-reorder fix, D017) and **0020** (no paused read-ahead after a frame step, D019). Current framework
+  (full recipe, 2026-09-14 23:30–23:33, 20 `Applying:` lines; the first 19-patch build was 18:42): contribs and libvlc compiled clean on
   Xcode 27.0 / tvOS SDK 27.0, packaged with VLCKit's project tvOS target set to 26.0 (`MinimumOSVersion`
   26.0, `LC_BUILD_VERSION minos 26.0 sdk 27.0`, D018). ffmpeg 9.0 (`Lavc63.1.100`), Video Toolbox decoding,
   `samplebufferdisplay` video output, `avsamplebuffer` audio output. Reported version string:
@@ -179,3 +180,13 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 - **Second pause (0020's gap, step 7's case).** The resume flush sets the need-data flag again after frame stepping ends, and it stays set through a later plain pause: 3 967 demux calls while paused, PCR 98.4 → 182.4 s. Resume 2 was still clean (delay applied, 0 dropped).
 - **Origin (step 13).** After `git fetch`, `origin/main` is `b22f9c9` (pass 1e rerun 4) and local `main` is 4 commits ahead, so pass 1i's "pushed" line was right.
 - **State.** No patch 0021. libvlc clean and `Frameworks/` rebuilt by the full recipe (20 patches, as pass 1i). Home Theater runs HEAD + the uncommitted 1f diff. D008 unchanged. Not pushed.
+
+**Pass 1k (2026-09-14/15): native frame-back closed out.** Report `reports/2026-09-14-pass1k-frame-back-close.md`.
+- **Frame-back state.** While paused, a left/right click steps exactly one picture through VLCKit's native previous/next-frame (D008 revised; the seek-back is superseded). `PlayerModel.swift` carries it, committed. It needs patch 0020 (D019), which is in the 20-patch recipe and in `Frameworks/`. Exact on Home Theater for back and forward steps on Stargate (avcodec), Divergent and Wonder Woman (VideoToolbox): each click shows a new picture and the returning clicks show identical pictures (MAD 0).
+- **Resume matrix** (five films × back / forward / no step, ~80 s pauses): clock at Play+60 s 01:33–01:35 in every run (01:34–01:35 after steps); no-step controls 0 dropped.
+- **Known and accepted (D020), not defects.**
+  1. Play after any frame step drops the pictures below the demuxer's clock start: 21–29 after five back steps, 26–45 after five forward steps (~0.9–1.5 s of picture; the 29.97 fps episodes drop more). E1/E2 rejected.
+  2. 0020's remaining gap: Play's flush after stepping sets the need-data flag again, so a later plain pause with a subtitle track selected reads ahead (~84 s in pass 1j's run; that resume was clean).
+- **Audio start** has no timestamped event in the clean build and is not measured; pass 1k traces the first audio block's scheduled time instead. Pass 1i's audio figures carry a correction note (they were the tvOS output's periodic timing report).
+- **VideoLAN.** Draft `reports/logs/1k-upstream-videolan-draft.md`, not submitted.
+- **Push.** Not pushed — the owner tests the native step on Home Theater first.
