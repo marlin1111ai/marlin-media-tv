@@ -135,3 +135,11 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   - An upstream report to VideoLAN.
 - **Not pushed** — the owner tests first.
 
+
+**Pass 1f (2026-09-14): STOPPED at item 3.**
+- **Stepping.** VLCKit's native `gotoPreviousFrame` steps exactly one picture per left click on Stargate Extended, both ways. Five back, five forward and five back stay on the file's 33/50 ms picture grid, the screenshots return to identical pictures, and there's no `RESET_PCR` loop.
+- **Resume.** Play after stepping starts with every picture late by the whole paused time: 57.6 s measured, 57.7 s paused. VLC drops 713 pictures and the clock runs 01:04 → 02:23.
+- **Cause.** Read from VLC's source (not instrumented): the paused previous-frame seek resets the main clock, which discards the pause date, so `vlc_clock_main_ChangePause` adds no delay on resume.
+- **Not run.** Wonder Woman and Magicians.
+- **Code state.** The native call is **not committed**; `PlayerModel.swift` is at HEAD with D008's seek-back, and the tested diff is `reports/logs/1f-playermodel-native-prevframe.diff`. **Home Theater still has the pass 1f build installed.** D008 unchanged.
+- **Where it is written up.** `reports/2026-09-14-pass1f-frame-back.md`, with the fix options as question 1.
