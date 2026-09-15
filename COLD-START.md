@@ -134,7 +134,7 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   - A single late picture at audio start / display mode switch (Wonder Woman, Magicians, after a seek).
   - The paused frame-back step (D008; passes 1f–1i).
   - An upstream report to VideoLAN.
-- **Pushed.** Pass 1e's HEAD `b22f9c9` is on `origin/main`; the passes after it are local until the owner tests.
+- **Pushed.** Pass 1e's HEAD `b22f9c9` is on `origin/main`; the passes after it were local until the owner tested (pushed in pass 1l, `6bfdbad`).
 
 
 **Pass 1f (2026-09-14): STOPPED at item 3.**
@@ -189,4 +189,6 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   2. 0020's remaining gap: Play's flush after stepping sets the need-data flag again, so a later plain pause with a subtitle track selected reads ahead (~84 s in pass 1j's run; that resume was clean).
 - **Audio start** has no timestamped event in the clean build and is not measured; pass 1k traces the first audio block's scheduled time instead. Pass 1i's audio figures carry a correction note (they were the tvOS output's periodic timing report).
 - **VideoLAN.** Draft `reports/logs/1k-upstream-videolan-draft.md`, not submitted.
-- **Push.** Not pushed — the owner tests the native step on Home Theater first.
+- **Push.** The owner tested native frame-back on Home Theater and accepted it; pushed in pass 1l.
+
+**Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.
