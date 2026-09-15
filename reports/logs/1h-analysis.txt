@@ -1,0 +1,283 @@
+# pass 1h — Stargate Extended, native back steps, instrumented libvlc (Home Theater, 2026-09-14 21:46:27–21:50:36)
+# framework: libvlc e50d9ac36a + 19 patches + reports/logs/1h-libvlc-instrumentation-combined.diff (device slice only)
+# app log: reports/logs/1h-stargate-back-full.log.gz (excerpt: 1h-stargate-back-excerpt.log); trace (19 MB) off-repo
+
+## run notes (harness)
+[p1h] attached at 21:46:30.789
+[p1h] stargate-back: player up at 21:46:54.689
+[p1h] stargate-back: pause at 21:47:25.949
+[p1h] stargate-back: click 1 L at 21:48:46.596
+[p1h] stargate-back: click 2 L at 21:48:50.847
+[p1h] stargate-back: click 3 L at 21:48:55.094
+[p1h] stargate-back: click 4 L at 21:48:59.330
+[p1h] stargate-back: click 5 L at 21:49:03.568
+[p1h] stargate-back: wait after steps from 21:49:07.808
+[p1h] stargate-back: play at 21:49:28.202
+[p1h] stargate-back: play+60s shot at 21:50:29.450, player exists true
+
+## gatecheck.py — check1 value transitions
+line 1065: GetBuffering=0 b_eof=0 need_data=0 -> demux_allowed=0   [after: 9:47:25.996 PM [player] state Paused at 33483 ms]
+   … held 1 evaluations (log lines 1065..1111)
+line 1112: GetBuffering=1 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:46.638 PM [player] buffering 0.0]
+   … held 116 evaluations (log lines 1112..1559)
+line 1560: GetBuffering=0 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:46.723 PM [player] buffering 1.0]
+   … held 3956 evaluations (log lines 1560..21945)
+line 21946: GetBuffering=1 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:50.898 PM [player] buffering 0.0]
+   … held 67 evaluations (log lines 21946..22288)
+line 22289: GetBuffering=0 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:50.973 PM [player] buffering 1.0]
+   … held 4152 evaluations (log lines 22289..43709)
+line 43710: GetBuffering=1 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:55.137 PM [player] buffering 0.0]
+   … held 65 evaluations (log lines 43710..44024)
+line 44025: GetBuffering=0 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:55.220 PM [player] buffering 1.0]
+   … held 4349 evaluations (log lines 44025..66492)
+line 66493: GetBuffering=1 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:59.373 PM [player] buffering 0.0]
+   … held 63 evaluations (log lines 66493..66800)
+line 66801: GetBuffering=0 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:48:59.452 PM [player] buffering 1.0]
+   … held 4547 evaluations (log lines 66801..90234)
+line 90235: GetBuffering=1 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:49:03.616 PM [player] buffering 0.0]
+   … held 61 evaluations (log lines 90235..90542)
+line 90543: GetBuffering=0 b_eof=0 need_data=1 -> demux_allowed=1   [after: 9:49:03.686 PM [player] buffering 1.0]
+   … held 5696 evaluations (to end)
+totals (GetBuffering, b_eof, need_data, demux_allowed): {('0', '0', '0', '0'): 1, ('1', '0', '1', '1'): 372, ('0', '0', '1', '1'): 22700}
+
+## need-data lifecycle
+12288 1h: decoder notify need_data=1 frames_countdown=1
+   2 1h: INPUT_CONTROL_NEED_DATA_FRAME_NEXT 0 -> 1
+12286 1h: INPUT_CONTROL_NEED_DATA_FRAME_NEXT 1 -> 1
+1109:[DBG] 1h: INPUT_CONTROL_NEED_DATA_FRAME_NEXT 0 -> 1 now=478285229545
+119837:[DBG] 1h: next_frame_need_data cleared by control 0 now=478326785202
+119845:[DBG] 1h: INPUT_CONTROL_NEED_DATA_FRAME_NEXT 0 -> 1 now=478326792090
+
+## pacecheck.py — demux reads while paused vs the pause-date anchor
+pause date (VLC ticks) 478204561297; Play at +122.224 s
+  anchor at + -34.216 s: paused=0 current_date=+-34.216 s update=+-35.216 s stream_start=0 ms
+  anchor at +  80.733 s: paused=1 current_date=pause date update=+-1.318 s stream_start=33116 ms
+  anchor at +  84.984 s: paused=1 current_date=pause date update=+-1.284 s stream_start=33116 ms
+  anchor at +  89.231 s: paused=1 current_date=pause date update=+-1.234 s stream_start=33116 ms
+  anchor at +  93.463 s: paused=1 current_date=pause date update=+-1.201 s stream_start=33116 ms
+  anchor at +  97.697 s: paused=1 current_date=pause date update=+-1.151 s stream_start=33116 ms
+  anchor at + 122.239 s: paused=0 current_date=+122.239 s update=+121.239 s stream_start=156790 ms
++ 80s demux calls while paused  4172  wakeup=0:   181  wakeup-now ms: min  -85066.4 median  -39389.8 max     159.8
++ 85s demux calls while paused  6027  wakeup=0:    64  wakeup-now ms: min  -89314.2 median  -55413.4 max     151.9
++ 90s demux calls while paused  6114  wakeup=0:    62  wakeup-now ms: min  -93546.1 median  -40111.6 max     159.7
++ 95s demux calls while paused  5720  wakeup=0:    60  wakeup-now ms: min  -97779.9 median  -38105.7 max     160.0
++100s demux calls while paused   232  wakeup=0:     0  wakeup-now ms: min      -7.0 median      20.7 max     156.9
++105s demux calls while paused   235  wakeup=0:     0  wakeup-now ms: min      -7.4 median      16.5 max     158.8
++110s demux calls while paused   231  wakeup=0:     0  wakeup-now ms: min      -7.1 median      17.5 max     157.3
++115s demux calls while paused   232  wakeup=0:     0  wakeup-now ms: min      -7.3 median      16.3 max     157.3
++120s demux calls while paused   109  wakeup=0:     0  wakeup-now ms: min      -7.3 median      17.3 max     156.4
+
+## reads per gate state and their wakeup
+22700	GetBuffering=0 need_data=1 wakeup=0:0
+5	GetBuffering=1 need_data=1 wakeup=0:0
+367	GetBuffering=1 need_data=1 wakeup=0:1
+
+## fifocheck.py — per-stream decoder fifo between pause and Play
+window: pause date → Play (122.224 s)
+  audio/2  fifo queue events 0 | DEMUX OUT 15459 DEC IN 0 DEC OUT 0
+  spu/4    fifo queue events 0 | DEMUX OUT 5 DEC IN 0 DEC OUT 0
+  video/1  fifo queue events 11893, count min 1 max 2956 last 2956 (64799670 B), queued into an empty fifo 36 | DEMUX OUT 11893 DEC IN 79 DEC OUT 62
+
+## pcrcheck.py — trace PCR / demux / video fifo per 5 s from pause
+paused at trace t0; resumed at +122.17 s
++  0s  PCR -                                demux out video    0 audio    0  video fifo None
++  5s  PCR -                                demux out video    0 audio    0  video fifo None
++ 10s  PCR -                                demux out video    0 audio    0  video fifo None
++ 15s  PCR -                                demux out video    0 audio    0  video fifo None
++ 20s  PCR -                                demux out video    0 audio    0  video fifo None
++ 25s  PCR -                                demux out video    0 audio    0  video fifo None
++ 30s  PCR -                                demux out video    0 audio    0  video fifo None
++ 35s  PCR -                                demux out video    0 audio    0  video fifo None
++ 40s  PCR -                                demux out video    0 audio    0  video fifo None
++ 45s  PCR -                                demux out video    0 audio    0  video fifo None
++ 50s  PCR -                                demux out video    0 audio    0  video fifo None
++ 55s  PCR -                                demux out video    0 audio    0  video fifo None
++ 60s  PCR -                                demux out video    0 audio    0  video fifo None
++ 65s  PCR -                                demux out video    0 audio    0  video fifo None
++ 70s  PCR -                                demux out video    0 audio    0  video fifo None
++ 75s  PCR -                                demux out video    0 audio    0  video fifo None
++ 80s  PCR 33116000..38112001 ms (2058)     demux out video 2222 audio 2870  video fifo ('109', '2463419')
++ 85s  PCR 38171001..77494001 ms (2896)     demux out video 3120 audio 4061  video fifo ('1055', '19976663')
++ 90s  PCR 77632001..113497001 ms (2912)    demux out video 3140 audio 4082  video fifo ('1920', '38256541')
++ 95s  PCR 113530001..134496001 ms (2672)   demux out video 2879 audio 3751  video fifo ('2424', '50176998')
++100s  PCR 134518001..139439001 ms (112)    demux out video  118 audio  156  video fifo ('2542', '53343051')
++105s  PCR 139472367..144444001 ms (112)    demux out video  120 audio  154  video fifo ('2662', '56548257')
++110s  PCR 144477367..149504001 ms (113)    demux out video  122 audio  159  video fifo ('2784', '59940633')
++115s  PCR 149533001..154454001 ms (109)    demux out video  118 audio  156  video fifo ('2902', '63221877')
++120s  PCR 154487367..160736001 ms (138)    demux out video  149 audio  192  video fifo ('22', '493950') <resume
++125s  PCR 160794001..165728001 ms (111)    demux out video  120 audio  156  video fifo ('22', '447008')
++130s  PCR 165732733..170752001 ms (112)    demux out video  121 audio  157  video fifo ('22', '368717')
++135s  PCR 170804001..175744001 ms (133)    demux out video  139 audio  156  video fifo ('31', '435367')
++140s  PCR 175775367..180768001 ms (144)    demux out video  150 audio  157  video fifo ('31', '700245')
++145s  PCR 180780367..185760001 ms (140)    demux out video  150 audio  156  video fifo ('31', '447336')
++150s  PCR 185785367..190784001 ms (143)    demux out video  150 audio  157  video fifo ('31', '651896')
++155s  PCR 190790367..195746001 ms (130)    demux out video  128 audio  159  video fifo ('21', '500973')
++160s  PCR 195904001..200751001 ms (117)    demux out video  120 audio  157  video fifo ('21', '551424')
++165s  PCR 200896001..205756001 ms (121)    demux out video  120 audio  156  video fifo ('21', '551441')
++170s  PCR 205920001..210761001 ms (121)    demux out video  120 audio  156  video fifo ('21', '561883')
++175s  PCR 210912001..215766001 ms (116)    demux out video  120 audio  154  video fifo ('21', '544003')
++180s  PCR 215904001..220470001 ms (108)    demux out video  114 audio  147  video fifo ('22', '586056')
++185s  PCR -                                demux out video    0 audio    0  video fifo None
+
+## resume60.py — 60 s after vout resumed
+dropped 1495 per 20 s [1493, 2, 0] | late 4 per 20 s [3, 1, 0] | first video render +2.0 ms drift -122089.2 ms | first audio render +1486.4 ms drift 0.0 ms | first audio DEC OUT +0.5 ms | audio − video first render 1484.4 ms
+
+## scripts
+### gatecheck.py
+# gatecheck.py <app log>: last player session. Walks the log in order; tracks the last stamped app line.
+# Prints every change of the check1 tuple (es_out_GetBuffering, b_eof, next_frame_need_data, demux_allowed) with its
+# line, the nearest preceding app line, and how many evaluations the previous tuple held.
+import re, sys, collections
+lines = open(sys.argv[1], errors='replace').read().split('\n')
+st = [i for i, l in enumerate(lines) if '[player] play() called' in l]
+base = st[-1] if st else 0
+last_app = ''; prev = None; held = 0; first_line = None
+counts = collections.Counter()
+for i in range(base, len(lines)):
+    l = lines[i]
+    if re.match(r'^\d+:\d\d:\d\d\.\d\d\d', l) and ('[player]' in l or '[framestep]' in l): last_app = l.strip()[:90]
+    m = re.search(r'1h: check1 now=(\d+) state=PAUSE_S es_out_GetBuffering=(\d) b_eof=(\d) next_frame_need_data=(\d) -> demux_allowed=(\d)', l)
+    if not m: continue
+    tup = m.group(2, 3, 4, 5); counts[tup] += 1
+    if tup != prev:
+        if prev is not None: print(f'   … held {held} evaluations (log lines {first_line}..{i})')
+        print(f'line {i+1}: GetBuffering={tup[0]} b_eof={tup[1]} need_data={tup[2]} -> demux_allowed={tup[3]}   [after: {last_app}]')
+        prev = tup; held = 0; first_line = i + 1
+    held += 1
+print(f'   … held {held} evaluations (to end)')
+print('totals (GetBuffering, b_eof, need_data, demux_allowed):', dict(counts))
+### pacecheck.py
+# pacecheck.py <app log>: last session. From the first "[player] pause (" line: per 5 s of VLC tick time (the "now=" in 1h lines,
+# µs, origin = the 1g es_out change_pause paused=1 date), the demuxed-while-paused count and wakeup-now (ms) min/median/max
+# and how many had wakeup=0; plus every 1g stop_buffering anchor line (update, current_date) and its offset from the pause.
+import re, sys, statistics as stt, collections
+lines = open(sys.argv[1], errors='replace').read().split('\n')
+st = [i for i, l in enumerate(lines) if '[player] play() called' in l]; lines = lines[st[-1]:] if st else lines
+p0 = next(int(m.group(1)) for l in lines for m in [re.search(r'1g: es_out change_pause paused=1 date=(\d+)', l)] if m)
+play = next((int(m.group(1)) for l in lines for m in [re.search(r'1g: input control_unpause date=(\d+)', l)] if m), None)
+print(f'pause date (VLC ticks) {p0}; Play at +{(play - p0) / 1e6:.3f} s' if play else f'pause date {p0}')
+B = collections.OrderedDict()
+for l in lines:
+    m = re.search(r'1h: demuxed-while-paused now=(\d+) wakeup=(-?\d+) wakeup-now=(-?\d+)', l)
+    if m:
+        now, wk, d = map(int, m.groups()); k = int((now - p0) // 5e6) * 5
+        b = B.setdefault(k, {'n': 0, 'd': [], 'zero': 0})
+        b['n'] += 1
+        if wk == 0: b['zero'] += 1
+        else: b['d'].append(d / 1000)
+    m = re.search(r'1g: es_out stop_buffering now=(\d+) paused=(\d) pause_date=(-?\d+) current_date=(\d+) buffering_duration=(\d+) update=(\d+) stream_start=(\d+)', l)
+    if m:
+        now, pz, pd, cd, bd, up, ss = map(int, m.groups())
+        print(f'  anchor at +{(now - p0) / 1e6:8.3f} s: paused={pz} current_date={"pause date" if cd == p0 else f"+{(cd - p0) / 1e6:.3f} s"} update=+{(up - p0) / 1e6:.3f} s stream_start={ss / 1000:.0f} ms')
+for k, b in B.items():
+    d = b['d']
+    print(f'+{k:3d}s demux calls while paused {b["n"]:5d}  wakeup=0: {b["zero"]:5d}  wakeup-now ms: ' + (f'min {min(d):9.1f} median {stt.median(d):9.1f} max {max(d):9.1f}' if d else '-'))
+### fifocheck.py
+# fifocheck.py <app log> <trace.json>: between the pause date and Play (from the 1g lines, VLC ticks x1000 = trace ns):
+# per stream id, decoder fifo trace events (emitted after each queue in vlc_input_decoder_DecodeWithStatus), fifo_count
+# min/max/last, how many queues found the fifo empty (count==1 after queue), DEMUX OUT and DEC IN/OUT counts.
+import json, re, sys, collections
+log = open(sys.argv[1], errors='replace').read()
+p0 = int(re.search(r'1g: es_out change_pause paused=1 date=(\d+)', log).group(1)) * 1000
+play = int(re.search(r'1g: input control_unpause date=(\d+)', log).group(1)) * 1000
+fifo = collections.defaultdict(list); c = collections.Counter()
+for line in open(sys.argv[2], errors='replace'):
+    try: o = json.loads(line)
+    except Exception: continue
+    t = int(o['Timestamp']); b = o['Body']
+    if not (p0 <= t <= play): continue
+    i = str(b.get('id', ''))
+    if 'fifo_count' in b: fifo[i].append((t, int(b['fifo_count']), int(b['fifo_size'])))
+    if b.get('type') in ('DEMUX', 'DEC') and b.get('stream') in ('IN', 'OUT'): c[(i, b['type'], b['stream'])] += 1
+print(f'window: pause date → Play ({(play - p0) / 1e9:.3f} s)')
+for i in sorted(set(list(fifo) + [k[0] for k in c])):
+    v = fifo.get(i, [])
+    fs = (f'fifo queue events {len(v)}, count min {min(x[1] for x in v)} max {max(x[1] for x in v)} last {v[-1][1]} ({v[-1][2]} B), queued into an empty fifo {sum(1 for x in v if x[1] == 1)}'
+          if v else 'fifo queue events 0')
+    print(f'  {i:8s} {fs} | DEMUX OUT {c[(i, "DEMUX", "OUT")]} DEC IN {c[(i, "DEC", "IN")]} DEC OUT {c[(i, "DEC", "OUT")]}')
+### pcrcheck.py
+# pcrcheck.py <trace.json>: last session. From the vout 'paused' event to 70 s after 'resumed': per 5 s bucket of trace time,
+# the demux PCR range, video/audio DEMUX OUT counts, and the last video fifo_count/fifo_size.
+import json, sys, collections
+ev = []
+for line in open(sys.argv[1], errors='replace'):
+    try: o = json.loads(line)
+    except Exception: continue
+    b = o['Body']; b['_t'] = int(o['Timestamp']); ev.append(b)
+ev.sort(key=lambda b: b['_t'])
+vid = 'video/1'
+pz = max(i for i, b in enumerate(ev) if b.get('id') == vid and b.get('event') == 'paused')
+rs = next((i for i in range(pz, len(ev)) if ev[i].get('id') == vid and ev[i].get('event') == 'resumed'), len(ev) - 1)
+t0 = ev[pz]['_t']; tr = ev[rs]['_t']
+print(f'paused at trace t0; resumed at +{(tr - t0) / 1e9:.2f} s')
+B = collections.OrderedDict()
+for b in ev[pz:]:
+    if b['_t'] > tr + 70e9: break
+    k = int((b['_t'] - t0) // 5e9) * 5
+    d = B.setdefault(k, {'pcr': [], 'v': 0, 'a': 0, 'fifo': None})
+    if b.get('type') == 'DEMUX' and b.get('id') == 'PCR': d['pcr'].append(int(b['pcr']) // 1000)
+    if b.get('type') == 'DEMUX' and b.get('stream') == 'OUT':
+        if b.get('id') == vid: d['v'] += 1
+        elif str(b.get('id', '')).startswith('audio'): d['a'] += 1
+    if b.get('id') == vid and 'fifo_count' in b: d['fifo'] = (b['fifo_count'], b['fifo_size'])
+for k, d in B.items():
+    tag = ' <resume' if k <= (tr - t0) / 1e9 < k + 5 else ''
+    pr = f"{d['pcr'][0]}..{d['pcr'][-1]} ms ({len(d['pcr'])})" if d['pcr'] else '-'
+    print(f'+{k:3d}s  PCR {pr:32s} demux out video {d["v"]:4d} audio {d["a"]:4d}  video fifo {d["fifo"]}{tag}')
+### resume60.py
+# resume60.py <trace.json> [video id]: last session. From the vout 'resumed' event (the last one), 60 s of trace time:
+#   dropped = video RENDER 'toolate' events, late = video RENDER 'late' events, per 20 s;
+#   first video realtime RENDER after resume (its drift), first audio realtime RENDER after resume (its drift),
+#   and the audio decoder's first DEC OUT after resume, relative to the first video render.
+import json, sys
+vid = sys.argv[2] if len(sys.argv) > 2 else 'video/1'
+ev = []
+for line in open(sys.argv[1], errors='replace'):
+    try: o = json.loads(line)
+    except Exception: continue
+    b = o['Body']; b['_t'] = int(o['Timestamp']); ev.append(b)
+ev.sort(key=lambda b: b['_t'])
+rs = max(i for i, b in enumerate(ev) if b.get('id') == vid and b.get('event') == 'resumed')
+t0 = ev[rs]['_t']; win = [b for b in ev[rs:] if b['_t'] <= t0 + 60e9]
+aid = next((b['id'] for b in ev if b.get('type') == 'DEC' and str(b.get('id', '')).startswith('audio')), None)
+tl = [b['_t'] for b in win if b.get('id') == vid and b.get('event') == 'toolate']
+lt = [b['_t'] for b in win if b.get('id') == vid and b.get('event') == 'late']
+per = lambda ts: [sum(1 for x in ts if t0 + k * 20e9 <= x < t0 + (k + 1) * 20e9) for k in range(3)]
+fv = next((b for b in win if b.get('id') == vid and b.get('type') == 'RENDER' and b.get('mode') == 'realtime'), None)
+fa = next((b for b in win if b.get('id') == aid and b.get('type') == 'RENDER' and b.get('mode') == 'realtime'), None)
+ao = next((b for b in win if b.get('id') == aid and b.get('type') == 'DEC' and b.get('stream') == 'OUT'), None)
+ms = lambda b: None if b is None else round((b['_t'] - t0) / 1e6, 1)
+dr = lambda b: None if b is None else round(int(b.get('drift', 0)) / 1e6, 1)
+print(f'dropped {len(tl)} per 20 s {per(tl)} | late {len(lt)} per 20 s {per(lt)} | first video render +{ms(fv)} ms drift {dr(fv)} ms | '
+      f'first audio render +{ms(fa)} ms drift {dr(fa)} ms | first audio DEC OUT +{ms(ao)} ms | audio − video first render {None if fa is None or fv is None else round((fa["_t"] - fv["_t"]) / 1e6, 1)} ms')
+### excerpt.py
+# excerpt.py <full app log> <out>: every non-repetitive line; every check1 value transition; and, between two
+# non-repetitive lines, only the first 12 and last 12 repetitive 1h lines (the rest is counted in a marker line).
+import sys, re
+lines = open(sys.argv[1], errors='replace').read().split('\n')
+rep = re.compile(r'1h: (check1|check2|wait|demuxed-while-paused|decoder notify need_data=1|INPUT_CONTROL_NEED_DATA_FRAME_NEXT 1 -> 1)')
+sig = re.compile(r'es_out_GetBuffering=\d b_eof=\d next_frame_need_data=\d -> demux_allowed=\d')
+out = []; seg = []; last_tuple = None
+def flush():
+    if len(seg) <= 24:
+        out.extend(l for _, l in seg)
+    else:
+        head, tail, mid = seg[:12], seg[-12:], seg[12:-12]
+        out.extend(l for _, l in head)
+        trans = [l for keep, l in mid if keep]
+        out.append(f'[… {len(mid) - len(trans)} repetitive 1h lines omitted (full log: 1h-stargate-back-full.log.gz); check1 transitions kept below …]')
+        out.extend(trans)
+        out.extend(l for _, l in tail)
+    seg.clear()
+for l in lines:
+    if rep.search(l):
+        keep = False
+        m = sig.search(l) if '1h: check1' in l else None
+        if m and m.group(0) != last_tuple:
+            keep = True; last_tuple = m.group(0)
+        seg.append((keep, l))
+    else:
+        flush(); out.append(l)
+flush()
+open(sys.argv[2], 'w').write('\n'.join(out))
+print('excerpt lines', len(out))
