@@ -1,0 +1,140 @@
+//
+//  Diag2eUITests.swift — temporary harness for pass 2e (2026-09-15). Not committed.
+//  Attach mode (the app is started by `devicectl … --console` with the run's VLCParams, tracer on), from pass 2d.
+//  XCUIRemote cannot touch the Siri Remote's surface: Page Up plays the uncommitted hook's 2 s scripted drag (+0.08 of
+//  the width) with pass 2a's paused seeks (one per 250 ms and one on lift); Page Down plays the same drag seeking on
+//  lift only.
+//  Session: play 30 s, 4 × Right (+30 s) 1.5 s apart, 20 s, then four paused scrubs, each followed by 30 s of playback:
+//    1. pause, 3 s, Page Up, land with Play/Pause at drag +9 s (pass 2a's landing: play only)
+//    2. pause, 3 s, Page Up, land with a click at drag +9 s (HEAD's landing: play, then one seek)
+//    3. pause, 20 s, Page Up, land with Play/Pause at drag +9 s (a longer pause before the same drag)
+//    4. pause, 3 s, Page Down (seek on lift only), land with Play/Pause at drag +9 s
+//  Screenshots at drag +1 s (mid-drag), +3 s (lifted), +8.5 s (before landing), landing +3 s. Then Menu.
+//
+
+import XCTest
+
+final class Diag2eUITests: XCTestCase {
+    private var app: XCUIApplication!
+    private let remote = XCUIRemote.shared
+    private let headerOrder = ["tab.Movies", "tab.TV Shows", "tab.Videos", "sort"]
+
+    override func setUp() { continueAfterFailure = true }
+
+    private func shot(_ name: String) {
+        let a = XCTAttachment(screenshot: XCUIScreen.main.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+    private func note(_ t: String) { let a = XCTAttachment(string: t); a.name = "note"; a.lifetime = .keepAlways; add(a); NSLog("[p2e] %@", t) }
+    private func press(_ b: XCUIRemote.Button, _ n: Int = 1, wait: UInt32 = 1) { for _ in 0..<n { remote.press(b); sleep(wait) } }
+    private func focusedIds() -> [String] {
+        app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == YES")).allElementsBoundByIndex.map { $0.identifier.isEmpty ? "(\($0.label))" : $0.identifier }
+    }
+    private func isFocused(_ id: String) -> Bool { focusedIds().contains(id) }
+    private func isFocused(prefix: String) -> Bool { focusedIds().contains { $0.hasPrefix(prefix) } }
+    @discardableResult private func moveUntilFocused(_ id: String, pressing b: XCUIRemote.Button, limit: Int = 8) -> Bool {
+        for _ in 0..<limit { if isFocused(id) { return true }; press(b) }
+        return isFocused(id)
+    }
+    private func focusHeader() { for _ in 0..<8 { if isFocused(prefix: "tab.") || isFocused("sort") { return }; press(.up) } }
+    private func focusHeaderItem(_ id: String) {
+        focusHeader(); guard let target = headerOrder.firstIndex(of: id) else { return }
+        for _ in 0..<8 { if isFocused(id) { return }; let cur = headerOrder.firstIndex { isFocused($0) } ?? 0; press(cur < target ? .right : .left) }
+    }
+    private func selectTab(_ name: String) { focusHeaderItem("tab.\(name)"); press(.select, wait: 2) }
+    private func openPoster(_ id: String, tab: String) {
+        selectTab(tab); press(.down); if !isFocused(prefix: "poster.") { press(.down) }
+        _ = moveUntilFocused(id, pressing: .right, limit: 6) || moveUntilFocused(id, pressing: .left, limit: 6)
+        press(.select, wait: 3)
+        XCTAssertTrue(app.staticTexts["detail.title"].waitForExistence(timeout: 20), "detail did not open; focus \(focusedIds())")
+        sleep(2)
+    }
+    private func pressPlay() { if !isFocused("play") { moveUntilFocused("play", pressing: .up, limit: 6) }; press(.select, wait: 2) }
+    private func stamp() -> String { let f = DateFormatter(); f.dateFormat = "HH:mm:ss.SSS"; return f.string(from: Date()) }
+    private func openStargate() {
+        openPoster("poster.Stargate", tab: "Movies"); pressPlay()
+        XCTAssertTrue(app.buttons["pick.Extended"].waitForExistence(timeout: 5)); moveUntilFocused("pick.Extended", pressing: .up, limit: 3); press(.select, wait: 2)
+    }
+    private func openEpisode(show: String, season: Int, episode: Int) {
+        openPoster("poster.\(show)", tab: "TV Shows")
+        XCTAssertTrue(app.buttons["season.\(season)"].waitForExistence(timeout: 30), "seasons did not load"); sleep(2)
+        if !app.buttons["episode.\(season).\(episode)"].exists {
+            moveUntilFocused("season.\(season)", pressing: .right, limit: 4); press(.select, wait: 2)
+        }
+        XCTAssertTrue(moveUntilFocused("episode.\(season).\(episode)", pressing: .down, limit: 6), "episode not focused; focus \(focusedIds())")
+        press(.select, wait: 2)
+    }
+    private func open(_ film: String) {
+        switch film {
+        case "stargate": openStargate()
+        default: openEpisode(show: "The Magicians", season: 1, episode: 1)
+        }
+    }
+    private func attach() {
+        app = XCUIApplication(); app.activate()
+        note("attached at \(stamp())")
+        XCTAssertTrue(app.buttons["tab.Movies"].waitForExistence(timeout: 60), "library did not load")
+        sleep(3)
+    }
+    private func playerUp(_ tag: String) {
+        XCTAssertTrue(app.otherElements["player"].waitForExistence(timeout: 20), "player did not appear; focus \(focusedIds())")
+        note("\(tag): player up at \(stamp())")
+    }
+
+    private enum Ending: String { case click, playpause }
+
+    /// (pause before the drag in s, drag button, ending, label)
+    private typealias ScrubSpec = (UInt32, XCUIRemote.Button, Ending, String)
+
+    private func scrubSession(_ film: String) {
+        scrubSession(film, tagSuffix: "scrub", [
+            (3, .pageUp, .playpause, "seeks-playpause"),
+            (3, .pageUp, .click, "seeks-click"),
+            (20, .pageUp, .playpause, "seeks-longpause-playpause"),
+            (3, .pageDown, .playpause, "liftonly-playpause"),
+        ])
+    }
+
+    private func scrubSession(_ film: String, tagSuffix: String, _ scrubs: [ScrubSpec]) {
+        let tag = "\(film)-\(tagSuffix)"
+        attach(); open(film); playerUp(tag)
+        sleep(30)
+        for n in 1...4 { note("\(tag): skip +30 \(n) at \(stamp())"); remote.press(.right); usleep(1_500_000) }
+        sleep(20)
+        for (i, (hold, button, ending, label)) in scrubs.enumerated() {
+            let name = String(format: "p2e-\(tag)-%02d-\(label)", i + 1)
+            note("\(tag): pause (Play/Pause) before scrub \(i + 1) at \(stamp())")
+            remote.press(.playPause)
+            sleep(hold)
+            note("\(tag): scrub \(i + 1) drag \(button == .pageUp ? "seeks" : "lift-only") at \(stamp())")
+            remote.press(button)
+            usleep(1_000_000); shot("\(name)-a-mid-drag")
+            sleep(2); shot("\(name)-b-lifted")
+            usleep(5_500_000); shot("\(name)-c-before-land")
+            usleep(500_000)
+            note("\(tag): scrub \(i + 1) \(ending.rawValue) at \(stamp())")
+            remote.press(ending == .click ? .select : .playPause)
+            sleep(3)
+            shot("\(name)-d-after+3s")
+            sleep(27)
+        }
+        note("\(tag): exit at \(stamp())")
+        press(.menu, wait: 3)
+        XCTAssertFalse(app.otherElements["player"].exists, "player still up after the final Menu")
+    }
+
+    func t0_Probe() {
+        attach(); open("magicians"); playerUp("magicians-probe")
+        sleep(15)
+        press(.menu, wait: 3)
+    }
+
+    func tMagiciansScrub() { scrubSession("magicians") }
+    /// Fresh session, lift-only seek first (pts_delay not yet raised by a lapped seek), then a lapping drag landed by a click.
+    func tMagiciansFresh() {
+        scrubSession("magicians", tagSuffix: "fresh", [
+            (3, .pageDown, .playpause, "liftonly-playpause"),
+            (20, .pageUp, .click, "seeks-longpause-click"),
+        ])
+    }
+    func tStargateScrub() { scrubSession("stargate") }
+}
