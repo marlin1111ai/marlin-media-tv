@@ -398,3 +398,33 @@ was built, installed and launched, with two device screenshots and no matrix.
   and the `PlayerHost.swift` hook stay uncommitted.
 
 **Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.
+
+**Pass 3c (2026-09-15): passes 2–3b accepted and pushed, and the test state reset.** Decisions
+D046, D047 (which discharges D037); report `reports/2026-09-15-pass3c-push-and-reset.md`. The owner
+tested passes 2, 2b, 2c, 3 and 3b on Home Theater and accepted them all ("all good"). **No app
+source was touched, and nothing was built, installed or launched** — Home Theater is left running
+the pass 3b build, which is now the pushed `main`.
+- **Pushed (D046).** `main` went to `origin` as a fast-forward, no force: **`3597d0a..896ee12`, five
+  commits** (`b3f3b02` pass 2, `8def8cd` 2b, `ef9ce11` 2c, `a99cccc` 3, `896ee12` 3b). Before the
+  push `origin/main` was `3597d0a`, an ancestor of `main`, and the range held five single-parent
+  commits and no merges; after it, local `main`, `origin/main` and `git ls-remote origin main` were
+  all `896ee1293ac9`. This note's commit was pushed the same way, so HEAD is on `origin/main`.
+  `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`) and has never been tracked or
+  pushed.
+- **The server's test state is gone (D047).** The five passes wrote playback state on **files 1, 2,
+  4, 5 and 8 and no others** — a full read confirmed the rest of the library was untouched — and
+  each was read, then written with `PUT …/playback {"position": 0, "watched": false}`, five `200`s.
+  Before: Stargate Extended 1 821.678 s, Wonder Woman 2 457.189 s, Magicians S1E1 1 224.173 s, Food
+  S4E2 `watched: true`, Divergent 0 with a `last_played`. After: **all five at position 0, watched
+  false**, and `GET /api/continue-watching` is **`[]`**. So the app now opens with **no Continue
+  Watching row** on Home (frame 00c) or on any library tab, and the launch focus D043 places is
+  deliberately not placed — that branch is now the one in play, and it has not been seen on the
+  device.
+- **`last_played` survives the reset**, stamped to the write's own instant rather than null: the
+  server sets it on every write and the body cannot clear it. Nothing depends on it — Continue
+  Watching is `position > 0 and watched = false` server-side, Recently Added sorts on `added`, and
+  the detail screens read only `position` and `watched` — except D026/D034's *followed* edition,
+  which is still Extended on Stargate, as before.
+- **Still uncommitted, unchanged, and deliberate:** the `PlayerHost.swift` Page Up / Down hook and
+  the five UI-test harnesses (`Diag2gUITests.swift`, `Pass2bUITests.swift`, `Pass2cUITests.swift`,
+  `Pass3ShotsUITests.swift`, `Pass3bShotsUITests.swift`).

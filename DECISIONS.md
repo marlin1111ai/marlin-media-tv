@@ -437,3 +437,44 @@ The owner's calls, given after testing pass 3. Evidence:
   `allowsHitTesting(false)`, so it takes no press, no touch and no focus; D008's skips, the frame
   step, the panels and D021's scrub are untouched, and `PlayerModel.swift` and `PlayerHost.swift`
   were not edited.
+
+## 2026-09-15 — pass 3c (the push, and the test-state reset)
+
+The owner tested passes 2, 2b, 2c, 3 and 3b on Home Theater and **accepted them all** ("all good",
+2026-09-15). Evidence: `reports/2026-09-15-pass3c-push-and-reset.md`. No app source was touched and
+nothing was built.
+
+- **D046** **Passes 2–3b are accepted and pushed.** `main` went to `origin` as a fast-forward, no
+  force: **`3597d0a..896ee12`, five commits** — `b3f3b02` (pass 2), `8def8cd` (2b), `ef9ce11` (2c),
+  `a99cccc` (3), `896ee12` (3b). Checked before the push: `origin/main` was `3597d0a`, it is an
+  ancestor of `main`, and the range holds five single-parent commits and **no merges**. Checked
+  after: local `main`, `origin/main` and `git ls-remote origin main` are all `896ee1293ac9`.
+  `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`) and nothing under `Frameworks/`
+  is tracked on any ref, so the custom VLCKit was not pushed — as in passes 1l and 2h. The notebook
+  and report commit of this pass was pushed the same way.
+
+- **D047** **The test playback state is reset — D037 is discharged.** The five passes wrote playback
+  state on **five files and no others**, which a full read of the library confirmed was exactly the
+  set (files 3, 6, 7 and 9–20 were all `position 0, watched false, last_played null` and were not
+  touched). Each was read off its item first — there is no read-back route for a single file — then
+  written with `PUT /api/files/{fileId}/playback {"position": 0, "watched": false}`, five `200`s:
+
+  | file | item | before | after |
+  |---|---|---|---|
+  | 1 | Divergent | 0, false, `01:45:31Z` | 0, false, `03:29:43Z` |
+  | 2 | Stargate · Extended | 1 821.678, false, `00:55:13Z` | 0, false, `03:29:43Z` |
+  | 4 | Wonder Woman | 2 457.189, false, `03:24:21Z` | 0, false, `03:29:43Z` |
+  | 5 | The Food That Built America S4 E2 | 0, **true**, `01:09:39Z` | 0, false, `03:29:43Z` |
+  | 8 | The Magicians S1 E1 | 1 224.173, false, `02:24:50Z` | 0, false, `03:29:43Z` |
+
+  (all timestamps 2026-09-16 UTC). Continue Watching went from **3 entries** —
+  `movie/4@2457.189s, episode/8@1224.173s, movie/2@1821.678s` — to **`[]`**, and no file on the
+  server now carries a position or a watched flag.
+
+  **`last_played` is not cleared, and is not meant to be.** The server stamps it on every write and
+  the body carries no way to null it, so the five read the reset's own instant rather than `null`.
+  Nothing the app does depends on that: Continue Watching is `position > 0 and watched = false`
+  server-side, Recently Added (D023) sorts on `added`, and the detail screens read only `position`
+  and `watched`. The one visible trace is D026/D034's *followed* edition, chosen by `last_played` —
+  on Stargate that is still Extended (file 2 stamped, file 3 still null), exactly as before. A true
+  virgin state would need a server-side clear, which is the server repo's call, not the client's.
