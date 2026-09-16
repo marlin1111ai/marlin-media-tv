@@ -604,3 +604,30 @@ No Swift file was touched, and neither app icon stack was touched.
     the owner will simply find an old build, or one that refuses to launch. Open questions.
   - **The Top Shelf banner could not be photographed there** — a newly installed app lands at the
     end of the app grid, not the top row, and nothing here can press the remote to move focus.
+
+## 2026-09-16 — pass 6 (the push)
+
+The owner tested pass 4's app icon and pass 5's Top Shelf banners and bedroom install on the Apple
+TVs and **accepted them all** ("all good", 2026-09-16). No app source, asset, project file or design
+file was touched; nothing was built, installed or launched; no device was touched. There is no
+separate report — the evidence is passes 4 and 5's own
+(`reports/2026-09-16-pass4-app-icon.md`, `reports/2026-09-16-pass5-topshelf-and-bedroom.md`).
+
+- **D051** **Passes 4 and 5 are accepted and pushed.** `main` went to `origin` as a fast-forward, no
+  force: **`ceae8c2..6de2d9b`, two commits** — `1a4d4ab` (pass 4, the layered tvOS app icon, D048)
+  and `6de2d9b` (pass 5, the Top Shelf banners D049 and the Master Bedroom ATV install D050).
+
+  Checked before the push: `origin/main` was `ceae8c2`, it is an ancestor of `main`, and the range
+  held **two single-parent commits and no merges**. Checked after: local `main`, `origin/main` and
+  `git ls-remote origin main` are all `6de2d9b4029516c6f8c1ad65c1b789bbc5188553`. The notebook commit
+  of this pass was pushed the same way.
+
+  `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`) and nothing under
+  `Frameworks/` is tracked on any ref, so the 725 MB framework was not pushed — as in passes 1l, 2h
+  and 3c.
+
+  **What acceptance does and does not settle.** It settles that the icon and the banners look right
+  on the owner's televisions and that the bedroom box may keep the app. It settles nothing about the
+  items D049 and D050 left open: which Top Shelf imageset tvOS chose, the App Store icon that has
+  never been rendered, the icon parallax that was never photographed, and the bedroom install's
+  staleness, expiring profile and wholly untested `AppleTV6,2` playback path. Those stand.

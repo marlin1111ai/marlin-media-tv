@@ -291,13 +291,12 @@ Outside the Swift files:
 
 ## Current state
 
-As of **pass 5 (2026-09-16)**, the newest pass.
+As of **pass 6 (2026-09-16)**, the newest pass.
 
 ### Built and owner-accepted
 
-Everything in this list down to the clock has been tested by the owner on Home Theater and
-accepted. **Pass 4's app icon and pass 5's Top Shelf banners are built and proven on the device
-but not yet owner-tested.**
+Every feature below has been tested by the owner on the Apple TVs and accepted; **nothing is
+waiting on an owner test.**
 
 - **The library and the player** (pass 1): the three library tabs, movie, show and video detail,
   the edition picker, and VLCKit playing the four MKVs and a Magicians episode directly — the
@@ -325,13 +324,13 @@ but not yet owner-tested.**
 - **The clock** (D041, D044, D045): on Home, the three library tabs, the movie, show and video
   screens, frames 16 and 17, and the player **while paused only**. Frames 16 and 17 are a code
   trace, not device proof — open item 6.
-- **The app icon** (D048, pass 4, **awaiting the owner's look**): the layered tvOS icon from the
+- **The app icon** (D048, pass 4): the layered tvOS icon from the
   Claude Design export, Front over Back, on the Home screen icon and the App Store icon. Proven on
   Home Theater by a device screenshot of tvOS's own Home screen
   (`reports/screenshots/p4/p4-1-appletv-home-screen.png`), where the app now shows the artwork
   instead of the generic tile. The parallax lift a focused icon gets was **not** seen, because
   photographing it needs the icon focused and nothing here can press the remote's Home button.
-- **The Top Shelf banners** (D049, pass 5, **awaiting the owner's look**): the four flat opaque
+- **The Top Shelf banners** (D049, pass 5): the four flat opaque
   PNGs from the export fill `Top Shelf Image` and `Top Shelf Image Wide`, closing what was open
   item 20. Proven on Home Theater by a device screenshot of tvOS's Home screen with the app
   focused and the banner drawn above the top row
@@ -344,8 +343,7 @@ paused if a subtitle track is selected.
 
 ### Pushed
 
-Everything on `main` is on `origin/main` **except the pass 4 and pass 5 commits**, which are
-deliberately committed and not pushed (both passes said so).
+Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
 
 - Passes 1–1e up to `b22f9c9` (pass 1e rerun 4).
 - Passes 1f–1k as `b22f9c9..6bfdbad`, six commits (pass 1l).
@@ -354,12 +352,15 @@ deliberately committed and not pushed (both passes said so).
   `ef9ce11` (2c), `a99cccc` (3), `896ee12` (3b) — each a fast-forward, no force, no merges (D046).
   After that push, local `main`, `origin/main` and `git ls-remote origin main` were all
   `896ee1293ac9`.
-- `896ee12` is the newest commit carrying **Swift** source. Pass 3c's notebook commit `d64679a`,
-  the COLD-START rewrite `ceae8c2`, pass 4's `1a4d4ab` and pass 5's commit changed no Swift file —
-  pass 4 changed the asset catalog and two lines of `project.pbxproj`, and pass 5 only the
-  catalog's two Top Shelf slots.
-- `ceae8c2` (the COLD-START rewrite) is the newest commit on `origin/main`; **passes 4 and 5 are
-  committed and unpushed**, waiting on the owner.
+- **Passes 4 and 5 as `ceae8c2..6de2d9b`, two commits** — `1a4d4ab` (pass 4, the app icon) and
+  `6de2d9b` (pass 5, the Top Shelf banners and the bedroom install) — a fast-forward, no force, no
+  merges (D051). After that push, local `main`, `origin/main` and `git ls-remote origin main` were
+  all `6de2d9b4029516c6f8c1ad65c1b789bbc5188553`.
+- `896ee12` is still the newest commit carrying **Swift** source. Everything after it — pass 3c's
+  notebook commit `d64679a`, the COLD-START rewrite `ceae8c2`, pass 4's `1a4d4ab`, pass 5's
+  `6de2d9b` and pass 6's own commit — changed no Swift file: pass 4 added the asset catalog and two
+  lines of `project.pbxproj`, pass 5 filled the catalog's two Top Shelf slots, and passes 3c and 6
+  are notebook-only.
 - `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`). Nothing under `Frameworks/`
   is tracked on any ref, so the 725 MB framework has never been pushed.
 
@@ -380,17 +381,19 @@ The owner's `Design/Marlin Media tvOS Design2.zip` is not in the folder at all: 
 and deleted the zip (D042).
 
 Three further untracked paths appeared on 2026-09-16 from the owner's own work, outside any pass.
-**One of them is now tracked:** `Design/tvos icons/Marlin Media tvOS Design.zip` is the app icon's
-source and pass 4 committed it (D048). The other two are **still untracked and still nobody's
-decision** — `icon pixel/Marlin Media.pxd` (the icon's Pixelmator document, ~2 MB) and `Notes/`.
-Neither was opened, moved or committed; whoever picks them up should ask first.
+**One of them is now tracked and pushed:** `Design/tvos icons/Marlin Media tvOS Design.zip` is the
+source of both the app icon and the Top Shelf banners — pass 4 committed it (D048) and pass 5
+committed the owner's newer export over it (D049). The other two are **still untracked and still
+nobody's decision** — `icon pixel/Marlin Media.pxd` (the icon's Pixelmator document, ~2 MB) and
+`Notes/`. Neither was opened, moved or committed; whoever picks them up should ask first.
 
 ### What the Apple TVs run
 
-Both carry the **pass 5 build** — `896ee12`'s Swift source plus the pass 4 icon, the pass 5 Top
-Shelf banners and the app-icon build setting, built from the working tree and so still carrying the
-uncommitted `PlayerHost.swift` hook. No Swift file has changed since pass 3b, so the app behaves
-exactly as the owner accepted it; only the icon and the banners are new.
+Both carry the **pass 5 build**, which is now the pushed `main` (`6de2d9b`) — `896ee12`'s Swift
+source plus the pass 4 icon, the pass 5 Top Shelf banners and the app-icon build setting, built from
+the working tree and so still carrying the uncommitted `PlayerHost.swift` hook. No Swift file has
+changed since pass 3b. Pass 6 touched no source and built nothing, so this is still what is on both
+devices.
 
 - **Home Theater** — installed, launched and left running by pass 5, as by every pass before it.
 - **Master Bedroom ATV** — installed, launched and left running by pass 5, the first time the app
@@ -956,3 +959,25 @@ touched.**
   Theater only.
 - **Committed, not pushed** — the owner looks first. Both Apple TVs are left running this build.
   The `PlayerHost.swift` hook and the five harnesses stay uncommitted, unchanged.
+
+### Pass 6 — passes 4 and 5 accepted and pushed (`reports/2026-09-16-pass5-topshelf-and-bedroom.md`, no separate report)
+
+**Pass 6 (2026-09-16): the owner accepted passes 4 and 5 and they are pushed.** Decision D051. The
+owner tested the app icon, the Top Shelf banners and the bedroom install on the Apple TVs and
+accepted them all ("all good"). **No app source, asset, project file or design file was touched,
+nothing was built, installed or launched, and no device was touched.**
+- **Pushed (D051).** `main` went to `origin` as a fast-forward, no force: **`ceae8c2..6de2d9b`, two
+  commits** — `1a4d4ab` (pass 4, the app icon) and `6de2d9b` (pass 5, the Top Shelf banners and the
+  bedroom install). Before the push `origin/main` was `ceae8c2`, an ancestor of `main`, and the
+  range held two single-parent commits and no merges; after it, local `main`, `origin/main` and
+  `git ls-remote origin main` were all `6de2d9b4029516c6f8c1ad65c1b789bbc5188553`. This note's
+  commit was pushed the same way, so HEAD is on `origin/main`.
+  `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`) and has never been tracked or
+  pushed.
+- **Nothing is waiting on the owner, and nothing is waiting to be pushed.** Every feature in
+  **Current state** is accepted.
+- **The open items are unchanged** — passes 4 and 5 answered none of them by being accepted, and
+  raised none of their own here. The Top Shelf size question, the App Store icon, the icon parallax
+  and the three bedroom items all still stand.
+- **Still uncommitted, unchanged, and deliberate:** the `PlayerHost.swift` Page Up / Down hook and
+  the five UI-test harnesses, plus the owner's `icon pixel/` and `Notes/`.
