@@ -258,14 +258,34 @@ The owner's calls. Evidence, and which of them is actually working, is in
 the report says so.
 
 - **D031** **Press-and-hold on an episode row opens the mark menu, and a click still plays or
-  resumes.** A different gesture was not allowed. **Not working yet.** Pass 2's candidate (a), a
-  `UILongPressGestureRecognizer` restricted to the select press, was implemented on the window
-  while the show detail is up, with `@FocusState` naming the row. Instrumented on Home Theater it
-  **attaches** (`[hold] recogniser added to the window`) but **never receives the press** — no
-  recogniser state is ever reported — so the hold still reaches the row's Button and plays the
-  episode. A focused SwiftUI Button consumes the select press before any window-level recogniser
-  sees it. Candidate (b), a focusable non-Button row with its own select handling, is untried and
-  is the next thing to try; it was not attempted here under this pass's stop rule.
+  resumes.** A different gesture was not allowed.
+
+  **Pass 2b's candidate (a) is gone** (removed in pass 2c): a `UILongPressGestureRecognizer`
+  restricted to the select press, on the window while the show detail was up. Instrumented on Home
+  Theater it **attached** (`[hold] recogniser added to the window`) but **never received the
+  press** — no recogniser state was ever reported — because a focused SwiftUI Button consumes the
+  select press and acts on release.
+
+  **Pass 2c built candidate (b): the row is a focusable view, not a Button** — `EpisodeRowLabel`
+  with `.focusable()`, `.focused($focusedEpisode, equals:)` and the row's own
+  `.onLongPressGesture(minimumDuration: 0.6, perform:onPressingChanged:)`. It draws and focuses
+  exactly as before (the label is untouched and still reads `@Environment(\.isFocused)`), and
+  **the click half works**: a press reaches the row, and a release plays or resumes it
+  (`[hold] click: playing S1E3 from 0 ms`; `… S1E1 from 968576 ms` then
+  `seeking to the saved position 968576 ms`).
+
+  **The hold half still does not work, and pass 2c stopped there.** Instrumented press timing on
+  the device: an ordinary click is 4–15 ms between down and up, while the 1.4 s hold measured
+  **601 ms** — capped at the 0.6 s threshold — and no `[hold] mark menu` line followed. So the long
+  press *is* recognised, but SwiftUI delivers **`onPressingChanged(false)` before `perform`**: the
+  release handler treats it as a click and starts playback, and `perform` then finds `playerUp`
+  true and refuses. The cause is the handler's ordering, not the platform's gesture. **The fix is
+  to classify the press by its own elapsed time** — remember the press-down instant and treat a
+  release past the threshold as a hold rather than a click — which removes the race entirely. It
+  was not applied: the hold still played, which is pass 2c's stop condition.
+
+- **D032a** The press-down/press-up instrumentation in `ShowDetailScreen` stays in, as pass 2b's
+  did, for whoever finishes D031.
 
 - **D032** **Every detail screen re-reads its item when the player closes**, so the Resume / Play
   button, its bar, the watched pill, the episode states and the unwatched count are current on the
@@ -274,14 +294,25 @@ the report says so.
   video screens, which re-read on it. The show screen re-reads without its loading state, so the
   list does not flash and the chosen season is kept.
 
-- **D033** **Focus entering the Continue Watching row lands on its first card.** **Not working
-  yet.** The row is a focus scope whose first card is `prefersDefaultFocus`, but on Home Theater
-  directional focus ignores it: entering the row from the sort control lands on the **rightmost**
-  card, and re-entering after moving along the row lands on the card that was left. tvOS picks the
-  nearest focusable in the direction of travel, and `prefersDefaultFocus` governs only initial and
-  programmatic focus. The one case the owner named — entering the row after the player closes —
-  did land on the first card, but geometry explains that (the Movies tab sits above the first
-  card), so it is not evidence that the fix works.
+- **D033** **Focus entering the Continue Watching row lands on its first card.** **Working, from
+  pass 2c.**
+
+  **The mechanism:** every card carries `@FocusState` (`.focused($focusedCard, equals: entry.fileId)`),
+  and the row watches that state. When focus arrives and **no card held it a moment before**, it is
+  moved to the first card; a move from one card to another inside the row has a previous card and is
+  left alone, so left/right along the row is unchanged.
+
+  **Pass 2b's attempt is removed:** a focus scope whose first card was `prefersDefaultFocus`. It did
+  nothing, because tvOS resolves a directional press by nearest neighbour and `prefersDefaultFocus`
+  governs only initial and programmatic focus — entering from the sort control landed on the
+  **rightmost** card.
+
+  **Evidence** (Home Theater, pass 2c, with two cards — `continue.4` then `continue.2`): focus lands
+  on `continue.4` entering **from the sort control**, **from the tab the row sits under**, **after
+  moving to the second card and leaving and re-entering**, and **after returning from the player**.
+  The three that needed a move logged
+  `[focus] continue row entered at card 2; moved to the first card 4`; the fourth arrived on the
+  first card already and needed none.
 
 - **D034** On a movie with several editions, **Start over and the mark buttons act on the followed
   edition without the picker**, while Play / Resume opens the picker (pass 2 open question 3).

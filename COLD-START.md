@@ -305,4 +305,34 @@ Decisions D031–D038; report `reports/2026-09-15-pass2b-followups.md`, evidence
   (`Marlin Media TVUITests/Pass2bUITests.swift`) is **not** committed, nor is the owner's
   `Design/Marlin Media tvOS Design2.zip`.
 
+**Pass 2c (2026-09-15): the Continue Watching focus is fixed; the episode hold is STOPPED one step
+from working.** Decisions D031 (revised), D032a, D033 (revised); report
+`reports/2026-09-15-pass2c-hold-and-focus.md`, evidence `reports/logs/2c-*.log`, screenshots
+`reports/screenshots/p2c/`.
+- **Works (D033): focus entering the Continue Watching row always lands on its first card.** The
+  cards carry `@FocusState`, and when focus arrives from outside the row (no card had it a moment
+  before) it is moved to the first card; moving between cards inside the row is untouched. Proven
+  on Home Theater with two cards, in all four cases asked for — from the sort control, from the tab
+  the row sits under, after moving along the row and leaving and re-entering, and after returning
+  from the player — with `[focus] continue row entered at card 2; moved to the first card 4` in the
+  log for the three that needed a move. Pass 2b's `focusScope` / `prefersDefaultFocus` attempt is
+  removed.
+- **Works (D031, the click half): the episode row is now a focusable view rather than a Button**,
+  and a click still plays (`from 0 ms`) or resumes (`from 968576 ms`, then the seek). The row draws
+  and focuses exactly as before — `EpisodeRowLabel` is untouched.
+- **STOPPED (D031, the hold half).** Candidate (a)'s window recogniser was removed and candidate (b)
+  built, but a hold still plays the episode. Instrumented timing: a click is 4–15 ms down-to-up, the
+  1.4 s hold measured 601 ms (capped at the 0.6 s threshold), and no mark menu followed — SwiftUI
+  delivers `onPressingChanged(false)` **before** `perform`, so the release is taken as a click and
+  `perform` then finds the player already up. The fix is to judge the press by its own elapsed time
+  instead of racing the callbacks; it was not applied, because the hold playing is this pass's stop
+  condition.
+- **No server writes of this pass's own:** every write came from the app's own buttons while the
+  tests ran. A second Continue Watching card was made by letting the app play Wonder Woman past the
+  120 s floor.
+- **Committed locally on top of `8def8cd`, not pushed** — the owner tests passes 2, 2b and 2c
+  together. Home Theater is left running this build. The pass 2c harness
+  (`Marlin Media TVUITests/Pass2cUITests.swift`) is not committed, nor is the owner's
+  `Design/Marlin Media tvOS Design2.zip`.
+
 **Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.

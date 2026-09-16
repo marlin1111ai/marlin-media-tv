@@ -1,0 +1,10 @@
+10:10:00.677 PM [continue] 2 entries: episode/8@968s, movie/2@1821s
+10:10:00.698 PM [continue] 2 entries: episode/8@968s, movie/2@1821s
+10:10:28.293 PM [hold] press down on S1E2
+10:10:28.894 PM [hold] press up on S1E2
+10:10:28.895 PM [hold] click: playing S1E2 from 0 ms
+10:10:28.916 PM [player] request The Magicians — S1 E2 · The Source of Magic — http://192.168.1.250:8093/stream/9
+10:10:28.916 PM [playback] file 9 saved position 0.0 s watched=false; starting at 0 ms
+10:10:36.686 PM [playback] position 6.5 s not written (pause): under 120 s
+10:10:59.366 PM [playback] position 11.0 s not written (every 10 s): under 120 s
+10:11:02.956 PM [playback] position 14.6 s not written (pause): under 120 s

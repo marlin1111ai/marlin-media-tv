@@ -28,8 +28,9 @@ struct LibraryScreen: View {
     @FocusState private var focusedTab: LibraryTab?
     @FocusState private var sortFocus: SortOrder?
     @FocusState private var sortButtonFocused: Bool
-    /// D033: the row's own focus scope, so its first card can be the default.
-    @Namespace private var continueScope
+    /// D033: which card of the Continue Watching row has focus, so that focus arriving from
+    /// outside the row can be moved to its first card.
+    @FocusState private var focusedCard: Int?
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -146,13 +147,13 @@ struct LibraryScreen: View {
                 Kicker(text: "Continue watching")
                 ScrollView(.horizontal) {
                     HStack(alignment: .top, spacing: 34) {
-                        ForEach(Array(entries.enumerated()), id: \.element.fileId) { index, entry in
+                        ForEach(entries) { entry in
                             Button { openEntry(entry) } label: {
                                 ContinueCardLabel(entry: entry)
                             }
                             .buttonStyle(BareButtonStyle())
                             .accessibilityIdentifier("continue.\(entry.fileId)")
-                            .prefersDefaultFocus(index == 0, in: continueScope)
+                            .focused($focusedCard, equals: entry.fileId)
                         }
                     }
                     .padding(.vertical, 8)
@@ -163,7 +164,16 @@ struct LibraryScreen: View {
             // Its own focus region, so moving down from the tabs enters the row instead of
             // restoring the grid's last focused poster and skipping past it.
             .focusSection()
-            .focusScope(continueScope)
+            // D033: focus has come in from outside the row — a moment ago no card had it. tvOS
+            // picks the nearest card in the direction of travel (pass 2b: the rightmost one when
+            // arriving from the sort control), so it is moved to the first card here. A move from
+            // one card to another inside the row has a previous card, and is left alone.
+            .onChange(of: focusedCard) { previous, current in
+                guard previous == nil, let current,
+                      let first = entries.first?.fileId, current != first else { return }
+                focusedCard = first
+                EvidenceLog.line("[focus] continue row entered at card \(current); moved to the first card \(first)")
+            }
         }
     }
 

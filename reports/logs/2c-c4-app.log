@@ -1,0 +1,33 @@
+10:14:26.758 PM [continue] 2 entries: episode/8@985s, movie/2@1821s
+10:14:26.772 PM [continue] 2 entries: episode/8@985s, movie/2@1821s
+10:14:49.203 PM [player] request Wonder Woman — Wonder Woman (2017).mkv · 4K HDR · TrueHD 7.1 — http://192.168.1.250:8093/stream/4
+10:14:49.203 PM [playback] file 4 saved position 0.0 s watched=false; starting at 0 ms
+10:14:59.539 PM [playback] position 9.4 s not written (every 10 s): under 120 s
+10:15:09.575 PM [playback] position 19.4 s not written (every 10 s): under 120 s
+10:15:19.580 PM [playback] position 29.4 s not written (every 10 s): under 120 s
+10:15:29.716 PM [playback] position 39.4 s not written (every 10 s): under 120 s
+10:15:39.726 PM [playback] position 49.4 s not written (every 10 s): under 120 s
+10:15:49.735 PM [playback] position 59.4 s not written (every 10 s): under 120 s
+10:15:59.745 PM [playback] position 69.4 s not written (every 10 s): under 120 s
+10:16:09.813 PM [playback] position 79.4 s not written (every 10 s): under 120 s
+10:16:19.902 PM [playback] position 89.4 s not written (every 10 s): under 120 s
+10:16:30.128 PM [playback] position 99.4 s not written (every 10 s): under 120 s
+10:16:40.143 PM [playback] position 109.4 s not written (every 10 s): under 120 s
+10:16:50.372 PM [playback] PUT file 4 position=120.0 (every 10 s) → 200 position=120.0 watched=false last_played=2026-09-16T02:16:50Z
+10:17:00.369 PM [playback] PUT file 4 position=130.0 (every 10 s) → 200 position=130.0 watched=false last_played=2026-09-16T02:17:00Z
+10:17:10.461 PM [playback] PUT file 4 position=140.0 (every 10 s) → 200 position=140.0 watched=false last_played=2026-09-16T02:17:10Z
+10:17:13.607 PM [playback] PUT file 4 position=143.4 (exit) → 200 position=143.397 watched=false last_played=2026-09-16T02:17:13Z
+10:17:13.615 PM [detail] movie 3 re-read: position 143.397 watched false
+10:17:13.615 PM [continue] 3 entries: movie/4@143s, episode/8@985s, movie/2@1821s
+10:17:18.855 PM [continue] 3 entries: movie/4@143s, episode/8@985s, movie/2@1821s
+10:17:23.235 PM [focus] continue row entered at card 2; moved to the first card 4
+10:17:35.536 PM [focus] continue row entered at card 2; moved to the first card 4
+10:17:43.257 PM [focus] continue row entered at card 2; moved to the first card 4
+10:17:45.259 PM [player] request Wonder Woman — Wonder Woman (2017).mkv · 4K HDR · TrueHD 7.1 — http://192.168.1.250:8093/stream/4
+10:17:45.259 PM [playback] file 4 saved position 143.397 s watched=false; starting at 143397 ms
+10:17:45.695 PM [playback] seeking to the saved position 143397 ms (length 8476217 ms) tick=566424139828
+10:17:46.705 PM [playback] resume +1 s time=144215 ms (wanted 143397 ms, off by 818 ms) state Playing
+10:17:48.764 PM [playback] resume +3 s time=146059 ms (wanted 143397 ms, off by 2662 ms) state Playing
+10:17:55.750 PM [playback] PUT file 4 position=153.1 (every 10 s) → 200 position=153.06 watched=false last_played=2026-09-16T02:17:55Z
+10:18:04.511 PM [playback] PUT file 4 position=161.4 (exit) → 200 position=161.4 watched=false last_played=2026-09-16T02:18:04Z
+10:18:04.513 PM [continue] 3 entries: movie/4@153s, episode/8@985s, movie/2@1821s

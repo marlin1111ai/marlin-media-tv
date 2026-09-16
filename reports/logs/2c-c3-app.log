@@ -1,0 +1,15 @@
+10:13:27.431 PM [continue] 2 entries: episode/8@968s, movie/2@1821s
+10:13:27.445 PM [continue] 2 entries: episode/8@968s, movie/2@1821s
+10:13:53.181 PM [hold] press down on S1E1
+10:13:53.185 PM [hold] press up on S1E1
+10:13:53.185 PM [hold] click: playing S1E1 from 968576 ms
+10:13:53.193 PM [player] request The Magicians — S1 E1 · Unauthorized Magic — http://192.168.1.250:8093/stream/8
+10:13:53.193 PM [playback] file 8 saved position 968.576 s watched=false; starting at 968576 ms
+10:13:53.671 PM [playback] seeking to the saved position 968576 ms (length 3128562 ms) tick=566192115966
+10:13:54.679 PM [playback] resume +1 s time=969313 ms (wanted 968576 ms, off by 737 ms) state Playing
+10:13:56.681 PM [playback] resume +3 s time=971043 ms (wanted 968576 ms, off by 2467 ms) state Playing
+10:14:03.501 PM [playback] PUT file 8 position=977.6 (every 10 s) → 200 position=977.574 watched=false last_played=2026-09-16T02:14:03Z
+10:14:11.566 PM [playback] PUT file 8 position=985.6 (pause) → 200 position=985.574 watched=false last_played=2026-09-16T02:14:11Z
+10:14:14.329 PM [playback] PUT file 8 position=985.9 (exit) → 200 position=985.898 watched=false last_played=2026-09-16T02:14:14Z
+10:14:14.330 PM [continue] 2 entries: episode/8@985s, movie/2@1821s
+10:14:14.357 PM [detail] show 2 re-read: 13 unwatched
