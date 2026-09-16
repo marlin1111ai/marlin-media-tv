@@ -1,57 +1,109 @@
 # Marlin Media TV — cold start
 
 Read this and DECISIONS.md before any work; do not re-derive what they settle. Per-pass
-reports live in `reports/`.
+reports live in `reports/`. **Current state** is where the project stands now; **Pass history**
+holds every pass note, oldest first.
 
 ## What this is
 
 The tvOS client for **marlin-media**, the home media server (repo marlin1111ai/marlin-media;
-Go, SQLite, TMDB metadata, direct-play streaming). The app shows the server's movies, TV shows
-and videos, and plays the original files with VLCKit — the server never transcodes; it serves
-the file bytes with HTTP Range support at `/stream/{fileId}`.
+Go, SQLite, TMDB metadata, direct-play streaming). The app opens on a Home screen and shows the
+server's movies, TV shows and videos, and plays the original files with VLCKit — the server never
+transcodes; it serves the file bytes with HTTP Range support at `/stream/{fileId}`.
+
+Since pass 2 it also carries the server's playback state (D023–D029): Continue Watching, Resume
+with "N min left", Start over, watched marks, the per-episode state column and a Recently Added
+sort. Reading that state is `GET /api/continue-watching` plus the `playback` block the server puts
+on every file of an item (`MediaFile.playback` — editions, episodes and videos alike); writing it
+is `PUT /api/files/{fileId}/playback`, the app's only write.
 
 ## Where things are
 
 - **Server:** `http://192.168.1.250:8093`, fixed in `ServerConfig.baseURL` (D007: no settings
-  screen). Never the marlinpc dev copy. Endpoints used: `/api/movies`, `/api/movies/{id}`,
-  `/api/shows`, `/api/shows/{id}`, `/api/videos`, `/api/artwork/…`, `/stream/{fileId}`, and the
-  timeline stills of image 0.3.0 (pass 2g):
-  - `GET /api/files/{fileId}/thumbs` — the index: `interval` (10 s), `tile_width` (320),
-    `tile_height` (214 on the films measured), `columns` (6), `rows` (5), `per_sheet` (30),
-    `count`, `state` (`none` | `generating` | `complete` | `failed`) and `sheets`, an array of the
-    sheets that exist **at that moment**, each `{index, first_still, url}`. Generation starts on
-    the first index request, so the first caller usually gets `generating` with `sheets: []`; a
-    file with no usable duration returns `none`, and `failed` re-queues on request. An unknown
-    file id is `404 {"error":"file not found"}`.
-  - `GET /api/thumbs/{fileId}/{n}.jpg` — one sprite sheet, 6 × 5 tiles, row-major and
-    chronological (1920 × 1070 for a 320 × 214 tile, ~90 KB, `Cache-Control: max-age=86400`).
-    The index's `sheet.url` carries a `?v=` cache-buster.
+  screen). Never the marlinpc dev copy. Image **0.3.0** when it was last read (`GET /api/health`,
+  pass 2 recon 2026-09-15 — the app itself never calls `/api/health`). **Every call the app
+  makes**, read from the source:
+  - `GET /api/movies` and `GET /api/movies/{id}` — the movie list, and one movie with its
+    editions (`ServerAPI.swift:67–68`).
+  - `GET /api/shows` and `GET /api/shows/{id}` — the show list, and one show with its seasons and
+    episodes. The list carries no episodes, so Home asks for one `GET /api/shows/{id}` **per show,
+    every time it appears** (D040), and the show screen asks for its own (`ServerAPI.swift:69–70`,
+    `LibraryModel.swift:131`).
+  - `GET /api/videos` (`ServerAPI.swift:71`).
+  - `GET /api/continue-watching?limit=200` — the server's in-progress list (`position > 0` and not
+    watched), newest `last_played` first, one entry per file, decoded as `ContinueEntry`. A failure
+    here is a log line and an absent row, not a library failure (D024, `ServerAPI.swift:82`).
+  - `PUT /api/files/{fileId}/playback` with `{position?, watched?}` — **the app's first and only
+    write** (D024, D028). An omitted key means "leave unchanged"; the server stamps `last_played`
+    itself and answers with the block it stored. Every write goes through `PlaybackWrite.send`,
+    which logs the request and the answer; **a failed write is a log line and nothing else**
+    (`ServerAPI.swift:88–101`, `PlaybackWrite` at `:149`).
+  - `GET /stream/{fileId}` — the original file, Range-served, handed to VLCKit. The path is the
+    item's own `file.stream`, resolved against the base URL (`Models.swift:50–52`).
+  - `GET /api/artwork/…` — posters, backdrops and episode stills, as server-relative paths carried
+    in the JSON and resolved the same way (`ServerImage.swift`, `Artwork` in `Models.swift`).
+  - the timeline stills of image 0.3.0 (pass 2g):
+    - `GET /api/files/{fileId}/thumbs` — the index: `interval` (10 s), `tile_width` (320),
+      `tile_height` (214 on the films measured), `columns` (6), `rows` (5), `per_sheet` (30),
+      `count`, `state` (`none` | `generating` | `complete` | `failed`) and `sheets`, an array of the
+      sheets that exist **at that moment**, each `{index, first_still, url}`. Generation starts on
+      the first index request, so the first caller usually gets `generating` with `sheets: []`; a
+      file with no usable duration returns `none`, and `failed` re-queues on request. An unknown
+      file id is `404 {"error":"file not found"}`. Asked for **once when a detail screen opens**,
+      for the file that would play, and never polled or re-fetched (D021, `ServerAPI.swift:76`).
+    - `GET /api/thumbs/{fileId}/{n}.jpg` — one sprite sheet, 6 × 5 tiles, row-major and
+      chronological (1920 × 1070 for a 320 × 214 tile, ~90 KB, `Cache-Control: max-age=86400`).
+      The index's `sheet.url` carries a `?v=` cache-buster. Fetched as needed for display, on
+      `URLSession.shared`, and kept for the rest of the player's life (`ThumbStrip.swift:125–143`).
 - **Repo:** https://github.com/marlin1111ai/marlin-media-tv (branch `main`).
 - **Working folder:** `~/Xcode/Marlin Media TV`. `Marlin DVR TV` next to it is read-only prior
   art (same owner, same device, same team); nothing else under `~/Xcode` is touched.
-- **Design:** `Design/Marlin Media tvOS Design.zip`, unzipped in place. The 17 frames in
-  `Design/Marlin Media.dc.html` and the clickable `Design/Marlin Media Prototype.dc.html` are the
-  design; the Nocturne tokens are in `Design/_ds/nocturne-…/styles.css` and are mirrored in
-  `Marlin Media TV/Theme.swift`. Build what the frames show; design nothing (D006).
-- **Device:** Apple TV 4K (3rd generation), named **Home Theater**, tvOS 26.6, Developer Mode on,
-  paired with this Mac (D005). The bedroom Apple TV is not used.
-- **Xcode:** 27.0 (27A266a), tvOS 27.0 SDK (24J360) — since 2026-09-14 (pass 1e rerun; supersedes 26.6 (17F113) / tvOS 26.5 SDK). Bundle id `com.marlin1111.marlin-media-tv`, team
-  `C879JNVK7Z`, automatic signing (both read from Marlin DVR TV).
+- **Design:** the Claude Design export, unzipped in place. `Design/Marlin Media.dc.html` holds
+  **20 frames** — counted in the file: 00, 00b, 00c (Home), 01–04 (the three library tabs and the
+  empty Videos state), 05 (the sort control open), 06–09 (movie detail, edition picker, show
+  detail, video detail), 10–15 (the player), 16–17 (loading and "can't reach server"). Nineteen of
+  them are 1920 × 1080 artboards carrying `data-screen-label`; frame 05 is a 760 × 1080 detail
+  board standing beside frame 04 and has no such attribute. `Design/Marlin Media Prototype.dc.html`
+  is the clickable companion (Esc = Menu, Space = play/pause, ← → = skip or frame step, E = server
+  error), `Design/support.js` its runtime, and the Nocturne tokens are in
+  `Design/_ds/nocturne-cd16098c-beea-4866-98d8-a7f5e2b3cacd/styles.css`, mirrored in
+  `Marlin Media TV/Theme.swift`.
+  This is the **Design2** export (D042): the owner's `Marlin Media tvOS Design2.zip` was unzipped
+  over the pass-1 frames, prototype, `support.js` and `_ds/`, and that zip was then deleted — it is
+  not in the folder and was never committed. The **older `Design/Marlin Media tvOS Design.zip` is
+  still there**, untouched, and holds the pass-1 (17-frame) copies of the same files (`.thumbnail`,
+  the two `.dc.html`, `support.js` and the five under `_ds/`). What
+  Design2 changed: frames 00, 00b, 00c are new; 01–04, 06–09, 16 and 17 differ only by the clock
+  (and 01–04 by the sort control's 260 pt shift); 10–15, the player, are unchanged.
+  Build what the frames show; design nothing (D006).
+- **Device:** Apple TV 4K (3rd generation, `AppleTV14,1`), named **Home Theater**, tvOS 26.6,
+  Developer Mode enabled, paired with this Mac over the local network (D005) — all five re-read
+  from `xcrun devicectl` on 2026-09-16. The bedroom Apple TV is not used.
+- **Xcode:** 27.0 (27A266a), tvOS 27.0 SDK (24J360) — since 2026-09-14 (pass 1e rerun; supersedes
+  26.6 (17F113) / tvOS 26.5 SDK). Bundle id `com.marlin1111.marlin-media-tv`, team `C879JNVK7Z`,
+  automatic signing (both read from Marlin DVR TV). The UI-test target is
+  `com.marlin1111.marlin-media-tv.UITests`.
 
 ## Toolchain facts
 
 - **VLCKit:** a custom build of VideoLAN's VLCKit 4.0.0-a24 with the TrueHD/MLP decoder compiled in
-  (D012). It lives at `Frameworks/VLCKit.xcframework` (git-ignored, 725 MB; tvOS device arm64 +
-  simulator arm64/x86_64 slices) and the Xcode project links and embeds it by path — the Swift package
-  is gone (D013). Built by `tools/vlckit-truehd/build.sh` at `~/vlckit-build` (VideoLAN's scripts cannot
-  take spaces in paths) from libvlc master 5dd4aebda + 20 patches: VLCKit's 17 (0007 minus its mlp hunk),
-  **0018** (TrueHD/MLP decoder frames coalesced into 20 ms blocks, D015), **0019** (VideoToolbox
-  picture-reorder fix, D017) and **0020** (no paused read-ahead after a frame step, D019). Current framework
-  (full recipe, 2026-09-14 23:30–23:33, 20 `Applying:` lines; the first 19-patch build was 18:42): contribs and libvlc compiled clean on
-  Xcode 27.0 / tvOS SDK 27.0, packaged with VLCKit's project tvOS target set to 26.0 (`MinimumOSVersion`
-  26.0, `LC_BUILD_VERSION minos 26.0 sdk 27.0`, D018). ffmpeg 9.0 (`Lavc63.1.100`), Video Toolbox decoding,
-  `samplebufferdisplay` video output, `avsamplebuffer` audio output. Reported version string:
-  `4.0.0-dev Otto Chriek`.
+  (D012). It lives at `Frameworks/VLCKit.xcframework` (git-ignored at `.gitignore:47`, 725 MB; tvOS
+  device arm64 + simulator arm64/x86_64 slices) and the Xcode project links and embeds it by path —
+  the Swift package is gone (D013). Nothing under `Frameworks/` has ever been tracked or pushed on
+  any ref. Built by `tools/vlckit-truehd/build.sh` at `~/vlckit-build` (VideoLAN's scripts cannot
+  take spaces in paths) from libvlc master 5dd4aebda + 20 patches: VLCKit's 17 (0007 minus its mlp
+  hunk), **0018** (TrueHD/MLP decoder frames coalesced into 20 ms blocks, D015), **0019**
+  (VideoToolbox picture-reorder fix, D017) and **0020** (no paused read-ahead after a frame step,
+  D019). The four patch files this repo owns are in `tools/vlckit-truehd/`; a fifth, 0021, was
+  written in pass 2f and **dropped** in pass 2g (D022), so the recipe is 20 patches and the patch
+  text survives only as
+  `reports/logs/2f-0021-es_out-no-late-pcr-compensation-while-paused.diff.txt`.
+  Current framework (full recipe, pass 2g, 20 `Applying:` lines, libvlc clean at `6d623583`):
+  contribs and libvlc compiled clean on Xcode 27.0 / tvOS SDK 27.0, packaged with VLCKit's project
+  tvOS target set to 26.0 (`MinimumOSVersion` 26.0, `LC_BUILD_VERSION minos 26.0 sdk 27.0`, D018),
+  `_ff_truehd_decoder` present on the device slice and no instrumentation strings. ffmpeg 9.0
+  (`Lavc63.1.100`), Video Toolbox decoding, `samplebufferdisplay` video output, `avsamplebuffer`
+  audio output. Reported version string: `4.0.0-dev Otto Chriek`.
 - **VLCKit build prerequisites (not the app's):** python.org Python 3.14.7 at
   `/Library/Frameworks/Python.framework` (installed 2026-09-13; VideoLAN's script looks only there)
   and GNU make 4.4.1 built into `~/vlckit-build/tools` and passed as `VLC_PATH` (Xcode's make 3.81
@@ -60,12 +112,17 @@ the file bytes with HTTP Range support at `/stream/{fileId}`.
   were kept). `PACKAGE_ONLY=1 tools/vlckit-truehd/build.sh` re-packages the slices already built (no
   clone, patching, host tools or compiles; VideoLAN's script with `-n -l`) in about 30 s. Any change to
   the patches or the toolchain needs the full build, which resets libvlc and re-applies every patch.
+  `build.sh` only **copies** 0018/0019/0020 into `~/vlckit-build/VLCKit/libvlc/patches/` and never
+  clears that folder, while VideoLAN's script applies every `*.patch` it finds there. **A withdrawn
+  patch must be deleted by hand** — pass 2g found an orphaned `0021-….patch` still sitting there,
+  which the recipe would otherwise have re-applied.
   `~/vlckit-build` was 22 GB on 2026-09-13 (not re-measured since).
 - **Minimum tvOS:** 26.0 exactly (`TVOS_DEPLOYMENT_TARGET = 26.0`, D004). Both Apple TVs run 26.6.
 - **No CocoaPods, no xcodegen, no brew installs.** The project file was written by hand
-  (objectVersion 71, file-system-synchronized groups); Xcode opens it normally.
-- **Fonts:** the system font. The design names Inter; no font is bundled (open question in
-  the pass-1 report).
+  (objectVersion 71, file-system-synchronized groups); Xcode opens it normally. Everything in
+  `Marlin Media TV/` is therefore in the app target by virtue of being in the folder.
+- **Fonts:** the system font. The design names Inter; no font is bundled, and there is no asset
+  catalog and so no app icon (both still open questions in the pass-1 report).
 
 ## Build, install, run (all from the repo root)
 
@@ -78,42 +135,299 @@ xcrun devicectl device process launch --console --terminate-existing --device <i
 ```
 `xcrun devicectl list devices` gives the identifier. Each launch writes
 `Library/Caches/marlin-media-tv.log` in the app container (VLCKit's debug log plus the app's
-`[player]` lines); copy it off with
+`[player]`, `[playback]`, `[detail]`, `[focus]`, `[hold]`, `[scrub]` and `[thumbs]` lines); copy it
+off with
 `xcrun devicectl device copy from --device <id> --domain-type appDataContainer --domain-identifier com.marlin1111.marlin-media-tv --source Library/Caches/marlin-media-tv.log --destination <file>`.
+`EvidenceLog` opens the file on its **first line**, not when a player starts, because the detail
+screens write with no player up (pass 2).
 
-**Evidence harness** (the Marlin DVR TV convention — not a standing test):
-`Marlin Media TVUITests/EvidenceUITests.swift` drives the real remote through `XCUIRemote` on
-Home Theater and photographs the screen. Build with `build-for-testing`, then
-`xcodebuild test-without-building … -only-testing:"Marlin Media TVUITests/EvidenceUITests/test1_Library" -resultBundlePath <x.xcresult>`
+**Evidence harnesses** (the Marlin DVR TV convention — per-pass throwaways, not a standing test
+suite). Each drives the real remote through `XCUIRemote` on Home Theater and photographs the
+screen; each navigates by reading which element has focus (`hasFocus == YES`), never by counting
+presses. Build with `build-for-testing`, then
+`xcodebuild test-without-building … -only-testing:"Marlin Media TVUITests/<Class>/<test>" -resultBundlePath <x.xcresult>`
 and `xcrun xcresulttool export attachments --path <x.xcresult> --output-path <dir>` for the PNGs.
-It navigates by reading which element has focus (`hasFocus == YES`), never by counting presses.
-It makes no server write.
+- **Committed:** `EvidenceUITests.swift` (pass 1, library and player; makes no server write) and
+  `Pass2UITests.swift` (pass 2's resume/watched matrix, which seeds positions by PUT so a resume
+  or a 90 % mark takes seconds rather than an hour).
+- **Deliberately uncommitted**, with the `PlayerHost.swift` Page Up / Page Down hook they need:
+  `Diag2gUITests.swift`, `Pass2bUITests.swift`, `Pass2cUITests.swift`, `Pass3ShotsUITests.swift`,
+  `Pass3bShotsUITests.swift`. They exist only to script touch-surface drags, which `XCUIRemote`
+  cannot perform. Copies of the pass 2g pair are committed as evidence:
+  `reports/logs/2g-harness-Diag2gUITests.swift.txt` and `reports/logs/2g-harness-hook.diff`.
 
 ## How the app is put together
 
+Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app target.
+
+**Entry and shell**
+- `MarlinMediaTVApp.swift` — the `@main` scene; one `WindowGroup` holding `ContentView`.
+- `ContentView.swift` — the navigation: **Home is the root** (D040), the three Home buttons push a
+  library tab, Menu there pops back, detail screens push above either, and the player is a
+  full-screen cover above everything. It also counts the player's closes (`playerClosed`) and hands
+  that count to Home and every detail screen, because a full-screen cover never takes its content
+  off screen and so fires no appearance callback (D032).
+
+**Server and data**
 - `Models.swift` — Decodable models of the server JSON (every field real; decoded with
-  `convertFromSnakeCase`) and `Format`, the display mapping of the server's values (codec names,
-  "7.1", "2 h 20 min", "13.2 GB").
-- `ServerAPI.swift` — `ServerConfig` (base URL) and `APIClient`; every failure is an `APIError`
-  with a message the UI shows in full.
-- `LibraryModel.swift` / `LibraryScreen.swift` — frames 01–05, 16, 17. Tabs and seasons switch on
-  click (the prototype's behaviour); the sort menu is Title / Year (Recently Added waits for D009).
-- `MovieDetailScreen.swift` (frames 06, 07), `ShowDetailScreen.swift` (08),
-  `VideoDetailScreen.swift` (09).
-- `PlayerModel.swift` (VLCKit + the remote's meaning, D008), `PlayerHost.swift` (the UIKit
-  surface that owns every press, touch and swipe — an edge click is a `UIPress`, a swipe is not),
-  `PlayerScreen.swift` (frames 10–15, visuals only, nothing focusable), `EvidenceLog.swift`.
-- `Frameworks/VLCKit.xcframework` — the custom VLCKit (D012/D013), linked and embedded (code-sign on
-  copy) by the project; not in git. Rebuild with `tools/vlckit-truehd/build.sh`.
-- `Info.plist` carries `NSAllowsLocalNetworking` so plain-HTTP to 192.168.1.250 is allowed.
+  `convertFromSnakeCase`), including `Artwork`, `Playback` and `ContinueEntry`, plus `Format`, the
+  display mapping of the server's values (codec names, "7.1", "2 h 20 min", "13.2 GB").
+- `ServerAPI.swift` — `ServerConfig` (the fixed base URL and path resolution), `APIError` (every
+  failure carries a message the UI shows in full) and `APIClient` with the calls listed above,
+  including the one write.
+- `ServerImage.swift` — artwork loading from server-relative paths, with the frames' placeholder
+  (`InitialTile`: the gradient tile with the title's initial) while loading, when there is no
+  artwork and when the load fails.
+- `PlayRequest.swift` — what the player is asked to play: the stream URL, frame 10's two overlay
+  lines, and `startMs`, where playback begins (D029). It also decides whether a thumbnail index
+  belongs to the file being played (`PlayRequest.matching`).
+- `LibraryModel.swift` — the three lists loaded together (any one failing is the whole library's
+  failure, frame 17), the Continue Watching list (whose failure is only a log line), `SortOrder`
+  (**Title / Year / Recently Added**, D010/D023), every show's episodes for Home, and the three
+  Home rows with their orders (D040).
 
-## Current state after pass 1 (2026-09-13)
+**Screens**
+- `HomeScreen.swift` — frames 00, 00b, 00c: MARLIN and the three library buttons, then Continue
+  watching (every kind mixed, newest first, hidden when empty), Movies · N, TV Shows · N (up to six
+  **episode** cards in the frames' wide card) and Videos · N. It re-reads itself every time it
+  appears, and it places the launch focus on the first Continue Watching card (D043).
+- `LibraryScreen.swift` — frames 01 (Movies), 02 (TV Shows), 03 (Videos), 04 (Videos empty),
+  05 (the sort control open), 16 (loading) and 17 (can't reach server). Tabs and seasons switch on
+  click (the prototype's behaviour); the sort menu is **Title / Year / Recently Added**; each tab
+  carries a Continue Watching row above its grid holding only that tab's kind, and focus entering
+  that row lands on its first card (D033). Frame 17's "Browse cached" button is still not built.
+- `MovieDetailScreen.swift` — frames 06 (movie detail) and 07 (edition picker), with the watched
+  pill, "Resume · N min left" and its in-button bar, "Start over", "Mark watched / unwatched" and
+  the multi-edition rule (D026, D034).
+- `ShowDetailScreen.swift` — frame 08: season selector and episode list, "N unwatched" in the meta
+  row, the per-episode state column, a click that resumes at the saved position and a
+  press-and-hold that opens the mark menu (D027, D031, D039).
+- `VideoDetailScreen.swift` — frame 09, behaving exactly as the movie detail but with one file, so
+  no picker and nothing to follow. **Never run on a device** — this library has no videos (D038).
+- `NowClock.swift` — the date-and-time pair the new frames put at the top right (D041). It draws
+  only the pair; the placement (`right: 80, top: 56`) belongs to each screen. It ticks once a
+  second while it is on screen.
 
-See `reports/2026-09-13-pass1-scaffold-and-player.md`. Built and proven on Home Theater:
-library (3 movies, 2 shows, empty Videos), sort by Title and Year, movie/show detail, edition
-picker, and VLCKit playback of the four MKVs and a Magicians episode with the overlay, skips,
-pause, frame step, audio and subtitle panels. Committed locally on `main`; **not pushed** — the
-owner tests first.
+**Player**
+- `PlayerModel.swift` — VLCKit and the remote's meaning (D008 revised): click = play/pause,
+  Menu = back, skips while playing, a native one-picture frame step on a left/right click while
+  paused, and the paused touch-surface scrub with its landing and cancel (D021). It also adds
+  `:demux=mkv_trusted` on `.mkv` streams (D014), asks tvOS to match the display to the stream
+  (D016), seeks once to a `startMs` at the first `Playing` state (D029), and writes the position on
+  the D028 schedule.
+- `PlayerHost.swift` — the UIKit surface that owns every press, touch and swipe, and the VLCKit
+  drawable. An edge click is a `UIPress`; a swipe is not a press at all; the scrub pan runs
+  alongside the swipe recognizers and begins only while paused. **This file is the one with the
+  uncommitted Page Up / Page Down harness hook in the working tree** — HEAD's copy has no hook.
+- `PlayerScreen.swift` — frames 10–15 plus the scrub bar and its thumbnail, and the paused clock
+  (D045). Visuals only: the whole stack is `allowsHitTesting(false)` and nothing in it is focusable.
+- `ThumbStrip.swift` — the server's timeline stills: the index model (`ThumbIndex`, `ThumbSheet`),
+  the arithmetic that turns a target time into a sheet and a tile, the sheet fetches and the draw.
+  Where a still does not exist, nothing is drawn (D021).
+
+**Support**
+- `Theme.swift` — the Nocturne tokens from `Design/_ds/…/styles.css` plus the values the frames use
+  inline; screens are 1920 × 1080 at 1×, content 80 pt from the sides. (Its header comment still
+  says "the 17 frames", from before D042 replaced the export.)
+- `EvidenceLog.swift` — one log file per launch in `Library/Caches`, VLCKit's own debug logger and
+  the app's bracketed lines interleaved, also echoed to the console (D011).
+
+Outside the Swift files:
+- `Frameworks/VLCKit.xcframework` — the custom VLCKit (D012/D013), linked and embedded (code-sign
+  on copy) by the project; not in git. Rebuild with `tools/vlckit-truehd/build.sh`.
+- `Info.plist` carries `NSAppTransportSecurity` → `NSAllowsLocalNetworking`, so plain HTTP to
+  192.168.1.250 is allowed.
+
+## Current state
+
+As of **pass 3c (2026-09-15)**, the newest pass. Nothing since it has been built, installed or
+launched.
+
+### Built and owner-accepted
+
+Every feature below has been tested by the owner on Home Theater and accepted; nothing is waiting
+on an owner test.
+
+- **The library and the player** (pass 1): the three library tabs, movie, show and video detail,
+  the edition picker, and VLCKit playing the four MKVs and a Magicians episode directly — the
+  overlay, the −10 s / +30 s skips, pause, the audio and subtitle panels, and Menu closing an open
+  panel. The custom VLCKit decodes TrueHD to 8-channel PCM (D012, D015), MKV seeks use the file's
+  cues (D014), tvOS matches the display to the stream (D016), and the VideoToolbox reorder fix
+  ended Wonder Woman's judder (D017).
+- **Native frame-back while paused** (D008 revised, D019, D020): a left/right click steps exactly
+  one picture, both ways, on avcodec and VideoToolbox streams. Accepted and pushed in pass 1l.
+- **The paused touch-surface scrub with timeline thumbnails** (D021 revised again, D022): a swipe
+  or drag while paused moves the target and the server's nearest still, the picture holds, click or
+  Play/Pause lands and plays, Menu cancels and stays paused. The owner tried the gesture by hand
+  and accepted it; pushed in pass 2h.
+- **Playback state** (D023–D029, D032, D034–D036): Recently Added on all three tabs, the Continue
+  Watching row on Home and each library tab, Resume / Start over / the watched pill / Mark watched
+  and unwatched on the movie and video details, "N unwatched" and the per-episode state column on
+  the show detail, position writes on the D028 schedule with a 120 s floor and the watched mark at
+  90 %, and resuming at a saved position with one seek.
+- **The episode row** (D031, D039): a click plays or resumes, a hold of 0.6 s or more opens the
+  mark menu, and the focus highlight is back.
+- **The Continue Watching focus rule** (D033) on the library tabs, and **launch focus on the first
+  Continue Watching card** (D043) on Home.
+- **Home as the app's first screen** (D040), frames 00/00b/00c, with Menu on a library tab
+  returning to it.
+- **The clock** (D041, D044, D045): on Home, the three library tabs, the movie, show and video
+  screens, frames 16 and 17, and the player **while paused only**. Frames 16 and 17 are a code
+  trace, not device proof — open item 6.
+
+Known and accepted as behaviour rather than defects, not open: **D020's two** — Play after any
+frame step drops the pictures below the demuxer's clock start (21–45 pictures, about 0.9–1.5 s),
+and patch 0020's remaining gap, where a plain pause taken after a frame step can read ahead while
+paused if a subtitle track is selected.
+
+### Pushed
+
+Everything on `main` is on `origin/main`; nothing is waiting to be pushed.
+
+- Passes 1–1e up to `b22f9c9` (pass 1e rerun 4).
+- Passes 1f–1k as `b22f9c9..6bfdbad`, six commits (pass 1l).
+- Passes 2a–2g as `e9df636..1e13538`, seven commits (pass 2h).
+- **Passes 2–3b as `3597d0a..896ee12`, five commits** — `b3f3b02` (pass 2), `8def8cd` (2b),
+  `ef9ce11` (2c), `a99cccc` (3), `896ee12` (3b) — each a fast-forward, no force, no merges (D046).
+  After that push, local `main`, `origin/main` and `git ls-remote origin main` were all
+  `896ee1293ac9`.
+- `896ee12` is the newest commit carrying **app source**. Pass 3c's own notebook and report commit
+  `d64679a` changed no Swift file, and neither does this rewrite.
+- `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`). Nothing under `Frameworks/`
+  is tracked on any ref, so the 725 MB framework has never been pushed.
+
+### Deliberately uncommitted
+
+These stay out of git on purpose and are expected in `git status`:
+
+- `Marlin Media TV/PlayerHost.swift` — the Page Up / Page Down hook (pass 2g), the only
+  modification to a tracked file. It exists to script touch-surface drags through the model,
+  because `XCUIRemote` has no touch-surface API. A copy is committed as
+  `reports/logs/2g-harness-hook.diff`.
+- Five UI-test harnesses, all in `Marlin Media TVUITests/`: `Diag2gUITests.swift`,
+  `Pass2bUITests.swift`, `Pass2cUITests.swift`, `Pass3ShotsUITests.swift`,
+  `Pass3bShotsUITests.swift`. A copy of the pass 2g one is committed as
+  `reports/logs/2g-harness-Diag2gUITests.swift.txt`.
+
+The owner's `Design/Marlin Media tvOS Design2.zip` is not in the folder at all: pass 3 unzipped it
+and deleted the zip (D042).
+
+Two further untracked paths appeared on 2026-09-16 while this section was being written, from the
+owner's own work and recorded in no pass: `icon pixel/Marlin Media.pxd` and
+`Design/tvos icons/Marlin Media tvOS Design.zip` (2.4 MB, a different file from the pass-1
+`Design/Marlin Media tvOS Design.zip`). They were not opened, moved or committed here. They look
+like app-icon work, which is open item 19; whoever picks that up should ask before assuming.
+
+### What Home Theater runs
+
+The **pass 3b build** — `896ee12`'s app source, built from the working tree and so carrying the
+uncommitted `PlayerHost.swift` hook. Pass 3b installed it and left it running; pass 3c touched no
+source and built nothing, so that is still what is on the device.
+
+### The server's state
+
+The library, counted by `GET /api/health` on 2026-09-15 (pass 2 recon): **3 movies, 2 shows,
+3 seasons, 16 episodes, 0 videos, 0 unmatched**, on 20 files. That is why D038's video check
+has never run.
+
+Pass 3c reset the playback state the test passes had written (D047). Files 1, 2, 4, 5 and 8 are all
+back to `position 0, watched false`, no other file was ever touched, and
+`GET /api/continue-watching` is **`[]`**. So the app now opens with **no Continue Watching row** on
+Home (frame 00c) or on any library tab, and D043's launch focus deliberately places nothing — that
+branch is the one in play and it has not been seen on the device. `last_played` survives on the
+five, stamped to the reset's own instant, which leaves Stargate's *followed* edition (D026/D034)
+still Extended, exactly as before.
+
+### Open items
+
+Each is recorded as open in DECISIONS.md or in a pass report; the source follows it.
+
+**The library's coverage**
+
+1. **Videos have never run on a device.** Recently Added on the Videos tab and the whole video
+   detail screen are traced from the code, because this library has no videos. — `DECISIONS.md`
+   D038; `reports/2026-09-15-pass3c-push-and-reset.md` open question 2.
+
+**Home (raised in pass 3, untouched through 3b and 3c)**
+
+2. **Home fetches one `GET /api/shows/{id}` per show every time it appears** — two requests on this
+   library, about 34 on the owner's full one. Cache them, or ask only when the shows list changes?
+   — `reports/2026-09-15-pass3-home-and-rows.md` open question 3.
+3. **The TV Shows row uses the wide episode card** the brief asked for, while frames 00b/00c draw
+   that row as posters. The brief won, but the app and the frames now differ there. — same report,
+   open question 4.
+4. **With no videos the Videos heading shows above an empty space**, as asked. Is that the wanted
+   look once a video exists, or should the row hide the way Continue watching does? — same report,
+   open question 5.
+5. **Nothing pins Home's header**; the rows are one vertical scroll, and frames 00 and 00b are two
+   scrolled states of the same screen. Is the header meant to stay put? — same report, open
+   question 6.
+
+**The clock**
+
+6. **Frames 16 and 17 carry the clock by code trace, not device proof.** Neither state can be
+   reached on Home Theater without something out of scope — the loading phase is over before the
+   first painted frame, and the error screen needs the server unreachable. — `DECISIONS.md` D044;
+   `reports/2026-09-15-pass3b-fixes.md` open question 1.
+7. **The paused clock shows during a scrub, and while the player is buffering or opening**
+   (`!isPlaying` is true then too). Neither was separately asked for, and the frames say nothing
+   either way because they draw no clock on the player at all. —
+   `reports/2026-09-15-pass3b-fixes.md` open questions 2 and 3.
+
+**The scrub thumbnails (pass 2g)**
+
+8. **"The file that would play" is a guess on multi-file screens.** One index per screen means a
+   movie's first edition and a show's first episode of season 1; play any other edition or episode
+   and there are simply no thumbnails. Fetch per selection, or lazily when the player opens? —
+   `DECISIONS.md` D021 (revised again); `reports/2026-09-15-pass2g-scrub-thumbnails.md` §6.1.
+9. **A file's first visit shows no stills at all**, because that first index request is what starts
+   generation on the server. Accept "second visit onwards", or re-ask when the player opens? — same
+   report, §6.2.
+10. **The stills are letterboxed** into the server's 320 × 214 tile. Crop them in the client, or
+    leave the server's tile as it is? — same report, §6.3.
+11. **Nothing logs which still is drawn.** The proof that it follows the target is the screenshots
+    alone. — same report, §6.5.
+
+**The player**
+
+12. **A pause after a scrub landing lets the demuxer read at 1× while paused**, up to about 36 s of
+    stream. No seek is involved and no landing moved. Observed, not decided. — `DECISIONS.md` D021
+    ("Observed, not decided", carried through the pass 2c and 2d entries).
+13. **Start-up late pictures.** Wonder Woman and Magicians each show one picture late or dropped at
+    the moment the audio output starts, while tvOS switches display mode. Accept as start-up
+    behaviour, or a later diagnosis pass? — `reports/2026-09-14-pass1e-reorder-fix.md` §R4-6
+    question 1.
+14. **Wonder Woman's displayed picture rendered 24 s late at one resume**, against a clock from the
+    last step. One run, not reproduced on the other films, not instrumented. —
+    `reports/2026-09-14-pass1k-frame-back-close.md` open question 2.
+15. **Audio start is still unmeasured.** It needs either a timestamped app log line, an instrumented
+    build, or measuring outside the device. — same report, open question 3.
+
+**Outside the app**
+
+16. **The VideoLAN report is drafted and not submitted.** "Submit it, and in whose name?" — draft
+    `reports/logs/1k-upstream-videolan-draft.md`;
+    `reports/2026-09-14-pass1k-frame-back-close.md` open question 4.
+17. **`last_played` was not cleared by the reset** and cannot be: the server stamps it on every
+    write and the PUT body carries no way to null it. A true virgin state needs a server-side clear
+    or a `last_played` field on the PUT — a request to the server repo, not a client change. —
+    `DECISIONS.md` D047; `reports/2026-09-15-pass3c-push-and-reset.md` open question 1.
+
+**Never settled since pass 1**
+
+18. **Inter is not bundled** — the system font is used at the frames' sizes and weights. —
+    `reports/2026-09-13-pass1-scaffold-and-player.md` open question 8.
+19. **There is no asset catalog and so no app icon**; the tvOS Home screen shows the generic tile. —
+    same report, open question 11.
+20. **Frame 17's "Browse cached" button and its "Last successful sync … cached" line are not
+    built**, because there is no cache. — same report, open question 9.
+
+## Pass history
+
+Every pass note as it was written, oldest first. Two passes were numbered 2b and two 2c; each is
+headed by its own report file.
+
+### Pass 1b — the custom VLCKit with the TrueHD decoder (`reports/2026-09-13-pass1b-vlckit-truehd.md`)
 
 **Pass 1b (2026-09-13) done after four stops** (repo path spaces, missing GNU mirror tarballs,
 Xcode's Python 3.9.6, Xcode's make 3.81 — all recorded in
@@ -126,9 +440,15 @@ frame back shows a wrong frame and puts this VLC alpha into a rebuffer loop over
 native `gotoPreviousFrame` exists in this build but was not tried. TrueHD is solved by pass 1b. Deferred to a later pass (D009):
 Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 
+### Pass 1c — MKV seeks on the file's cues (`reports/2026-09-14-pass1c-mkv-seek.md`)
+
 **Pass 1c (2026-09-14):** MKV seeks now use the file's Cues — one media option, `:demux=mkv_trusted`, on `.mkv` streams only (D014). Ten +30 s skips bring the picture back in under 0.6 s on all four MKVs (8–51 s before); nothing else changed. Numbers in `reports/2026-09-14-pass1c-mkv-seek.md`; the two diagnosis reports of 2026-09-14 (`…-diag-mkv-stutter.md`, `…-diag2-seek.md`) hold the evidence and VLC's code path. Still open: Wonder Woman's steady ~3.6 dropped pictures/s (2160p HEVC decode/display path, not the network), and the paused frame-back step, which now starts from the previous cue instead of the file start but still runs VLC's paused-seek rebuffer loop until the next input (pass-1 open question 2, D008).
 
+### Pass 1d — TrueHD blocks, display matching, Menu closes a panel (`reports/2026-09-14-pass1d-truehd-audio-and-framerate.md`)
+
 **Pass 1d (2026-09-14):** three changes. (1) VLCKit patch 0018 (D015) coalesces TrueHD/MLP decoder frames into 20 ms blocks — the framework was rebuilt with `tools/vlckit-truehd/build.sh` (which now installs that patch too; 3 min when contribs are already built) and `Frameworks/VLCKit.xcframework` replaced. (2) The player requests display matching per stream (D016): frame rate from VLC's parse or the player's video track, HDR10/SDR from the server's flag; tvOS switches to 24 Hz for the 4K films. (3) Menu closes an open track panel instead of exiting. Numbers in `reports/2026-09-14-pass1d-truehd-audio-and-framerate.md`. Still open: Wonder Woman's ~3.6 dropped pictures/s (unchanged at 24 Hz — a decode/output limit for that stream, `…-diag3-wonder-woman.md` §B), the paused frame-back step (D008, pass-1 open question 2), and whether TrueHD is now audible (the owner's check).
+
+### Pass 1e — the VideoToolbox picture-reorder fix (`reports/2026-09-14-pass1e-reorder-fix.md`)
 
 **Pass 1e (2026-09-14):** Wonder Woman's judder is fixed.
 - **Cause.** VLC's VideoToolbox reorder buffer released each mini-GOP's anchor before its last B-picture when only the max-latency count triggered a release (diag4), so the vout dropped 642 pictures per 3 minutes.
@@ -147,6 +467,7 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   - An upstream report to VideoLAN.
 - **Pushed.** Pass 1e's HEAD `b22f9c9` is on `origin/main`; the passes after it were local until the owner tested (pushed in pass 1l, `6bfdbad`).
 
+### Pass 1f — native frame-back tried (STOPPED) (`reports/2026-09-14-pass1f-frame-back.md`)
 
 **Pass 1f (2026-09-14): STOPPED at item 3.**
 - **Stepping.** VLCKit's native `gotoPreviousFrame` steps exactly one picture per left click on Stargate Extended, both ways. Five back, five forward and five back stay on the file's 33/50 ms picture grid, the screenshots return to identical pictures, and there's no `RESET_PCR` loop.
@@ -155,6 +476,8 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 - **Not run.** Wonder Woman and Magicians.
 - **Code state.** The native call is **not committed**; `PlayerModel.swift` is at HEAD with D008's seek-back, and the tested diff is `reports/logs/1f-playermodel-native-prevframe.diff`. **Home Theater still has the pass 1f build installed.** D008 unchanged.
 - **Where it is written up.** `reports/2026-09-14-pass1f-frame-back.md`, with the fix options as question 1.
+
+### Pass 1g — the paused read-ahead found (STOPPED) (`reports/2026-09-14-pass1g-frame-back-resume.md`)
 
 **Pass 1g (2026-09-14): STOPPED at step 4.**
 - **Cause, from an instrumented libvlc on Home Theater.** The instrumentation was 32 log lines, since removed; the diff is `reports/logs/1g-libvlc-clock-instrumentation.diff`.
@@ -168,6 +491,8 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   - The libvlc tree is clean at `e50d9ac36a`. `Frameworks/`' device slice was relinked from clean objects (same sources, not byte-identical).
   - D008 unchanged; `tools/vlckit-truehd/` untouched. Not pushed.
 
+### Pass 1h — the demux-pause diagnosis (`reports/2026-09-14-pass1h-demux-pause-diagnosis.md`)
+
 **Pass 1h (2026-09-14), diagnosis only.** Pinned candidate B from pass 1g with one instrumented Stargate run on Home Theater.
 - **What keeps the demuxer reading while paused.** `next_frame_need_data` stays true. The first native back step flushes the subtitle decoder while paused, which gives it `frames_countdown = 1` (`decoder.c:2789–2793`). It then asks for data (12 288 requests).
 - **Why nothing clears it.** es_out drops every non-video block in frame-step mode (`es_out.c:3164–3169`), so the request is never met or cleared (`decoder.c:2686–2687`). Only Play clears it (`INPUT_CONTROL_SET_STATE`), and Play's resume flush sets it again at once.
@@ -178,6 +503,8 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
   - libvlc is at `51f8302c27`, the same tree as `e50d9ac36a` (the recipe's `git am` rewrites hashes).
   - `PlayerModel.swift` is at HEAD, and Home Theater runs that build. D008 unchanged. Not pushed.
 
+### Pass 1i — patch 0020 (STOPPED) (`reports/2026-09-14-pass1i-frame-back-fix.md`)
+
 **Pass 1i (2026-09-14): STOPPED at step 8.**
 - **Patch 0020** (`tools/vlckit-truehd/0020-es_out-forward-next-frame-need-data-only-from-stepped-es.diff`, design B1, 2 lines in `src/input/es_out.c`): while frame stepping, only the stepped video ES's need-data request reaches the input, and a request standing when stepping starts is cleared. `build.sh` installs it after 0019. VLC's player tests: 19/20 before and after (the one failure, `attachments`, is the host test build's missing BMP encoder).
 - **Framework.** Full recipe, 22:43–22:46, 20 patches, libvlc `03632d2eb8`. Both slices `MinimumOSVersion 26.0` and `minos 26.0 sdk 27.0`; `_ff_truehd_decoder` on the device slice; no instrumentation strings.
@@ -185,12 +512,16 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 - **Why it stopped.** Stargate after five back steps drops 21 pictures and starts audio 1 477 ms after the first picture. After five forward steps: 26 dropped, 1 361 ms. The no-step control in the same session: 0 dropped, 176 ms. Play re-anchors the clock at the first PCR read after resume (~1 s past the displayed picture) while the video fifo still starts at the displayed picture. Wonder Woman, Divergent, Magicians, Food That Built America, step 7, step 9 and step 11 were not run.
 - **State.** `PlayerModel.swift` carries the 1f native back step, **uncommitted**; Home Theater runs that build with the clean recipe framework. D008 unchanged, no new decision. Report: `reports/2026-09-14-pass1i-frame-back-fix.md`. Not pushed.
 
+### Pass 1j — the resume trace (STOPPED) (`reports/2026-09-14-pass1j-frame-back-resume-fix.md`)
+
 **Pass 1j (2026-09-14): STOPPED at step 1.** An instrumented Stargate run (pause, five back steps, Play, 60 s, second pause ~80 s, Play) settles the resume trace; report `reports/2026-09-14-pass1j-frame-back-resume-fix.md`.
 - **Pictures — pass 1i's cause confirmed.** At Play the picture on screen is `pf_pts=33834001`. `EsOutChangePosition` resets the input clock, and the demuxer's first PCR becomes its reference (`input_clock reference stream=34785001`). The buffering end anchors the main clock there (`set_first_pcr ts=34785001`). Every queued picture below it is late: 21 dropped (`vout drop pts=33917001` … `34751001`), and the displayed one renders 955 ms late.
 - **Audio — pass 1i's "1.4 s delay" was a measuring error.** The tvOS audio output starts 92 ms after the first picture (`avs startNow` at +101.6 ms). The trace's first audio render event is the output's 1 s periodic timing report (`time_observed time=1000129` at +1563 ms). The first audio block is PTS 34.912 s, so a clock started at the displayed picture would put ~1.1 s of silence under the first pictures. That's why step 2 was not written.
 - **Second pause (0020's gap, step 7's case).** The resume flush sets the need-data flag again after frame stepping ends, and it stays set through a later plain pause: 3 967 demux calls while paused, PCR 98.4 → 182.4 s. Resume 2 was still clean (delay applied, 0 dropped).
 - **Origin (step 13).** After `git fetch`, `origin/main` is `b22f9c9` (pass 1e rerun 4) and local `main` is 4 commits ahead, so pass 1i's "pushed" line was right.
 - **State.** No patch 0021. libvlc clean and `Frameworks/` rebuilt by the full recipe (20 patches, as pass 1i). Home Theater runs HEAD + the uncommitted 1f diff. D008 unchanged. Not pushed.
+
+### Pass 1k — native frame-back closed out (`reports/2026-09-14-pass1k-frame-back-close.md`)
 
 **Pass 1k (2026-09-14/15): native frame-back closed out.** Report `reports/2026-09-14-pass1k-frame-back-close.md`.
 - **Frame-back state.** While paused, a left/right click steps exactly one picture through VLCKit's native previous/next-frame (D008 revised; the seek-back is superseded). `PlayerModel.swift` carries it, committed. It needs patch 0020 (D019), which is in the 20-patch recipe and in `Frameworks/`. Exact on Home Theater for back and forward steps on Stargate (avcodec), Divergent and Wonder Woman (VideoToolbox): each click shows a new picture and the returning clicks show identical pictures (MAD 0).
@@ -202,54 +533,11 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 - **VideoLAN.** Draft `reports/logs/1k-upstream-videolan-draft.md`, not submitted.
 - **Push.** The owner tested native frame-back on Home Theater and accepted it; pushed in pass 1l.
 
-**Pass 2a (2026-09-15): touch-surface scrubbing — STOPPED at step 5.** Report `reports/2026-09-15-pass2a-scrubbing.md`.
-- **Built, uncommitted.** A horizontal drag pauses and shows a scrub bar (frame 10's timeline row, target elapsed/remaining, a start mark), the picture follows the target by paused seeks (one per 250 ms and one on lift), click lands and plays, Menu returns. The diff is in the working tree and saved as `reports/logs/2a-scrub-app.diff`. Home Theater runs it (no harness hook).
-- **Why it stopped.** Landing hits the paused-seek read-ahead (pass 1g's seek-back loop), on Magicians S1E1 (MP4, no subtitle track): after the last paused seek VLC laps its rebuffer 12 times in 1.3 s (`PCR is called … late`, `ES_OUT_RESET_PCR`), reading PCR 238.2 → 269.0 s for a 238.6 s target; Play then starts at the read-ahead end (first picture PTS 266.3 s; clock 04:29 at +3 s for a 03:59 target). Trace in `reports/logs/2a-analysis.txt`. No fix; 23 of the 24 matrix runs and the step-4 controls not run.
-- **Drags can't be scripted on the remote.** XCUIRemote has no touch-surface API; the owner chose a hybrid: an uncommitted Page Up/Down hook plays a scripted drag through the model (`reports/logs/2a-harness-app.diff`), plus a physical check by the owner (not done — stopped first).
+### Pass 1l — the push of passes 1f–1k (no separate report)
 
-**Pass 2d (2026-09-15): the owner's scrub flow — committed (D021 revised).** Report `reports/2026-09-15-pass2d-owner-flow.md`.
-- **The owner's defect (real remote): a paused swipe did not scrub.** The pan waited for the left/right swipe recognizers to fail, so every paused flick was recognized as a side swipe and dropped by D008's paused rule (`right swipe while paused: no action (frame step is on click)`, 19 times in the owner's session; `[scrub] begin` 4 times). Touches around a click, or after swipe skips, also started scrubs while playing.
-- **The flow now.** Play/Pause pauses. Paused: a swipe or drag scrubs (the picture holds, nothing seeks until landing); a left/right click steps one frame. Play/Pause or a click on the surface lands at the target and plays. Menu cancels and stays paused where the drag began. Playing: a drag does nothing; skips unchanged. 25% of the running time per width; target 1 s short of the end. `PlayerHost.swift` (the pan runs alongside the swipes and begins only while paused), `PlayerModel.swift` (the scrub appears once the target moves; no scrub while playing; Menu stays paused).
-- **Proof on Home Theater** (drags scripted through the model — XCUIRemote cannot touch the surface): 24 paused scrubs on Stargate, Wonder Woman, Divergent, Magicians S1E1 — 16 landings −74…+94 ms from the target, 8 Menu cancels paused at the start; 8 drags while playing refused; skips exact; 5 + 5 clicks one picture each on all four (pixel comparison). One Divergent run lost a Play/Pause press between XCTest and the app (no app line, VLC kept playing); re-run once at the owner's call, clean.
-- **The owner must still try the gesture by hand** (report §6); nothing is pushed until then.
+**Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.
 
-**Pass 2c (2026-09-15): preview-playhead scrub — landed and committed (D021).** Report `reports/2026-09-15-pass2c-scrub-preview.md`.
-- **Behaviour.** A horizontal drag on the touch surface pauses and shows the scrub bar; the picture holds, nothing seeks during the drag or on lift; click or Play/Pause plays and then seeks once to the target; Menu cancels with no seek and restores the play state. 25% of the running time per surface width; target stops 1 s short of the end. `PlayerHost.swift` (pan), `PlayerModel.swift` (scrub state, land, cancel), `PlayerScreen.swift` (bar).
-- **Proof on Home Theater** (drags scripted through the model by an uncommitted Page Up/Down hook — `reports/logs/2c-harness-app.diff`; XCUIRemote cannot touch the surface): 48 scrubs on Stargate, Wonder Woman, Divergent and Magicians S1E1 — 32 landings with the first picture −72…+104 ms from the target, 16 cancels within 0.81 s; skips, frame steps and Menu-closes-panel unchanged on all four films.
-- **Still open.** The owner's test of the gesture on the real remote (not yet done; push waits for it). A pause after a landing reads the stream at 1× while paused, up to ~36 s (no effect on landings; not diagnosed).
-
-**Pass 2b (2026-09-15): fast seek on the scrub path — STOPPED at step 2, owner's call.** Report `reports/2026-09-15-pass2b-fast-seek.md`, evidence `reports/logs/2b-fast-seek-recon.txt`.
-- **Why it can't be scoped as asked.** Nothing in this libvlc reads the `input-fast-seek` option (declared, created on the input, read only by desktop GUI prefs), so a media option is inert; VLCKit has no seek-speed setting (`setTime:` always passes `b_fast = NO`). Fast vs precise is per seek: `libvlc_media_player_set_time(p, t, b_fast)`. The only scoped route is VLCKit's private `_playerInstance` plus that exported C call; the owner chose to stop rather than use it.
-- **State.** Nothing applied, built, installed or run. Tree and Home Theater as after pass 2a (scrub diff uncommitted). The scrub code is not committed: pass 2a's ~30 s landing overshoot stands.
-
-**Pass 2f (2026-09-15): patch 0021 (C1) with a moving scrub picture — STOPPED at step 9.** Report `reports/2026-09-15-pass2f-scrub-live-picture.md`, evidence `reports/logs/2f-analysis.txt`, `reports/logs/2f-vlc-tests.txt`.
-- **What works.** 0021 (`es_out.c:3661`, no late-PCR compensation while paused; one line) passes VLC's host tests unchanged. The full recipe built it with 21 patches; both slices check. On Home Theater, 20 paused scrubs on four films had 0 PCR-late lines, and every landing was within −81…+305 ms of its target. Steps 7–8 (skips, frame steps, panels, paused track switches, plain pause, edition/episode change) matched HEAD.
-- **Why it stopped.**
-  - **Magicians (MP4):** every ending logged a `clock gap`, and VLCKit's time froze after 4 of 5, so the overlay clock and the next drag's start were stale.
-  - **The picture did not track during drags** on Wonder Woman and Divergent (HEVC: 1–5 of 8–9 seeks shown), nor on Magicians scrub 3's lift.
-  - **Stargate scrub 4** dropped 7 pictures at landing.
-- **State, uncommitted.**
-  - `tools/vlckit-truehd/` (0021, `build.sh`, README), the app change and the harness. Copies are in `reports/logs/2f-*`.
-  - `Frameworks/` and the libvlc tree carry 21 patches, and Home Theater runs the 0021 build with the harness hook.
-  - D021 and DECISIONS unchanged. Nothing pushed.
-
-**Pass 2e (2026-09-15): why paused seeks can't make the picture follow the thumb — diagnosis only.** Report `reports/2026-09-15-pass2e-scrub-seek-diagnosis.md`, evidence `reports/logs/2e-analysis.txt`.
-- **Cause (instrumented libvlc, Magicians S1E1 and Stargate on Home Theater).**
-  - A paused seek's rebuffer anchors the input clock at the **pause date** (`es_out.c:1219`). The next PCR is late by about (time since the pause − pts_delay), so the late branch resets and rebuffers without moving the demuxer (`es_out.c:3661–3721`).
-  - Lap after lap reads forward, and past the 5 s `clock-jitter` cap the laps run until Play. Play-only landings played from 452 s for a 239 s target (Magicians) and from 667 s for 333 s (Stargate).
-  - A single seek on lift laps the same way, so seek count and pace don't matter. The need-data flag isn't involved on Magicians; Stargate's subtitle request adds paused reads.
-- **What still works.** HEAD's landing (play, then one seek) lands on the target even after laps. But during the hold the picture drifts forward while the bar shows the target.
-- **Candidates.** C1 (`es_out.c:3661`, skip late compensation while es_out is paused) is the narrowest; not implemented. No decision.
-- **State.** libvlc clean, and `Frameworks/` rebuilt by the full recipe (20 patches; both slices `MinimumOSVersion 26.0`, `minos 26.0 sdk 27.0`; `_ff_truehd_decoder`; no trace strings). The app is at HEAD and installed on Home Theater. Committed locally, not pushed.
-
-**Pass 2g (2026-09-15): 0021 dropped, the scrub gained timeline thumbnails — done.** Report `reports/2026-09-15-pass2g-scrub-thumbnails.md`, evidence `reports/logs/2g-*`, screenshots `reports/screenshots/2g/`.
-- **0021 is gone** (D022): the patch file, its `build.sh` step and its README line are removed, the app is back at HEAD's scrub, and the full recipe rebuilt `Frameworks/` at **20 patches** (20 `Applying:` lines, `ARCHIVE SUCCEEDED` ×2, libvlc clean at `6d623583` with `es_out.c:3661` back to its HEAD condition; both slices `MinimumOSVersion 26.0`, `minos 26.0 sdk 27.0`, `_ff_truehd_decoder`, no instrumentation strings). A stale `0021-….patch` was still sitting in `~/vlckit-build/VLCKit/libvlc/patches/` and had to be deleted first, or the recipe would have re-applied it.
-- **The thumbnail** (D021 revised again): during a paused drag the server's still nearest the target shows above the bar and changes with it; where no still exists, nothing shows. `ThumbStrip.swift` is new; the index is fetched once per detail screen (never polled, never re-fetched) and sheets as needed.
-- **On Home Theater** (Stargate Extended, one session, 191.5 s, passed): one index line, two sheet fetches (185/115 ms) for four targets, the thumbnail tracking 03:59 → 05:32 → 08:08 → 06:50, exact drag rates, landing 0 ms from the target, Menu cancel 0 ms back at the drag's start and still paused, and five frame steps retraced to pixel-identical screenshots.
-- **Owner-accepted.** The owner tried the gesture by hand on Home Theater — the push gate standing since pass 2c — and **accepted the scrub and its thumbnails**; pushed in pass 2h.
-- **Still open:** which file a multi-edition movie or multi-episode show should fetch an index for; and that a file's **first** visit shows no thumbnails, because that first request is what starts generation.
-
-**Pass 2h (2026-09-15): pushed.** The owner tested the touch-surface scrub with its timeline thumbnails on Home Theater and **accepted it** (D021 revised again, D022). `main` was pushed to `origin` as a fast-forward, no force: `e9df636..1e13538`, **seven commits** (passes 2a–2g). After a fetch, local `main`, `origin/main` and the live remote ref were all `1e13538317da`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`): nothing under `Frameworks/` is tracked on any ref, so the 725 MB framework was not pushed and never has been. **Deliberately not pushed, and still uncommitted:** the pass 2g UI-test harness (`Marlin Media TVUITests/Diag2gUITests.swift`) and its `PlayerHost.swift` Page Up / Page Down hook, which exist only to script drags that XCUIRemote cannot perform — copies are committed as `reports/logs/2g-harness-Diag2gUITests.swift.txt` and `reports/logs/2g-harness-hook.diff`.
+### Pass 2 — resume, watched, Continue Watching, Recently Added (`reports/2026-09-15-pass2-resume-watched.md`)
 
 **Pass 2 (2026-09-15): resume, watched, Continue Watching, Recently Added — built and verified on
 Home Theater, one step short.** Decisions D023–D030; report `reports/2026-09-15-pass2-resume-watched.md`,
@@ -279,6 +567,21 @@ evidence `reports/logs/2-*.log`, screenshots `reports/screenshots/p2/`.
   this build. `Marlin Media TVUITests/Diag2gUITests.swift` and the `PlayerHost.swift` Page Up/Down hook stay
   uncommitted, as before.
 
+### Pass 2a — touch-surface scrubbing (STOPPED) (`reports/2026-09-15-pass2a-scrubbing.md`)
+
+**Pass 2a (2026-09-15): touch-surface scrubbing — STOPPED at step 5.** Report `reports/2026-09-15-pass2a-scrubbing.md`.
+- **Built, uncommitted.** A horizontal drag pauses and shows a scrub bar (frame 10's timeline row, target elapsed/remaining, a start mark), the picture follows the target by paused seeks (one per 250 ms and one on lift), click lands and plays, Menu returns. The diff is in the working tree and saved as `reports/logs/2a-scrub-app.diff`. Home Theater runs it (no harness hook).
+- **Why it stopped.** Landing hits the paused-seek read-ahead (pass 1g's seek-back loop), on Magicians S1E1 (MP4, no subtitle track): after the last paused seek VLC laps its rebuffer 12 times in 1.3 s (`PCR is called … late`, `ES_OUT_RESET_PCR`), reading PCR 238.2 → 269.0 s for a 238.6 s target; Play then starts at the read-ahead end (first picture PTS 266.3 s; clock 04:29 at +3 s for a 03:59 target). Trace in `reports/logs/2a-analysis.txt`. No fix; 23 of the 24 matrix runs and the step-4 controls not run.
+- **Drags can't be scripted on the remote.** XCUIRemote has no touch-surface API; the owner chose a hybrid: an uncommitted Page Up/Down hook plays a scripted drag through the model (`reports/logs/2a-harness-app.diff`), plus a physical check by the owner (not done — stopped first).
+
+### Pass 2b — fast seek on the scrub path (STOPPED) (`reports/2026-09-15-pass2b-fast-seek.md`)
+
+**Pass 2b (2026-09-15): fast seek on the scrub path — STOPPED at step 2, owner's call.** Report `reports/2026-09-15-pass2b-fast-seek.md`, evidence `reports/logs/2b-fast-seek-recon.txt`.
+- **Why it can't be scoped as asked.** Nothing in this libvlc reads the `input-fast-seek` option (declared, created on the input, read only by desktop GUI prefs), so a media option is inert; VLCKit has no seek-speed setting (`setTime:` always passes `b_fast = NO`). Fast vs precise is per seek: `libvlc_media_player_set_time(p, t, b_fast)`. The only scoped route is VLCKit's private `_playerInstance` plus that exported C call; the owner chose to stop rather than use it.
+- **State.** Nothing applied, built, installed or run. Tree and Home Theater as after pass 2a (scrub diff uncommitted). The scrub code is not committed: pass 2a's ~30 s landing overshoot stands.
+
+### Pass 2b — pass 2's follow-ups (`reports/2026-09-15-pass2b-followups.md`)
+
 **Pass 2b (2026-09-15): pass 2's follow-ups — one of three built and working, two STOPPED.**
 Decisions D031–D038; report `reports/2026-09-15-pass2b-followups.md`, evidence
 `reports/logs/2b-*.log`, screenshots `reports/screenshots/p2b/`.
@@ -304,6 +607,15 @@ Decisions D031–D038; report `reports/2026-09-15-pass2b-followups.md`, evidence
   Home Theater is left running this build. The pass 2b harness
   (`Marlin Media TVUITests/Pass2bUITests.swift`) is **not** committed, nor is the owner's
   `Design/Marlin Media tvOS Design2.zip`.
+
+### Pass 2c — the preview-playhead scrub (`reports/2026-09-15-pass2c-scrub-preview.md`)
+
+**Pass 2c (2026-09-15): preview-playhead scrub — landed and committed (D021).** Report `reports/2026-09-15-pass2c-scrub-preview.md`.
+- **Behaviour.** A horizontal drag on the touch surface pauses and shows the scrub bar; the picture holds, nothing seeks during the drag or on lift; click or Play/Pause plays and then seeks once to the target; Menu cancels with no seek and restores the play state. 25% of the running time per surface width; target stops 1 s short of the end. `PlayerHost.swift` (pan), `PlayerModel.swift` (scrub state, land, cancel), `PlayerScreen.swift` (bar).
+- **Proof on Home Theater** (drags scripted through the model by an uncommitted Page Up/Down hook — `reports/logs/2c-harness-app.diff`; XCUIRemote cannot touch the surface): 48 scrubs on Stargate, Wonder Woman, Divergent and Magicians S1E1 — 32 landings with the first picture −72…+104 ms from the target, 16 cancels within 0.81 s; skips, frame steps and Menu-closes-panel unchanged on all four films.
+- **Still open.** The owner's test of the gesture on the real remote (not yet done; push waits for it). A pause after a landing reads the stream at 1× while paused, up to ~36 s (no effect on landings; not diagnosed).
+
+### Pass 2c — the episode hold and the Continue Watching focus (`reports/2026-09-15-pass2c-hold-and-focus.md`)
 
 **Pass 2c (2026-09-15): the Continue Watching focus is fixed; the episode hold is STOPPED one step
 from working.** Decisions D031 (revised), D032a, D033 (revised); report
@@ -334,6 +646,53 @@ from working.** Decisions D031 (revised), D032a, D033 (revised); report
   together. Home Theater is left running this build. The pass 2c harness
   (`Marlin Media TVUITests/Pass2cUITests.swift`) is not committed, nor is the owner's
   `Design/Marlin Media tvOS Design2.zip`.
+
+### Pass 2d — the owner's scrub flow (`reports/2026-09-15-pass2d-owner-flow.md`)
+
+**Pass 2d (2026-09-15): the owner's scrub flow — committed (D021 revised).** Report `reports/2026-09-15-pass2d-owner-flow.md`.
+- **The owner's defect (real remote): a paused swipe did not scrub.** The pan waited for the left/right swipe recognizers to fail, so every paused flick was recognized as a side swipe and dropped by D008's paused rule (`right swipe while paused: no action (frame step is on click)`, 19 times in the owner's session; `[scrub] begin` 4 times). Touches around a click, or after swipe skips, also started scrubs while playing.
+- **The flow now.** Play/Pause pauses. Paused: a swipe or drag scrubs (the picture holds, nothing seeks until landing); a left/right click steps one frame. Play/Pause or a click on the surface lands at the target and plays. Menu cancels and stays paused where the drag began. Playing: a drag does nothing; skips unchanged. 25% of the running time per width; target 1 s short of the end. `PlayerHost.swift` (the pan runs alongside the swipes and begins only while paused), `PlayerModel.swift` (the scrub appears once the target moves; no scrub while playing; Menu stays paused).
+- **Proof on Home Theater** (drags scripted through the model — XCUIRemote cannot touch the surface): 24 paused scrubs on Stargate, Wonder Woman, Divergent, Magicians S1E1 — 16 landings −74…+94 ms from the target, 8 Menu cancels paused at the start; 8 drags while playing refused; skips exact; 5 + 5 clicks one picture each on all four (pixel comparison). One Divergent run lost a Play/Pause press between XCTest and the app (no app line, VLC kept playing); re-run once at the owner's call, clean.
+- **The owner must still try the gesture by hand** (report §6); nothing is pushed until then.
+
+### Pass 2e — why paused seeks can't follow the thumb (`reports/2026-09-15-pass2e-scrub-seek-diagnosis.md`)
+
+**Pass 2e (2026-09-15): why paused seeks can't make the picture follow the thumb — diagnosis only.** Report `reports/2026-09-15-pass2e-scrub-seek-diagnosis.md`, evidence `reports/logs/2e-analysis.txt`.
+- **Cause (instrumented libvlc, Magicians S1E1 and Stargate on Home Theater).**
+  - A paused seek's rebuffer anchors the input clock at the **pause date** (`es_out.c:1219`). The next PCR is late by about (time since the pause − pts_delay), so the late branch resets and rebuffers without moving the demuxer (`es_out.c:3661–3721`).
+  - Lap after lap reads forward, and past the 5 s `clock-jitter` cap the laps run until Play. Play-only landings played from 452 s for a 239 s target (Magicians) and from 667 s for 333 s (Stargate).
+  - A single seek on lift laps the same way, so seek count and pace don't matter. The need-data flag isn't involved on Magicians; Stargate's subtitle request adds paused reads.
+- **What still works.** HEAD's landing (play, then one seek) lands on the target even after laps. But during the hold the picture drifts forward while the bar shows the target.
+- **Candidates.** C1 (`es_out.c:3661`, skip late compensation while es_out is paused) is the narrowest; not implemented. No decision.
+- **State.** libvlc clean, and `Frameworks/` rebuilt by the full recipe (20 patches; both slices `MinimumOSVersion 26.0`, `minos 26.0 sdk 27.0`; `_ff_truehd_decoder`; no trace strings). The app is at HEAD and installed on Home Theater. Committed locally, not pushed.
+
+### Pass 2f — patch 0021 with a moving scrub picture (STOPPED) (`reports/2026-09-15-pass2f-scrub-live-picture.md`)
+
+**Pass 2f (2026-09-15): patch 0021 (C1) with a moving scrub picture — STOPPED at step 9.** Report `reports/2026-09-15-pass2f-scrub-live-picture.md`, evidence `reports/logs/2f-analysis.txt`, `reports/logs/2f-vlc-tests.txt`.
+- **What works.** 0021 (`es_out.c:3661`, no late-PCR compensation while paused; one line) passes VLC's host tests unchanged. The full recipe built it with 21 patches; both slices check. On Home Theater, 20 paused scrubs on four films had 0 PCR-late lines, and every landing was within −81…+305 ms of its target. Steps 7–8 (skips, frame steps, panels, paused track switches, plain pause, edition/episode change) matched HEAD.
+- **Why it stopped.**
+  - **Magicians (MP4):** every ending logged a `clock gap`, and VLCKit's time froze after 4 of 5, so the overlay clock and the next drag's start were stale.
+  - **The picture did not track during drags** on Wonder Woman and Divergent (HEVC: 1–5 of 8–9 seeks shown), nor on Magicians scrub 3's lift.
+  - **Stargate scrub 4** dropped 7 pictures at landing.
+- **State, uncommitted.**
+  - `tools/vlckit-truehd/` (0021, `build.sh`, README), the app change and the harness. Copies are in `reports/logs/2f-*`.
+  - `Frameworks/` and the libvlc tree carry 21 patches, and Home Theater runs the 0021 build with the harness hook.
+  - D021 and DECISIONS unchanged. Nothing pushed.
+
+### Pass 2g — 0021 dropped, the scrub gained timeline thumbnails (`reports/2026-09-15-pass2g-scrub-thumbnails.md`)
+
+**Pass 2g (2026-09-15): 0021 dropped, the scrub gained timeline thumbnails — done.** Report `reports/2026-09-15-pass2g-scrub-thumbnails.md`, evidence `reports/logs/2g-*`, screenshots `reports/screenshots/2g/`.
+- **0021 is gone** (D022): the patch file, its `build.sh` step and its README line are removed, the app is back at HEAD's scrub, and the full recipe rebuilt `Frameworks/` at **20 patches** (20 `Applying:` lines, `ARCHIVE SUCCEEDED` ×2, libvlc clean at `6d623583` with `es_out.c:3661` back to its HEAD condition; both slices `MinimumOSVersion 26.0`, `minos 26.0 sdk 27.0`, `_ff_truehd_decoder`, no instrumentation strings). A stale `0021-….patch` was still sitting in `~/vlckit-build/VLCKit/libvlc/patches/` and had to be deleted first, or the recipe would have re-applied it.
+- **The thumbnail** (D021 revised again): during a paused drag the server's still nearest the target shows above the bar and changes with it; where no still exists, nothing shows. `ThumbStrip.swift` is new; the index is fetched once per detail screen (never polled, never re-fetched) and sheets as needed.
+- **On Home Theater** (Stargate Extended, one session, 191.5 s, passed): one index line, two sheet fetches (185/115 ms) for four targets, the thumbnail tracking 03:59 → 05:32 → 08:08 → 06:50, exact drag rates, landing 0 ms from the target, Menu cancel 0 ms back at the drag's start and still paused, and five frame steps retraced to pixel-identical screenshots.
+- **Owner-accepted.** The owner tried the gesture by hand on Home Theater — the push gate standing since pass 2c — and **accepted the scrub and its thumbnails**; pushed in pass 2h.
+- **Still open:** which file a multi-edition movie or multi-episode show should fetch an index for; and that a file's **first** visit shows no thumbnails, because that first request is what starts generation.
+
+### Pass 2h — the push of passes 2a–2g (no separate report)
+
+**Pass 2h (2026-09-15): pushed.** The owner tested the touch-surface scrub with its timeline thumbnails on Home Theater and **accepted it** (D021 revised again, D022). `main` was pushed to `origin` as a fast-forward, no force: `e9df636..1e13538`, **seven commits** (passes 2a–2g). After a fetch, local `main`, `origin/main` and the live remote ref were all `1e13538317da`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`): nothing under `Frameworks/` is tracked on any ref, so the 725 MB framework was not pushed and never has been. **Deliberately not pushed, and still uncommitted:** the pass 2g UI-test harness (`Marlin Media TVUITests/Diag2gUITests.swift`) and its `PlayerHost.swift` Page Up / Page Down hook, which exist only to script drags that XCUIRemote cannot perform — copies are committed as `reports/logs/2g-harness-Diag2gUITests.swift.txt` and `reports/logs/2g-harness-hook.diff`.
+
+### Pass 3 — the episode rows, Home, the clock (`reports/2026-09-15-pass3-home-and-rows.md`)
 
 **Pass 3 (2026-09-15): the episode rows fixed, Home built, the clock added — all of it working.**
 Decisions D039–D042; report `reports/2026-09-15-pass3-home-and-rows.md`, evidence
@@ -367,6 +726,8 @@ so it was built, installed and launched, with four screenshots and no matrix.
   focused". Initial focus is not in the pass's list, so it was left alone. **Built in pass 3b
   (D043).**
 
+### Pass 3b — the owner's three fixes (`reports/2026-09-15-pass3b-fixes.md`)
+
 **Pass 3b (2026-09-15): the owner's three fixes after testing pass 3 — two built, one found already
 done.** Decisions D043–D045; report `reports/2026-09-15-pass3b-fixes.md`, evidence
 `reports/logs/3b-run1.log`, screenshots `reports/screenshots/p3b/`. The owner tests by hand, so it
@@ -397,7 +758,7 @@ was built, installed and launched, with two device screenshots and no matrix.
   Theater is left running this build. The harnesses (`Pass3bShotsUITests.swift` and the earlier ones)
   and the `PlayerHost.swift` hook stay uncommitted.
 
-**Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.
+### Pass 3c — the push of passes 2–3b, and the test-state reset (`reports/2026-09-15-pass3c-push-and-reset.md`)
 
 **Pass 3c (2026-09-15): passes 2–3b accepted and pushed, and the test state reset.** Decisions
 D046, D047 (which discharges D037); report `reports/2026-09-15-pass3c-push-and-reset.md`. The owner
