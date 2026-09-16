@@ -171,3 +171,82 @@ marlin1111ai/marlin-media (DECISIONS.md there) and are referenced by their numbe
   padding, carried over the target's place on the track with the bar row's 130 pt time columns as
   its margins and stopped at either end of the track; 8 pt corners, a `neutral700` hairline and a
   soft drop shadow. Nothing focusable, nothing else added.
+
+## 2026-09-15 — pass 2 (resume, watched, Continue Watching, Recently Added)
+
+The owner's calls for the playback state D009 deferred. Evidence for all of them:
+`reports/2026-09-15-pass2-resume-watched.md`. The server side (image 0.3.0) is marlin-media's
+D032–D035; this app's only write is `PUT /api/files/{fileId}/playback`.
+
+- **D023** **Recently Added** joins the sort control (completing D010): `added`, newest first, on
+  Movies, TV Shows and Videos. A **show sorts by the show's own `added`** — the server puts no date
+  on an episode, so there is nothing else to sort by. Every tab still **opens on Title**, and the
+  episode order inside a show is untouched. `LibraryModel.SortOrder`; the menu picks the third
+  option up from `allCases`, so frame 05's three rows appear by themselves.
+
+- **D024** **The client's two new calls.** `GET /api/continue-watching?limit=200` with a Decodable
+  entry type (`ContinueEntry`), and `PUT /api/files/{fileId}/playback {position?, watched?}` —
+  the app's first and only write, and an omitted key means "leave unchanged". Every write goes
+  through `PlaybackWrite.send`, which logs the request and the server's answer. **A failed write is
+  a log line and nothing else:** nothing appears on screen and playback is unaffected. A failed
+  continue-watching read is the same — the row is simply absent, because the library itself is fine.
+
+- **D025** **The Continue Watching row** (frames 01, 02), above the grid on each tab. It shows only
+  **that tab's kind** (movie / episode / video), in the **server's order** (newest `last_played`
+  first), **every entry**, scrolling sideways. Movie and video cards carry the title and
+  "N min left"; episode cards carry the show's title, "S# E# · episode title" and "N min left";
+  both carry the bar across the foot of the art. **No entries: no heading and no row, and the grid
+  moves up.** The row is re-read **every time the library appears**, including the return from the
+  player. **A card plays its own file straight away** — no detail screen and no edition picker —
+  after fetching that file's thumbnail index as a detail screen would (D021); because the entry
+  carries no path, HDR flag or codecs, the item's detail is read first so that D014's `.mkv` rule
+  and D016's display match still apply. **Grid posters get no bar and no watched mark.**
+
+- **D026** **Movie detail (frame 06) and video detail (frame 09), identical behaviour.**
+  - A **"✓ Watched"** pill at the end of the meta row when watched, and no pill when not.
+    **The frame's watch count ("Watched 2 ×") is dropped — the owner's call:** the server's
+    `playback` keeps a boolean, not a count.
+  - A saved position > 0 gives **"▶ Resume · N min left"** with the bar inside the button, plus
+    **"Start over"**. A position of 0 gives **"▶ Play"** alone — no bar, no Start over.
+  - A third button reads **"Mark watched"** when not watched and **"Mark unwatched"** when watched.
+    Both write **position 0** (with `watched` true / false) and then re-read the screen.
+  - **Start over** writes position 0 first, then plays from the beginning.
+  - On a movie with several editions the buttons **follow the edition with the latest
+    `last_played`** (the first edition when none has been played), and pressing Play or Resume
+    **still opens the picker** (frame 07), where **"Resume · N min left"** shows under the editions
+    that have a saved position and nothing under the others. Start over and the mark buttons act on
+    the followed edition.
+
+- **D027** **Show detail (frame 08).** "**N unwatched**" at the end of the meta row counts every
+  episode of the show not marked watched, **a partly watched one included**. Each episode row's
+  right-hand column reads **"Watched ✓"**, **"N min left"** (with the bar across its still) or
+  **"Unwatched"**. Clicking a row with a saved position **resumes there**; one without plays from
+  the start. **Press-and-hold** on a row opens an overlay in the edition picker's style carrying
+  **"Mark watched"** or **"Mark unwatched"**, with the same writes as D026.
+
+- **D028** **What the player writes.** The position in seconds is written **every 10 s while
+  playing, once on pause, on stop and on exit**; a dismiss and the stop that follows it write once
+  between them, not twice. **A position under 120 s is never written**, so a peek leaves no saved
+  spot. At **90 % of the file's own length** (VLCKit's `length`, not the server's `duration`)
+  the app writes **`watched: true` with `position: 0`** once, which is exactly what takes the item
+  off the server's continue-watching list (marlin-media D033); **after that mark no further
+  position is written for that playback**.
+
+- **D029** **Starting at a saved position: one seek, once the film is playing.** A request carrying
+  a `startMs` plays from the beginning and is seeked once at the first `Playing` state — D021's
+  landing path. On Home Theater (Stargate Extended, saved 1 800 s): `length 7798056 ms`,
+  `resume +1 s time=1800835 ms`, 0 `PCR is called … late`, 0 clock gaps, and the one
+  `ES_OUT_RESET_PCR` is the seek's own (`SET_TIME to 1800000000`, preroll pts 1 799.815 s — D014's
+  cues landing just before the target). D008, D014, D016 and D021 are untouched.
+
+  **Rejected: the `:start-time=` media option**, tried first on Home Theater in this pass. It plays
+  the right picture, but it **re-bases VLC's whole timeline**: for the same file `length` came back
+  as **5 998 056 ms** (7 798 056 − 1 800 000) and `player.time` restarted at **0**, so the overlay
+  read 00:15 / −1:39:43 with the knob at the left. Every position written would have been wrong by
+  the start offset, the 90 % mark would have measured the remainder rather than the file, and
+  D021's scrub would have mapped over a short timeline. Compensating with an offset would have
+  meant changing every path that reads the clock — the skips, the frame step and the scrub — which
+  is exactly what this pass was told not to disturb.
+
+- **D030** **A home page is wanted as its own design and its own pass, after pass 2.** It is not
+  designed yet: the 17 frames have no home screen, and nothing of it is built here.

@@ -3,8 +3,13 @@
 //  Marlin Media TV
 //
 //  Frames 01 (Movies), 02 (TV Shows), 03 (Videos), 04 (Videos empty), 05 (sort control open),
-//  16 (loading) and 17 (can't reach server). Continue Watching, progress bars, watched marks
-//  and the "Browse cached" button are a later pass (DECISIONS.md D009) and are not here.
+//  16 (loading) and 17 (can't reach server).
+//
+//  Pass 2 (D023, D025): the sort control carries Recently Added, and each tab shows a
+//  "Continue watching" row above its grid holding only that tab's kind, in the server's order,
+//  every entry, scrolling sideways. With no entries there is no heading and no row, and the grid
+//  moves up. The grid posters themselves carry no bar and no watched mark. The "Browse cached"
+//  button of frame 17 is still not here.
 //
 
 import SwiftUI
@@ -12,6 +17,8 @@ import SwiftUI
 struct LibraryScreen: View {
     @Bindable var model: LibraryModel
     let open: (Destination) -> Void
+    /// D025: a Continue Watching card plays its file directly.
+    let openEntry: (ContinueEntry) -> Void
 
     @State private var sortOpen = false
     @FocusState private var focusedTab: LibraryTab?
@@ -54,6 +61,9 @@ struct LibraryScreen: View {
                     .zIndex(5)
             }
         }
+        // D025: the row is asked for again every time the library appears — including the return
+        // from a detail screen or from the player.
+        .onAppear { Task { await model.refreshContinueWatching() } }
         .onChange(of: sortOpen) { _, open in
             if open {
                 Task { @MainActor in
@@ -119,11 +129,40 @@ struct LibraryScreen: View {
         .onExitCommand { sortOpen = false }
     }
 
+    /// D025: the row for the tab on screen, or nothing at all when the server lists no entry of
+    /// that kind — no heading, no row, and the grid moves up to take the space.
+    @ViewBuilder
+    private var continueRow: some View {
+        let entries = model.continueEntries(for: model.tab)
+        if !entries.isEmpty {
+            VStack(alignment: .leading, spacing: 22) {
+                Kicker(text: "Continue watching")
+                ScrollView(.horizontal) {
+                    HStack(alignment: .top, spacing: 34) {
+                        ForEach(entries) { entry in
+                            Button { openEntry(entry) } label: {
+                                ContinueCardLabel(entry: entry)
+                            }
+                            .buttonStyle(BareButtonStyle())
+                            .accessibilityIdentifier("continue.\(entry.fileId)")
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+                .scrollClipDisabled()
+            }
+            .padding(.bottom, 30)
+            // Its own focus region, so moving down from the tabs enters the row instead of
+            // restoring the grid's last focused poster and skipping past it.
+            .focusSection()
+        }
+    }
+
     @ViewBuilder
     private var content: some View {
         switch model.tab {
         case .movies:
-            PosterGrid(heading: "All movies · \(model.movies.count)") {
+            PosterGrid(heading: "All movies · \(model.movies.count)", lead: { continueRow }) {
                 ForEach(model.sortedMovies) { movie in
                     let file = movie.editions.first?.file
                     PosterCard(title: movie.title, year: movie.year, poster: movie.artwork.poster,
@@ -135,7 +174,7 @@ struct LibraryScreen: View {
             }
         case .shows:
             // The shows list carries no per-file resolution or HDR, so shows get no badges.
-            PosterGrid(heading: "All shows · \(model.shows.count)") {
+            PosterGrid(heading: "All shows · \(model.shows.count)", lead: { continueRow }) {
                 ForEach(model.sortedShows) { show in
                     PosterCard(title: show.title, year: show.year, poster: show.artwork.poster, badges: []) {
                         open(.show(show))
@@ -147,7 +186,7 @@ struct LibraryScreen: View {
             if model.videos.isEmpty {
                 VideosEmptyView()
             } else {
-                VideoList(videos: model.sortedVideos) { open(.video($0)) }
+                VideoList(videos: model.sortedVideos, lead: { continueRow }) { open(.video($0)) }
             }
         }
     }
@@ -159,6 +198,70 @@ struct LibraryScreen: View {
         if file.resolutionLabel == "4K" { out.append(("4K", false)) }
         if file.hdr { out.append(("HDR", true)) }
         return out
+    }
+}
+
+// MARK: - Continue watching (frames 01, 02; D025)
+
+/// Frame 01's card for a movie or a video, frame 02's for an episode: the art with the position's
+/// bar across its foot, the title, the episode line for a show, and "N min left". Where the server
+/// reports no duration there is no line and no bar.
+private struct ContinueCardLabel: View {
+    let entry: ContinueEntry
+    @Environment(\.isFocused) private var focused
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ServerImage(path: entry.artwork?.poster ?? entry.artwork?.backdrop ?? entry.artwork?.still) {
+                InitialTile(title: entry.cardTitle)
+            }
+            .frame(width: 262, height: 393)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(alignment: .bottom) {
+                if let share = entry.progress {
+                    ZStack(alignment: .leading) {
+                        Rectangle().fill(Nocturne.text.opacity(0.18))
+                        GeometryReader { geo in
+                            Rectangle().fill(Nocturne.accent).frame(width: geo.size.width * share)
+                        }
+                    }
+                    .frame(height: 5)
+                }
+            }
+            .overlay {
+                if focused {
+                    RoundedRectangle(cornerRadius: 12).stroke(Nocturne.accent, lineWidth: 4).padding(-8)
+                } else {
+                    RoundedRectangle(cornerRadius: 8).stroke(Nocturne.neutral800, lineWidth: 1)
+                }
+            }
+            .shadow(color: focused ? .black.opacity(0.65) : .clear, radius: 35, y: 26)
+            .shadow(color: focused ? Nocturne.accent.opacity(0.3) : .clear, radius: 35)
+            Text(entry.cardTitle)
+                .font(.nocturne(22, .medium))
+                .foregroundStyle(focused ? Nocturne.accent100 : Nocturne.text)
+                .lineLimit(1)
+                .padding(.top, 14)
+            if let subtitle = entry.cardSubtitle {
+                Text(subtitle)
+                    .font(.nocturne(19))
+                    .foregroundStyle(Nocturne.neutral500)
+                    .lineLimit(1)
+                    .padding(.top, 4)
+            }
+            if let left = entry.timeLeftText {
+                Text(left)
+                    .font(.nocturne(19))
+                    .foregroundStyle(entry.cardSubtitle == nil ? Nocturne.neutral500 : Nocturne.neutral600)
+                    .lineLimit(1)
+                    .padding(.top, entry.cardSubtitle == nil ? 4 : 2)
+            }
+        }
+        .frame(width: 262, alignment: .leading)
+        .opacity(focused ? 1 : 0.82)
+        .scaleEffect(focused ? 1.05 : 1, anchor: .top)
+        .offset(y: focused ? -8 : 0)
+        .animation(.easeOut(duration: 0.15), value: focused)
     }
 }
 
@@ -250,13 +353,15 @@ private struct SortOptionLabel: View {
 
 // MARK: - Poster grid (frames 01, 02)
 
-private struct PosterGrid<Content: View>: View {
+private struct PosterGrid<Lead: View, Content: View>: View {
     let heading: String
+    @ViewBuilder let lead: () -> Lead
     @ViewBuilder let content: () -> Content
 
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 22) {
+                lead()
                 Kicker(text: heading)
                 LazyVGrid(columns: Array(repeating: GridItem(.fixed(250), spacing: 36, alignment: .top), count: 6),
                           alignment: .leading, spacing: 44) {
@@ -264,7 +369,7 @@ private struct PosterGrid<Content: View>: View {
                 }
                 .padding(.top, 12)
             }
-            .padding(.top, 52)
+            .padding(.top, 46)
             .padding(.horizontal, 80)
             .padding(.bottom, 80)
         }
@@ -336,13 +441,15 @@ private struct PosterCardLabel: View {
 
 // MARK: - Videos (frames 03, 04)
 
-private struct VideoList: View {
+private struct VideoList<Lead: View>: View {
     let videos: [Video]
+    @ViewBuilder let lead: () -> Lead
     let open: (Video) -> Void
 
     var body: some View {
         ScrollView(.vertical) {
-            VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 16) {
+                lead()
                 ForEach(videos) { video in
                     Button { open(video) } label: {
                         VideoRowLabel(video: video)
@@ -351,7 +458,7 @@ private struct VideoList: View {
                     .accessibilityIdentifier("video.\(video.title)")
                 }
             }
-            .frame(width: 1200)
+            .frame(width: 1200, alignment: .leading)
             .padding(.top, 44)
             .padding(.horizontal, 80)
             .padding(.bottom, 80)

@@ -5,6 +5,10 @@
 //  The marlin-media server, fixed at http://192.168.1.250:8093 (DECISIONS.md D007: no settings
 //  screen). Every failure is thrown as an APIError with a message the UI shows in full.
 //
+//  Pass 2 (D024) adds the app's first and only write, `PUT /api/files/{fileId}/playback`, and the
+//  `GET /api/continue-watching` list. Every playback write goes through `PlaybackWrite` so that a
+//  failure is a log line and nothing else.
+//
 
 import Foundation
 
@@ -48,6 +52,7 @@ enum APIError: LocalizedError {
 struct APIClient: Sendable {
     private let session: URLSession
     private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
 
     init() {
         let config = URLSessionConfiguration.default
@@ -56,6 +61,7 @@ struct APIClient: Sendable {
         session = URLSession(configuration: config)
         decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
+        encoder = JSONEncoder()
     }
 
     func movies() async throws -> [Movie] { try await get("/api/movies") }
@@ -70,12 +76,44 @@ struct APIClient: Sendable {
         FileThumbs(fileId: fileId, index: try await get("/api/files/\(fileId)/thumbs"))
     }
 
-    private func get<T: Decodable>(_ path: String) async throws -> T {
-        let url = ServerConfig.baseURL.appending(path: path)
+    /// Pass 2 (D024): the server's in-progress list — `position > 0` and not watched, newest
+    /// `last_played` first, one entry per file. The order is the server's and is kept.
+    func continueWatching(limit: Int = 200) async throws -> [ContinueEntry] {
+        try await get("/api/continue-watching", query: [URLQueryItem(name: "limit", value: String(limit))])
+    }
+
+    /// Pass 2 (D024): the app's only write. Either key may be omitted and the server leaves an
+    /// omitted one unchanged; it sets `last_played` to its own clock on every write and answers
+    /// with the block it stored. Callers go through `PlaybackWrite`, not this directly.
+    @discardableResult
+    func putPlayback(fileId: Int, position: Double? = nil, watched: Bool? = nil) async throws -> Playback {
+        /// Optional properties are encoded with `encodeIfPresent`, so a nil key is simply absent —
+        /// which is exactly the server's "leave unchanged".
+        struct Body: Encodable {
+            let position: Double?
+            let watched: Bool?
+        }
+        let path = "/api/files/\(fileId)/playback"
+        var request = URLRequest(url: ServerConfig.baseURL.appending(path: path))
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try encoder.encode(Body(position: position, watched: watched))
+        return try await send(request, path: path)
+    }
+
+    private func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+        var url = ServerConfig.baseURL.appending(path: path)
+        if !query.isEmpty { url.append(queryItems: query) }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        return try await send(request, path: path)
+    }
+
+    private func send<T: Decodable>(_ request: URLRequest, path: String) async throws -> T {
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await session.data(from: url)
+            (data, response) = try await session.data(for: request)
         } catch let error as URLError {
             throw APIError.transport(error, path: path)
         }
@@ -100,6 +138,28 @@ struct APIClient: Sendable {
         case let .valueNotFound(type, context): return "null where \(type) expected at \(path(context))"
         case let .dataCorrupted(context): return "corrupt data at \(path(context)): \(context.debugDescription)"
         @unknown default: return error.localizedDescription
+        }
+    }
+}
+
+/// Pass 2 (D024): every playback write in the app goes through here. The request and the server's
+/// answer are written to the app's log; a failure is written there too and nowhere else — nothing
+/// appears on screen and playback is never affected by it.
+@MainActor
+enum PlaybackWrite {
+    @discardableResult
+    static func send(_ api: APIClient, fileId: Int, position: Double? = nil, watched: Bool? = nil,
+                     why: String) async -> Playback? {
+        let sent = [position.map { "position=\(String(format: "%.1f", $0))" }, watched.map { "watched=\($0)" }]
+            .compactMap { $0 }.joined(separator: " ")
+        do {
+            let stored = try await api.putPlayback(fileId: fileId, position: position, watched: watched)
+            EvidenceLog.line("[playback] PUT file \(fileId) \(sent) (\(why)) → 200 position=\(stored.position) watched=\(stored.watched) last_played=\(stored.lastPlayed ?? "null")")
+            return stored
+        } catch {
+            let detail = (error as? APIError)?.localizedDescription ?? String(describing: error)
+            EvidenceLog.line("[playback] PUT file \(fileId) \(sent) (\(why)) FAILED: \(detail)")
+            return nil
         }
     }
 }

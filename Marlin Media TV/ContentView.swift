@@ -5,6 +5,10 @@
 //  Library at the root of a NavigationStack (Menu pops, as tvOS does); detail screens are
 //  pushed; the player is a full-screen cover above everything.
 //
+//  Pass 2 (D025): a Continue Watching card opens the player directly — its file's detail and
+//  thumbnail index are fetched first — and the row is asked for again whenever the player closes,
+//  so a position written during playback is on the row when the library comes back.
+//
 
 import SwiftUI
 
@@ -21,7 +25,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            LibraryScreen(model: library) { path.append($0) }
+            LibraryScreen(model: library, open: { path.append($0) }, openEntry: openEntry)
                 .navigationDestination(for: Destination.self) { destination in
                     switch destination {
                     case let .movie(movie):
@@ -37,6 +41,20 @@ struct ContentView: View {
         .fullScreenCover(item: $playRequest) { request in
             PlayerScreen(request: request) { playRequest = nil }
         }
+        .onChange(of: playRequest) { _, request in
+            // D025: back from the player — the position just written belongs on the row.
+            if request == nil { Task { await library.refreshContinueWatching() } }
+        }
         .task { await library.load() }
+    }
+
+    /// D025: no detail screen and no edition picker — the card plays its own file, from its
+    /// saved position.
+    private func openEntry(_ entry: ContinueEntry) {
+        Task {
+            if let request = await library.playRequest(for: entry) {
+                playRequest = request
+            }
+        }
     }
 }

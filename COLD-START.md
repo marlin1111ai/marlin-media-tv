@@ -251,4 +251,32 @@ Continue Watching, progress, watched marks, Resume / Start over, Recently Added.
 
 **Pass 2h (2026-09-15): pushed.** The owner tested the touch-surface scrub with its timeline thumbnails on Home Theater and **accepted it** (D021 revised again, D022). `main` was pushed to `origin` as a fast-forward, no force: `e9df636..1e13538`, **seven commits** (passes 2a–2g). After a fetch, local `main`, `origin/main` and the live remote ref were all `1e13538317da`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`): nothing under `Frameworks/` is tracked on any ref, so the 725 MB framework was not pushed and never has been. **Deliberately not pushed, and still uncommitted:** the pass 2g UI-test harness (`Marlin Media TVUITests/Diag2gUITests.swift`) and its `PlayerHost.swift` Page Up / Page Down hook, which exist only to script drags that XCUIRemote cannot perform — copies are committed as `reports/logs/2g-harness-Diag2gUITests.swift.txt` and `reports/logs/2g-harness-hook.diff`.
 
+**Pass 2 (2026-09-15): resume, watched, Continue Watching, Recently Added — built and verified on
+Home Theater, one step short.** Decisions D023–D030; report `reports/2026-09-15-pass2-resume-watched.md`,
+evidence `reports/logs/2-*.log`, screenshots `reports/screenshots/p2/`.
+- **The server's playback state is now wired.** The app's only write is `PUT /api/files/{fileId}/playback`;
+  it also reads `GET /api/continue-watching?limit=200`. Every write and the server's answer are in the app
+  log, and a failed write is a log line and nothing else (D024).
+- **Built:** Recently Added on all three tabs (D023); the Continue Watching row on frames 01/02, each tab
+  showing only its kind, a card playing its file straight from its saved position (D025); the watched pill,
+  "Resume · N min left" with its bar, "Start over" and "Mark watched / unwatched" on the movie and video
+  details, with the multi-edition rule and the picker's resume line (D026); "N unwatched" and the per-episode
+  state column on the show detail (D027); position writes every 10 s / pause / stop / exit with a 120 s floor,
+  and the watched mark at 90 % (D028); and resuming at a saved position (D029).
+- **Measured on Home Theater** (harness `Marlin Media TVUITests/Pass2UITests.swift`, positions seeded by PUT
+  so a resume or a 90 % mark takes seconds rather than an hour): resume landings −165 / −229 / −261 ms from
+  the saved position on Stargate Extended, Food S4E2 and Magicians S1E1; the 90 % mark at 3 578 411 ms of
+  3 975 982 ms (threshold 3 578 384) with every later write refused; a 48 s peek writing nothing; skips exact;
+  frame steps one picture per click; a scrub landing 0 ms off. 0 `PCR is called … late`, 0 clock gaps in every
+  run.
+- **STOPPED at step 5's press-and-hold.** `.onLongPressGesture` on the episode row never fires on tvOS — the
+  Button's own action wins, so a hold *plays* the episode instead of opening the mark menu (log: hold at
+  21:13:49.409 → `[playback] file 9 … starting at 0 ms`). The menu itself is built and unreachable; no retry
+  was made. Everything else in step 5 works. Diagnosis and the candidates are in the report.
+- **Also changed:** `EvidenceLog` now opens its file on the first line rather than only when a player starts,
+  because the detail screens' writes happen with no player up.
+- **Committed locally, not pushed** — the owner tests on Home Theater first. Home Theater is left running
+  this build. `Marlin Media TVUITests/Diag2gUITests.swift` and the `PlayerHost.swift` Page Up/Down hook stay
+  uncommitted, as before.
+
 **Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.

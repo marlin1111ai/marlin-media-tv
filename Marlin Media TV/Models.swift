@@ -181,6 +181,56 @@ struct Video: Decodable, Hashable, Identifiable {
     }
 }
 
+/// One entry of `GET /api/continue-watching` (pass 2, D024). The shared fields are on every entry;
+/// the rest belong to one `kind` only, so they are optional here. The server's order is newest
+/// `last_played` first and is kept as given.
+struct ContinueEntry: Decodable, Hashable, Identifiable {
+    enum Kind: String, Decodable, Hashable { case movie, episode, video }
+
+    // Shared
+    let kind: Kind
+    let fileId: Int
+    let stream: String
+    let playback: Playback
+    let duration: Double?
+    // movie
+    let movieId: Int?
+    let year: Int?
+    let edition: String?
+    // episode
+    let showId: Int?
+    let showTitle: String?
+    let season: Int?
+    let episode: Int?
+    // video
+    let videoId: Int?
+    // movie, episode (null when the episode has no title) and video
+    let title: String?
+    /// Movie and episode entries only; a video entry carries none.
+    let artwork: Artwork?
+
+    var id: Int { fileId }
+
+    /// Frame 01/02's card title: the show's title for an episode, the item's own otherwise.
+    var cardTitle: String { (kind == .episode ? showTitle : title) ?? title ?? "—" }
+
+    /// Frame 02's second line, episodes only: "S1 E1 · Unauthorized Magic".
+    var cardSubtitle: String? {
+        guard kind == .episode, let season, let episode else { return nil }
+        guard let title, !title.isEmpty else { return "S\(season) E\(episode)" }
+        return "S\(season) E\(episode) · \(title)"
+    }
+
+    /// "47 min left", or nil when the server gives no duration (then no bar and no line, pass 2).
+    var timeLeftText: String? { Format.timeLeft(position: playback.position, duration: duration) }
+
+    /// How far through the file this entry is, or nil when the length is unknown.
+    var progress: Double? {
+        guard let duration, duration > 0 else { return nil }
+        return min(1, max(0, playback.position / duration))
+    }
+}
+
 // MARK: - Presentation of the server's values (display names only; the data is the server's)
 
 nonisolated enum Format {
@@ -302,4 +352,27 @@ nonisolated enum Format {
     }
 
     static func genres(_ g: [String]) -> String { g.joined(separator: " · ") }
+
+    /// An RFC3339 UTC stamp from the server ("2026-09-14T01:09:07Z") as a Date. A missing or
+    /// unparsable value is `.distantPast`, so it sorts oldest and never crashes a comparison.
+    static func rfc3339(_ value: String?) -> Date {
+        guard let value else { return .distantPast }
+        return ISO8601DateFormatter().date(from: value) ?? .distantPast
+    }
+
+    /// The Recently Added sort key (D023).
+    static func addedAt(_ value: String) -> Date { rfc3339(value) }
+
+    /// "47 min left" / "1 h 12 min left" — the frames' remaining-time line. **Nil when the file's
+    /// length is unknown**, and then nothing is shown and no bar is drawn (pass 2).
+    static func timeLeft(position: Double, duration: Double?) -> String? {
+        guard let duration, duration > 0 else { return nil }
+        return minutes(max(0, duration - position)) + " left"
+    }
+
+    /// How far through a file a saved position is, or nil when the length is unknown.
+    static func share(position: Double, duration: Double?) -> Double? {
+        guard let duration, duration > 0 else { return nil }
+        return min(1, max(0, position / duration))
+    }
 }

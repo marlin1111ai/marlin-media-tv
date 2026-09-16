@@ -20,19 +20,30 @@ enum EvidenceLog {
         URL.cachesDirectory.appending(path: fileName)
     }
 
-    /// The file is truncated once per launch; every player after that appends to it.
-    /// Returns VLCKit's file logger on it (nil if the file could not be opened).
-    static func fileLogger() -> VLCFileLogger? {
-        if handle == nil {
+    private static var openFailed = false
+
+    /// The file is opened (and truncated) by whichever comes first — the first logged line or the
+    /// first player. Pass 2: the playback writes of the detail screens happen with no player up, so
+    /// waiting for `fileLogger()` would have left every one of them out of the file.
+    @discardableResult
+    private static func ensureHandle() -> FileHandle? {
+        if handle == nil, !openFailed {
             FileManager.default.createFile(atPath: url.path, contents: nil)
             guard let fh = try? FileHandle(forWritingTo: url) else {
+                openFailed = true
                 print("[log] could not open \(url.path)")
                 return nil
             }
             handle = fh
+            // Safe: `handle` is already set, so this line does not re-enter this branch.
             line("[log] started \(Date()) VLCKit \(VLCLibrary.shared().version)")
         }
-        guard let handle else { return nil }
+        return handle
+    }
+
+    /// VLCKit's file logger on the same handle (nil if the file could not be opened).
+    static func fileLogger() -> VLCFileLogger? {
+        guard let handle = ensureHandle() else { return nil }
         let logger = VLCFileLogger(fileHandle: handle)
         logger.level = .debug
         return logger
@@ -42,8 +53,9 @@ enum EvidenceLog {
         let stamp = Date().formatted(.dateTime.hour().minute().second().secondFraction(.fractional(3)))
         let out = "\(stamp) \(text)"
         print(out)
+        let fh = ensureHandle()
         if let data = (out + "\n").data(using: .utf8) {
-            handle?.write(data)
+            fh?.write(data)
         }
     }
 }

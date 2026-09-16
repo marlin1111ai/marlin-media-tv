@@ -1,0 +1,26 @@
+9:04:23.826 PM [continue] 2 entries: episode/8@904s, movie/2@1821s
+9:04:23.848 PM [continue] 2 entries: episode/8@904s, movie/2@1821s
+9:04:40.223 PM [player] request The Magicians — S1 E1 · Unauthorized Magic — http://192.168.1.250:8093/stream/8
+9:04:40.224 PM [playback] file 8 saved position 904.452 s watched=false; starting at 904452 ms
+9:04:40.224 PM [thumbs] file 8: 313 stills every 10.0 s, 11 of 11 sheets, state complete
+9:04:40.739 PM [player] state Opening at 0 ms
+9:04:40.958 PM [player] length 3128562 ms
+9:04:40.975 PM [player] state Playing at 0 ms
+9:04:40.975 PM [playback] seeking to the saved position 904452 ms (length 3128562 ms) tick=562039419309
+9:04:41.982 PM [playback] resume +1 s time=905191 ms (wanted 904452 ms, off by 739 ms) state Playing
+9:04:44.011 PM [playback] resume +3 s time=906909 ms (wanted 904452 ms, off by 2457 ms) state Playing
+9:04:50.846 PM [playback] PUT file 8 position=913.4 (every 10 s) → 200 position=913.441 watched=false last_played=2026-09-16T01:04:50Z
+9:04:56.334 PM [player] state Paused at 919251 ms
+9:04:56.354 PM [playback] PUT file 8 position=918.9 (pause) → 200 position=918.91 watched=false last_played=2026-09-16T01:04:56Z
+9:04:59.055 PM [scrub] begin at 919251 ms tick=562057499380
+9:05:01.101 PM [scrub] lift target=981822 ms tick=562059545032
+9:05:02.700 PM [scrub] cancel menu at 981822 ms, back to 919251 ms tick=562061144616
+9:05:03.780 PM [scrub] cancel +1 s time=919251 ms (expected 919251 ms) state Paused
+9:05:05.417 PM [player] state Playing at 919251 ms
+9:05:05.782 PM [scrub] cancel +3 s time=919259 ms (expected 919251 ms) state Playing
+9:05:11.039 PM [playback] PUT file 8 position=924.4 (every 10 s) → 200 position=924.44 watched=false last_played=2026-09-16T01:05:11Z
+9:05:11.677 PM [player] dismiss at 925077 ms, state Playing
+9:05:11.685 PM [player] state Stopping at 925337 ms
+9:05:11.706 PM [playback] PUT file 8 position=925.1 (exit) → 200 position=925.077 watched=false last_played=2026-09-16T01:05:11Z
+9:05:11.712 PM [continue] 2 entries: episode/8@925s, movie/2@1821s
+9:05:11.805 PM [player] state Stopped at 925337 ms

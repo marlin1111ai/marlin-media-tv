@@ -1,0 +1,18 @@
+8:57:41.492 PM [continue] 2 entries: movie/4@600s, movie/2@1821s
+8:57:41.509 PM [continue] 2 entries: movie/4@600s, movie/2@1821s
+8:58:05.780 PM [playback] PUT file 4 position=0.0 (start over) → 200 position=0.0 watched=false last_played=2026-09-16T00:58:05Z
+8:58:05.794 PM [player] request Wonder Woman — Wonder Woman (2017).mkv · 4K HDR · TrueHD 7.1 — http://192.168.1.250:8093/stream/4
+8:58:05.795 PM [playback] file 4 saved position 600.0 s watched=false; starting at 0 ms
+8:58:05.795 PM [thumbs] file 4: 848 stills every 10.0 s, 29 of 29 sheets, state complete
+8:58:05.941 PM [player] state Opening at 0 ms
+8:58:06.041 PM [player] length 8476217 ms
+8:58:06.072 PM [player] state Playing at 0 ms
+8:58:16.073 PM [playback] position 9.4 s not written (every 10 s): under 120 s
+8:58:20.577 PM [playback] position 13.4 s not written (exit): under 120 s
+8:58:20.578 PM [player] dismiss at 13383 ms, state Playing
+8:58:20.595 PM [player] state Stopping at 13883 ms
+8:58:20.620 PM [continue] 1 entries: movie/2@1821s
+8:58:20.679 PM [player] state Stopped at 13883 ms
+8:58:20.679 PM [playback] position 13.9 s not written (stop): under 120 s
+8:58:29.685 PM [playback] PUT file 4 position=0.0 watched=true (mark watched) → 200 position=0.0 watched=true last_played=2026-09-16T00:58:29Z
+8:58:35.608 PM [playback] PUT file 4 position=0.0 watched=false (mark unwatched) → 200 position=0.0 watched=false last_played=2026-09-16T00:58:35Z

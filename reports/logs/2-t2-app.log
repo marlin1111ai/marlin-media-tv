@@ -1,0 +1,19 @@
+8:49:07.955 PM [continue] 1 entries: movie/2@1800s
+8:49:07.971 PM [continue] 1 entries: movie/2@1800s
+8:49:34.430 PM [player] request Stargate — Extended · SD · AC-3 5.1 — http://192.168.1.250:8093/stream/2
+8:49:34.430 PM [playback] file 2 saved position 1800.0 s watched=false; starting at 1800000 ms
+8:49:34.430 PM [thumbs] file 2: 780 stills every 10.0 s, 26 of 26 sheets, state complete
+8:49:34.644 PM [player] state Opening at 0 ms
+8:49:34.762 PM [player] length 5998056 ms
+8:49:34.781 PM [player] state Playing at 0 ms
+8:49:44.734 PM [playback] position 9.0 s not written (every 10 s): under 120 s
+8:49:49.809 PM [playback] position 14.6 s not written (pause): under 120 s
+8:49:49.825 PM [player] state Paused at 14634 ms
+8:49:52.424 PM [player] state Playing at 14634 ms
+8:49:54.740 PM [playback] position 16.6 s not written (every 10 s): under 120 s
+8:49:59.673 PM [playback] position 21.6 s not written (exit): under 120 s
+8:49:59.673 PM [player] dismiss at 21614 ms, state Playing
+8:49:59.692 PM [player] state Stopping at 21866 ms
+8:49:59.712 PM [continue] 1 entries: movie/2@1800s
+8:49:59.767 PM [player] state Stopped at 21866 ms
+8:49:59.767 PM [playback] position 21.9 s not written (stop): under 120 s

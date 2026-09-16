@@ -12,6 +12,21 @@
 //  appears on touch and fades after 4 s while playing. Audio and Subtitles are reached with an
 //  up swipe from the surface; the panels list VLCKit's actual tracks and switch on selection.
 //
+//  Pass 2 adds the playback state the server keeps:
+//   - **D028, position saves:** the position in seconds is written every 10 s while playing, once
+//     on pause, once on stop and once on exit. A position under 120 s is never written, so a peek
+//     leaves no saved spot. After the watched mark no further position is written for that
+//     playback.
+//   - **D028, watched:** at 90 % of the file's own length, `watched: true` with `position: 0` is
+//     written once, which is exactly what takes the item off the server's continue-watching list.
+//   - **D029, starting at a saved position:** the film plays from the beginning and is seeked once
+//     to the saved position as soon as it is actually playing — D021's landing path, which lands
+//     within about 100 ms and does not lap. **Rejected: `:start-time=`** (tried on Home Theater,
+//     pass 2): it plays the right picture but re-bases VLC's whole timeline — `length` came back
+//     as 5 998 056 ms for Stargate Extended's 7 798 056 ms file and `player.time` restarted at 0 —
+//     so every position written would have been wrong, the 90 % mark would have measured the
+//     remainder, and the overlay clock and the D021 scrub would have been off by the start.
+//
 
 import Foundation
 import Observation
@@ -96,10 +111,17 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
     static let skipBack = 10
     static let skipForward = 30
 
+    /// D028: how often a position is written while playing, the floor under which none is written
+    /// at all, and the share of the file at which it counts as watched.
+    static let positionEvery: Duration = .seconds(10)
+    static let positionFloorSeconds = 120.0
+    static let watchedAtShare = 0.9
+
     let request: PlayRequest
     let onDismiss: () -> Void
     @ObservationIgnored private let library: VLCLibrary
     @ObservationIgnored let player: VLCMediaPlayer
+    @ObservationIgnored private let api = APIClient()
 
     private(set) var stateName = "Opening"
     private(set) var isPlaying = false
@@ -119,6 +141,15 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
     @ObservationIgnored private var skipTask: Task<Void, Never>?
     @ObservationIgnored private var frameTask: Task<Void, Never>?
     @ObservationIgnored private var hasPlayed = false
+
+    // D028: the position writer's own state.
+    @ObservationIgnored private var positionTask: Task<Void, Never>?
+    /// Set once the watched mark is written; no further position is written for this playback.
+    @ObservationIgnored private var watchedWritten = false
+    /// Set by the stop path so that the exit path does not write the same position again.
+    @ObservationIgnored private var teardownWritten = false
+    /// D029: the one seek to the saved position has been made.
+    @ObservationIgnored private var startApplied = false
 
     /// A touch-surface scrub (D021), taken only while paused: the position the picture is held at, and the target the
     /// thumb has moved to. Nothing seeks until it lands; Menu drops it and the film stays paused where it was.
@@ -164,6 +195,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         player.delegate = self
         EvidenceLog.line("[player] request \(request.title) — \(request.subtitle) — \(request.url.absoluteString)")
         EvidenceLog.line("[player] file \(request.file.path) \(request.file.resolution ?? "?") hdr=\(request.file.hdr) video=\(request.file.videoCodec ?? "?") audio=\(request.file.audioTracks.map { "\($0.codec) \($0.layout)" }.joined(separator: ", "))")
+        EvidenceLog.line("[playback] file \(request.file.fileId) saved position \(request.file.playback.position) s watched=\(request.file.playback.watched); starting at \(request.startMs) ms")
         if let thumbs = request.thumbs {
             thumbStrip = ThumbStrip(thumbs)
         } else {
@@ -186,6 +218,8 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         if request.file.path.lowercased().hasSuffix(".mkv") {
             media.addOption(":demux=mkv_trusted")
         }
+        // D029: no `:start-time=` here — it re-bases VLC's timeline (see the note at the top of this
+        // file). The saved position is applied as one seek once the film is playing, in stateChanged.
         drawableView = drawable
         pendingMedia = media
         // D016: ask tvOS for the stream's frame rate and dynamic range before playback. The server does not
@@ -214,7 +248,72 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         player.media = media
         player.play()
         EvidenceLog.line("[player] play() called")
+        startPositionWrites()
         bumpOverlay()
+    }
+
+    // MARK: the saved position (D029)
+
+    /// One seek, the first time the film is actually playing — the same path as a scrub landing
+    /// (D021), which lands within about 100 ms and does not lap.
+    private func applyStartPositionIfNeeded() {
+        guard !startApplied, request.startMs > 0, !dismissed else { return }
+        startApplied = true
+        EvidenceLog.line("[playback] seeking to the saved position \(request.startMs) ms (length \(lengthMs) ms) tick=\(Self.tick())")
+        player.time = VLCTime(int: Int32(request.startMs))
+        Task { @MainActor [weak self] in
+            for mark in [1, 3] {
+                try? await Task.sleep(for: .seconds(mark == 1 ? 1 : 2))
+                guard let self, !self.dismissed else { return }
+                self.timeMs = Int(self.player.time.intValue)
+                EvidenceLog.line("[playback] resume +\(mark) s time=\(self.timeMs) ms (wanted \(self.request.startMs) ms, off by \(self.timeMs - self.request.startMs) ms) state \(self.stateName)")
+            }
+        }
+    }
+
+    // MARK: playback state on the server (D028)
+
+    /// The one place a position is written. `why` names the trigger in the log.
+    private func writePosition(_ why: String) {
+        guard hasPlayed else { return }          // nothing ever played: there is no position
+        guard !watchedWritten else {
+            EvidenceLog.line("[playback] position not written (\(why)): already marked watched")
+            return
+        }
+        let seconds = Double(player.time.intValue) / 1000
+        guard seconds >= Self.positionFloorSeconds else {
+            EvidenceLog.line("[playback] position \(String(format: "%.1f", seconds)) s not written (\(why)): under \(Int(Self.positionFloorSeconds)) s")
+            return
+        }
+        let fileId = request.file.fileId
+        Task { @MainActor [api] in
+            await PlaybackWrite.send(api, fileId: fileId, position: seconds, why: why)
+        }
+    }
+
+    /// D028: every 10 s, and only while playing.
+    private func startPositionWrites() {
+        positionTask?.cancel()
+        positionTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: Self.positionEvery)
+                guard let self, !Task.isCancelled, !self.dismissed else { return }
+                if self.isPlaying { self.writePosition("every 10 s") }
+            }
+        }
+    }
+
+    /// D028: 90 % of the file's own length, once, with position 0 — which is what takes the item
+    /// off the server's continue-watching list (the server's D033).
+    private func markWatchedIfDue() {
+        guard !watchedWritten, hasPlayed, lengthMs > 0 else { return }
+        guard Double(timeMs) >= Self.watchedAtShare * Double(lengthMs) else { return }
+        watchedWritten = true
+        EvidenceLog.line("[playback] \(Int(Self.watchedAtShare * 100))% reached at \(timeMs) ms of \(lengthMs) ms — marking watched")
+        let fileId = request.file.fileId
+        Task { @MainActor [api] in
+            await PlaybackWrite.send(api, fileId: fileId, position: 0, watched: true, why: "90% watched")
+        }
     }
 
     // MARK: display matching (D016)
@@ -320,6 +419,14 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
     func dismiss() {
         guard !dismissed else { return }
         dismissed = true
+        // D028: the exit write, taken before the player is stopped so the time is still readable.
+        // Stopping always follows a dismiss, so the flag also stops the .stopped path writing the
+        // same position a second time.
+        if !teardownWritten {
+            writePosition("exit")
+            teardownWritten = true
+        }
+        positionTask?.cancel()
         hideTask?.cancel(); skipTask?.cancel(); frameTask?.cancel()
         parseFallbackTask?.cancel(); parser?.cancelAllParsing()
         EvidenceLog.line("[player] dismiss at \(timeMs) ms, state \(stateName)")
@@ -491,6 +598,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         if isPlaying {
             EvidenceLog.line("[player] pause (\(source)) at \(player.time.intValue) ms")
             player.pause()
+            writePosition("pause")       // D028
         } else {
             EvidenceLog.line("[player] play (\(source)) at \(player.time.intValue) ms")
             player.play()
@@ -706,6 +814,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         case .playing:
             hasPlayed = true
             refreshTracks()
+            applyStartPositionIfNeeded()     // D029
             bumpOverlay()
         case .paused:
             bumpOverlay()
@@ -715,7 +824,15 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
             EvidenceLog.line("[player] \(errorText!)")
             overlayVisible = true
         case .stopped:
-            if hasPlayed { dismiss() }
+            if hasPlayed {
+                // D028: stop and exit write once between them — whichever comes first. A natural
+                // end stops before it dismisses; Menu dismisses before the stop that follows it.
+                if !teardownWritten {
+                    writePosition("stop")
+                    teardownWritten = true
+                }
+                dismiss()
+            }
         default:
             break
         }
@@ -724,6 +841,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
     private func timeChanged() {
         timeMs = Int(player.time.intValue)
         if lengthMs == 0, let length = player.media?.length.intValue, length > 0 { lengthMs = Int(length) }
+        markWatchedIfDue()               // D028
     }
 
     // MARK: overlay values (frame 10)

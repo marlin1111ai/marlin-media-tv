@@ -1,0 +1,17 @@
+9:11:12.790 PM [continue] 2 entries: episode/8@968s, movie/2@1821s
+9:11:12.805 PM [continue] 2 entries: episode/8@968s, movie/2@1821s
+9:11:32.849 PM [player] request Divergent — Divergent (2014).mkv · 4K HDR · DTS 7.1 — http://192.168.1.250:8093/stream/1
+9:11:32.849 PM [playback] file 1 saved position 0.0 s watched=false; starting at 0 ms
+9:11:32.849 PM [thumbs] file 1: 838 stills every 10.0 s, 28 of 28 sheets, state complete
+9:11:33.336 PM [player] state Opening at 0 ms
+9:11:33.530 PM [player] length 8379371 ms
+9:11:33.553 PM [player] state Playing at 0 ms
+9:11:43.381 PM [playback] position 9.0 s not written (every 10 s): under 120 s
+9:11:53.579 PM [playback] position 19.6 s not written (every 10 s): under 120 s
+9:12:03.584 PM [playback] position 29.6 s not written (every 10 s): under 120 s
+9:12:13.782 PM [playback] position 39.6 s not written (every 10 s): under 120 s
+9:12:22.213 PM [playback] position 48.0 s not written (exit): under 120 s
+9:12:22.213 PM [player] dismiss at 47640 ms, state Playing
+9:12:22.229 PM [player] state Stopping at 48300 ms
+9:12:22.264 PM [continue] 2 entries: episode/8@968s, movie/2@1821s
+9:12:22.306 PM [player] state Stopped at 48300 ms
