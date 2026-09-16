@@ -25,6 +25,201 @@
   <div style="font:400 26px/1.5 var(--font-body);color:#9397ab">tvOS client for a home media server. 1920 × 1080, Siri-remote focus model: focus is an accent outline plus a lift and a soft glow, and only one element carries it per screen.</div>
 </div>
 
+<!-- 00 HOME -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">00 · Home</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080 · first screen on launch, first card focused</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="00" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:60px;padding:52px 80px 0">
+      <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+      <div style="display:flex;align-items:stretch;gap:16px">
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">Movies</div>
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">TV Shows</div>
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">Videos</div>
+      </div>
+    </div>
+    <div style="padding:46px 0 0 80px;display:flex;flex-direction:column;gap:36px">
+      <div><div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Continue watching</div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+        <div style="width:250px;transform:translateY(-8px) scale(1.04);transform-origin:top center">
+          <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#332e4e 0%,#1b1d2b 62%,#232532 100%);outline:4px solid #9184d9;outline-offset:6px;box-shadow:0 26px 70px rgba(0,0,0,.65), 0 0 70px rgba(145,132,217,.3);display:flex;align-items:center;justify-content:center">
+            <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.1)">S</span>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(233,233,237,.18)">
+              <div style="height:5px;width:58%;background:#9184d9"></div>
+            </div>
+          </div>
+          <div style="margin-top:18px;font:500 23px/1.25 var(--font-heading);color:#f5f4ff">Severance</div>
+          <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#b2b6ca">S2 E4 · Woe’s Hollow</div>
+          <div style="margin-top:2px;font:400 19px/1.3 var(--font-body);color:#9397ab">18 min left</div>
+        </div>
+        <sc-for list="{{ homeRow }}" as="c" hint-placeholder-count="5">
+          <div style="width:250px;opacity:.86">
+            <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ c.initial }}</span>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(233,233,237,.18)">
+                <div style="height:5px;width:{{ c.pct }};background:#9184d9"></div>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ c.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ c.line2 }}</div>
+            <div style="margin-top:2px;font:400 19px/1.3 var(--font-body);color:#75798c">{{ c.line3 }}</div>
+          </div>
+        </sc-for>
+      </div></div>
+      <div><div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Movies · 128</div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+        <sc-for list="{{ homeMovies }}" as="m" hint-placeholder-count="5">
+          <div style="width:250px;opacity:.82">
+            <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ m.initial }}</span>
+              <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+                <sc-for list="{{ m.badges }}" as="bd" hint-placeholder-count="1">
+                  <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">{{ bd }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ m.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ m.y }}</div>
+          </div>
+        </sc-for>
+      </div></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;height:150px;background:linear-gradient(to top, #141626 0%, rgba(20,22,38,.85) 40%, rgba(20,22,38,0) 100%);pointer-events:none"></div>
+  </div>
+</div>
+
+<!-- 00B HOME -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">00b · Home — scrolled</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080 · TV Shows and Videos rows, first TV poster focused</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="00b" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:60px;padding:52px 80px 0">
+      <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+      <div style="display:flex;align-items:stretch;gap:16px">
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">Movies</div>
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">TV Shows</div>
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">Videos</div>
+      </div>
+    </div>
+    <div style="padding:46px 0 0 80px;display:flex;flex-direction:column;gap:20px">
+      <div><div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">TV Shows · 34</div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+        <div style="width:250px;transform:translateY(-8px) scale(1.04);transform-origin:top center">
+          <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#332e4e 0%,#1b1d2b 62%,#232532 100%);outline:4px solid #9184d9;outline-offset:6px;box-shadow:0 26px 70px rgba(0,0,0,.65), 0 0 70px rgba(145,132,217,.3);display:flex;align-items:center;justify-content:center">
+            <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.1)">S</span>
+          </div>
+          <div style="margin-top:20px;font:500 23px/1.25 var(--font-heading);color:#f5f4ff">Severance</div>
+          <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#b2b6ca">2022</div>
+        </div>
+        <sc-for list="{{ homeShows2 }}" as="m" hint-placeholder-count="5">
+          <div style="width:250px;opacity:.82">
+            <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ m.initial }}</span>
+              <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+                <sc-for list="{{ m.badges }}" as="bd" hint-placeholder-count="1">
+                  <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">{{ bd }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ m.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ m.y }}</div>
+          </div>
+        </sc-for>
+      </div></div>
+      <div><div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Videos · 5</div>
+      <div style="display:flex;gap:30px;align-items:flex-start">
+        <sc-for list="{{ homeVideos }}" as="v" hint-placeholder-count="5">
+          <div style="width:340px;opacity:.86">
+            <div style="height:191px;border-radius:8px;background:linear-gradient(150deg,#2b2741,#1b1d2b);box-shadow:0 0 0 1px #3f424d"></div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ v.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ v.spec }} · {{ v.dur }}</div>
+          </div>
+        </sc-for>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 00C HOME -->
+<div style="display:flex;flex-direction:column;gap:18px">
+  <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 22px/1 var(--font-heading);color:#9184d9;letter-spacing:.16em;text-transform:uppercase">00c · Home — nothing in progress</span>
+      <span style="font:400 18px/1 var(--font-body);color:#75798c">1920 × 1080 · no Continue watching row, Movies focused</span>
+    </div>
+  </sc-if>
+  <div data-screen-label="00c" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:60px;padding:52px 80px 0">
+      <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+      <div style="display:flex;align-items:stretch;gap:16px">
+        <div style="padding:13px 32px;border-radius:10px;background:rgba(145,132,217,.18);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.34);font:500 30px/1 var(--font-heading);color:#f5f4ff;white-space:nowrap">Movies</div>
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">TV Shows</div>
+        <div style="padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap">Videos</div>
+      </div>
+    </div>
+    <div style="padding:46px 0 0 80px;display:flex;flex-direction:column;gap:20px">
+      <div><div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Movies · 128</div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+        <sc-for list="{{ homeMovies }}" as="m" hint-placeholder-count="5">
+          <div style="width:250px;opacity:.82">
+            <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ m.initial }}</span>
+              <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+                <sc-for list="{{ m.badges }}" as="bd" hint-placeholder-count="1">
+                  <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">{{ bd }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ m.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ m.y }}</div>
+          </div>
+        </sc-for>
+      </div></div>
+      <div><div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">TV Shows · 34</div>
+      <div style="display:flex;gap:32px;align-items:flex-start">
+        <sc-for list="{{ homeShows }}" as="m" hint-placeholder-count="5">
+          <div style="width:250px;opacity:.82">
+            <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center">
+              <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.07)">{{ m.initial }}</span>
+              <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+                <sc-for list="{{ m.badges }}" as="bd" hint-placeholder-count="1">
+                  <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">{{ bd }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ m.t }}</div>
+            <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ m.y }}</div>
+          </div>
+        </sc-for>
+      </div></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;height:150px;background:linear-gradient(to top, #141626 0%, rgba(20,22,38,.85) 40%, rgba(20,22,38,0) 100%);pointer-events:none"></div>
+  </div>
+</div>
+
 <!-- 01 LIBRARY / MOVIES -->
 <div style="display:flex;flex-direction:column;gap:18px">
   <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
@@ -34,6 +229,10 @@
     </div>
   </sc-if>
   <div data-screen-label="01" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
       <div style="display:flex;align-items:center;gap:60px">
         <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
@@ -43,7 +242,7 @@
           <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Videos</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
+      <div style="display:flex;align-items:center;gap:12px;margin-right:260px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
         <span style="color:#75798c;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
         <span>{{ sortLabel }}</span>
         <span style="color:#9184d9;font-size:20px">▾</span>
@@ -110,6 +309,10 @@
     </div>
   </sc-if>
   <div data-screen-label="02" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
       <div style="display:flex;align-items:center;gap:60px">
         <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
@@ -119,7 +322,7 @@
           <div style="padding:16px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#9397ab;border:3px solid transparent">Videos</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
+      <div style="display:flex;align-items:center;gap:12px;margin-right:260px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
         <span style="color:#75798c;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
         <span>Title</span>
         <span style="color:#9184d9;font-size:20px">▾</span>
@@ -187,6 +390,10 @@
     </div>
   </sc-if>
   <div data-screen-label="03" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
       <div style="display:flex;align-items:center;gap:60px">
         <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
@@ -196,7 +403,7 @@
           <div style="padding:13px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.16);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.34)">Videos</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
+      <div style="display:flex;align-items:center;gap:12px;margin-right:260px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5">
         <span style="color:#75798c;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
         <span>Recently Added</span>
         <span style="color:#9184d9;font-size:20px">▾</span>
@@ -236,6 +443,10 @@
       </div>
     </sc-if>
     <div data-screen-label="04" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:52px 80px 0">
         <div style="display:flex;align-items:center;gap:60px">
           <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
@@ -245,7 +456,7 @@
             <div style="padding:13px 30px;border-radius:10px;font:500 30px/1 var(--font-heading);color:#f5f4ff;background:rgba(145,132,217,.16);border:3px solid #9184d9;box-shadow:0 0 44px rgba(145,132,217,.34)">Videos</div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #3f424d;background:#1a1c29;font:500 24px/1 var(--font-heading);color:#75798c">
+        <div style="display:flex;align-items:center;gap:12px;margin-right:260px;padding:14px 26px;border-radius:10px;border:1px solid #3f424d;background:#1a1c29;font:500 24px/1 var(--font-heading);color:#75798c">
           <span style="letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
           <span>Recently Added</span>
           <span style="font-size:20px">▾</span>
@@ -267,12 +478,16 @@
       </div>
     </sc-if>
     <div style="width:760px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(140% 70% at 80% 0%, #1d2033 0%, #161826 60%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d;padding:52px 60px 0;display:flex;flex-direction:column;align-items:flex-end">
-      <div style="display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:3px solid #9184d9;background:rgba(145,132,217,.16);font:500 24px/1 var(--font-heading);color:#f5f4ff;box-shadow:0 0 44px rgba(145,132,217,.3)">
+    <div style="position:absolute;right:60px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-right:260px;padding:14px 26px;border-radius:10px;border:3px solid #9184d9;background:rgba(145,132,217,.16);font:500 24px/1 var(--font-heading);color:#f5f4ff;box-shadow:0 0 44px rgba(145,132,217,.3)">
         <span style="color:#b2b6ca;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
         <span>Recently Added</span>
         <span style="color:#9184d9;font-size:20px">▴</span>
       </div>
-      <div style="margin-top:18px;width:420px;border-radius:12px;background:#232532;box-shadow:0 0 0 1px #595d6c, 0 22px 60px rgba(0,0,0,.7);overflow:hidden">
+      <div style="margin-top:18px;margin-right:260px;width:420px;border-radius:12px;background:#232532;box-shadow:0 0 0 1px #595d6c, 0 22px 60px rgba(0,0,0,.7);overflow:hidden">
         <div style="padding:22px 28px;font:500 28px/1 var(--font-heading);color:#cfd3e5;border-bottom:1px solid #2f3240">Title</div>
         <div style="padding:22px 28px;font:500 28px/1 var(--font-heading);color:#cfd3e5;border-bottom:1px solid #2f3240">Year</div>
         <div style="padding:22px 28px;display:flex;align-items:center;justify-content:space-between;background:rgba(145,132,217,.2);border-left:4px solid #9184d9;font:500 28px/1 var(--font-heading);color:#f5f4ff">
@@ -280,7 +495,7 @@
           <span style="color:#9184d9;font-size:26px">✓</span>
         </div>
       </div>
-      <div style="margin-top:26px;width:420px;font:400 19px/1.45 var(--font-body);color:#75798c;text-align:right">Focus moves vertically through the three options; the current sort carries the check and the accent mark.</div>
+      <div style="margin-top:26px;margin-right:260px;width:420px;font:400 19px/1.45 var(--font-body);color:#75798c;text-align:right">Focus moves vertically through the three options; the current sort carries the check and the accent mark.</div>
     </div>
   </div>
 </div>
@@ -294,6 +509,10 @@
     </div>
   </sc-if>
   <div data-screen-label="06" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#161826;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
     <div style="position:absolute;inset:0;background:radial-gradient(80% 90% at 78% 10%, #3b3560 0%, #232538 45%, #161826 75%)"></div>
     <div style="position:absolute;inset:0;background:linear-gradient(100deg, #161826 26%, rgba(22,24,38,.82) 48%, rgba(22,24,38,.25) 76%, rgba(22,24,38,.6) 100%)"></div>
     <div style="position:absolute;left:0;right:0;bottom:0;height:340px;background:linear-gradient(to top, #161826, rgba(22,24,38,0))"></div>
@@ -369,6 +588,10 @@
     </div>
   </sc-if>
   <div data-screen-label="07" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#161826;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
     <div style="position:absolute;inset:0;background:radial-gradient(80% 90% at 78% 10%, #3b3560 0%, #232538 45%, #161826 75%);filter:blur(2px);opacity:.5"></div>
     <div style="position:absolute;inset:0;background:rgba(11,12,19,.74)"></div>
     <div style="position:absolute;left:80px;top:78px;display:flex;gap:40px;align-items:flex-start;opacity:.35">
@@ -424,6 +647,10 @@
     </div>
   </sc-if>
   <div data-screen-label="08" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#161826;border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
     <div style="position:absolute;inset:0;background:radial-gradient(75% 85% at 80% 6%, #37345e 0%, #22243a 45%, #161826 72%)"></div>
     <div style="position:absolute;inset:0;background:linear-gradient(100deg, #161826 24%, rgba(22,24,38,.85) 46%, rgba(22,24,38,.35) 74%, rgba(22,24,38,.62) 100%)"></div>
 
@@ -485,6 +712,10 @@
     </div>
   </sc-if>
   <div data-screen-label="09" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(90% 80% at 20% 0%, #1f2235 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
     <div style="position:absolute;left:80px;top:96px;width:1100px">
       <div style="width:1100px;height:619px;border-radius:12px;background:linear-gradient(150deg,#332e4e 0%,#1b1d2b 60%,#232532 100%);box-shadow:0 0 0 1px #595d6c, 0 24px 70px rgba(0,0,0,.6)"></div>
     </div>
@@ -730,6 +961,10 @@
       </div>
     </sc-if>
     <div data-screen-label="16" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
       <div style="display:flex;align-items:center;gap:60px;padding:52px 80px 0">
         <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
         <div style="display:flex;gap:14px">
@@ -765,6 +1000,10 @@
       </div>
     </sc-if>
     <div data-screen-label="17" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(90% 80% at 50% 30%, #1d1f2f 0%, #161826 55%, #101220 100%);border-radius:14px;box-shadow:0 0 0 1px #3f424d">
+    <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+      <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">Tue 15 Sep</span>
+      <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">9:40 PM</span>
+    </div>
       <div style="position:absolute;left:80px;top:52px;font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</div>
       <div style="position:absolute;left:80px;top:50%;transform:translateY(-50%);max-width:900px">
         <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab">Connection</div>
@@ -850,7 +1089,22 @@ class Component extends DCLogic {
       { lang: 'Français', fmt: 'PGS' },
       { lang: '日本語', fmt: 'ASS' }
     ];
+    const homeRow = [
+      { t: 'Gran Canaria 2024', initial: 'G', line2: '8 min left', line3: '', pct: '37%' },
+      { t: 'Sicario', initial: 'S', line2: '9 min left', line3: '', pct: '92%' },
+      { t: 'Andor', initial: 'A', line2: 'S1 E9 · Nobody\u2019s Listening!', line3: '31 min left', pct: '27%' },
+      { t: 'Heat', initial: 'H', line2: '1 h 12 min left', line3: '', pct: '31%' },
+      { t: 'Blade Runner', initial: 'B', line2: '47 min left', line3: '', pct: '60%' }
+    ];
+    const homeVideos = [
+      { t: 'Gran Canaria 2024', spec: '2160p · HEVC', dur: '12:41' },
+      ...videos
+    ];
     return {
+      homeRow, homeVideos,
+      homeMovies: movies.slice(0, 6),
+      homeShows: shows.slice(0, 6),
+      homeShows2: shows.slice(0, 5),
       showLabels: this.props.showFrameLabels ?? true,
       sortLabel: this.props.sortLabel ?? 'Recently Added',
       movies, shows, cwMovies, cwShows, videos, editions,

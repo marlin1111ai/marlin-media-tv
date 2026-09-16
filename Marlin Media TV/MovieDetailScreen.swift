@@ -73,6 +73,11 @@ struct MovieDetailScreen: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // D041: the clock, as the new frame 06 draws it — before `ignoresSafeArea`, so it lands at
+        // the frame's own top right.
+        .overlay(alignment: .topTrailing) {
+            NowClock().padding(.trailing, 80).padding(.top, 56)
+        }
         .ignoresSafeArea()
         .onAppear { playFocused = true }
         .task { await loadThumbs() }

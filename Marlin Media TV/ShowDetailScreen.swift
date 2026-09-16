@@ -11,13 +11,20 @@
 //  saved position; and press-and-hold opens the mark menu. Where a file's length is unknown there
 //  is no "N min left" and no bar.
 //
-//  Pass 2c (D031, candidate b): an episode row is a **focusable view, not a Button**. The select
-//  press reaches its own long-press gesture: holding past 0.6 s opens the mark menu, and a release
-//  that no hold has claimed is an ordinary click that plays or resumes. Pass 2b's candidate (a) —
-//  a `UILongPressGestureRecognizer` on the window — is gone: it attached but never received the
-//  press, because a focused SwiftUI Button consumes select and acts on release. The row draws
-//  exactly as before: `EpisodeRowLabel` is unchanged and still takes its focus look from
-//  `@Environment(\.isFocused)`, which `.focusable()` drives just as the Button did.
+//  Pass 2c (D031): an episode row is a focusable view, not a Button, so the select press reaches
+//  the row's own gesture rather than a Button that swallows it.
+//
+//  Pass 3 (D039): two fixes to that row.
+//   - **The highlight is back.** A plain `.focusable()` view does not put `isFocused` into its
+//     child's environment the way a Button's style does, so `EpisodeRowLabel` saw `false` and drew
+//     nothing. The row now takes `focused:` explicitly from `@FocusState`; the drawing itself is
+//     the pass 2/2b row, unchanged.
+//   - **The hold is decided by the press's own length.** The press-down instant is remembered and
+//     the release is judged against it: past the threshold opens the mark menu and plays nothing,
+//     shorter plays or resumes. Pass 2c raced SwiftUI's callbacks instead — `onPressingChanged`
+//     arrives before `perform`, so the release was taken as a click and started playback. The
+//     pass 2c press-down/press-up instrumentation is removed.
+//
 //  Pass 2b (D032): the screen re-reads itself whenever the player closes.
 //
 
@@ -37,13 +44,13 @@ struct ShowDetailScreen: View {
     @State private var thumbs: FileThumbs?
     /// D027: the episode whose press-and-hold menu is open.
     @State private var holdEpisode: Episode?
-    /// D031: the row the remote is on, the hold that has just fired, and whether the player is up.
+    /// D031/D039: the row the remote is on, when the press began, and whether the player is up.
     @FocusState private var focusedEpisode: Int?
-    @State private var holdFired = false
+    @State private var pressDown: Date?
     @State private var playerUp = false
     @FocusState private var focusedSeason: Int?
 
-    /// D031: how long select must be held for the mark menu rather than a play.
+    /// D039: held at least this long and the press is a hold, not a click.
     private static let holdSeconds = 0.6
 
     var body: some View {
@@ -81,6 +88,9 @@ struct ShowDetailScreen: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // D041: the clock, as the new frame 08 draws it — before `ignoresSafeArea`, so it lands at
+        // the frame's own top right.
+        .overlay(alignment: .topTrailing) { NowClock().padding(.trailing, 80).padding(.top, 56) }
         .ignoresSafeArea()
         .task { await load() }
         .onChange(of: playerClosed) { _, _ in
@@ -203,19 +213,24 @@ struct ShowDetailScreen: View {
     }
 
     /// D031: each row is a focusable view rather than a Button, so the select press reaches the
-    /// row's own long-press gesture. The drawing is `EpisodeRowLabel`, unchanged.
+    /// row's own gesture. D039: the highlight comes from `@FocusState`, not the environment.
     private func episodes(detail: Show) -> some View {
         let season = detail.seasons?.first { $0.id == seasonId } ?? detail.seasons?.first
         return VStack(spacing: 8) {
             ForEach(season?.episodes ?? []) { episode in
-                EpisodeRowLabel(episode: episode)
+                EpisodeRowLabel(episode: episode, focused: focusedEpisode == episode.id)
                     .focusable()
                     .focused($focusedEpisode, equals: episode.id)
                     .accessibilityElement(children: .combine)
                     .accessibilityAddTraits(.isButton)
                     .accessibilityIdentifier("episode.\(episode.season).\(episode.number)")
-                    .onLongPressGesture(minimumDuration: Self.holdSeconds) {
-                        holdBegan(episode)
+                    // D039: this gesture is here only to report the press. Its own minimum is set
+                    // far beyond any real press, so SwiftUI never ends the press at the threshold
+                    // itself — pass 2c measured the release at 601 ms against a 600 ms minimum,
+                    // a race the comparison below cannot reliably win. With the minimum out of
+                    // reach, the release is the real one and its length decides.
+                    .onLongPressGesture(minimumDuration: 3600) {
+                        // never fires
                     } onPressingChanged: { pressing in
                         pressChanged(episode, pressing: pressing)
                     }
@@ -223,28 +238,21 @@ struct ShowDetailScreen: View {
         }
     }
 
-    /// D031: select has been held past the threshold — the mark menu, not a play.
-    private func holdBegan(_ episode: Episode) {
-        guard !playerUp, holdEpisode == nil else { return }
-        holdFired = true
-        holdEpisode = episode
-        EvidenceLog.line("[hold] mark menu for S\(episode.season)E\(episode.number) file \(episode.file.fileId) (watched=\(episode.file.playback.watched))")
-    }
-
-    /// D031: the press itself. A release that no hold has claimed is an ordinary click.
+    /// D039: the press decides itself. Down is remembered; the release is measured against it.
     private func pressChanged(_ episode: Episode, pressing: Bool) {
-        // Instrumentation only (pass 2c): the press's own down and up times. A gap of about the
-        // held duration means SwiftUI saw a long press and simply never fired `perform`; a gap of
-        // almost nothing means the press that arrived was never a hold at all.
-        EvidenceLog.line("[hold] press \(pressing ? "down" : "up") on S\(episode.season)E\(episode.number)")
-        guard !pressing else { return }
-        if holdFired {
-            holdFired = false
-            EvidenceLog.line("[hold] released after the hold: S\(episode.season)E\(episode.number) did not play")
+        if pressing {
+            pressDown = Date()
             return
         }
+        let held = pressDown.map { Date().timeIntervalSince($0) } ?? 0
+        pressDown = nil
         guard holdEpisode == nil, !playerUp else { return }
-        start(episode)
+        if held >= Self.holdSeconds {
+            holdEpisode = episode
+            EvidenceLog.line("[hold] menu for S\(episode.season)E\(episode.number) file \(episode.file.fileId) after \(Int(held * 1000)) ms (watched=\(episode.file.playback.watched))")
+        } else {
+            start(episode)
+        }
     }
 
     /// D027: the mark menu, in the edition picker's style (frame 07).
@@ -300,7 +308,7 @@ struct ShowDetailScreen: View {
             return
         }
         playerUp = true
-        EvidenceLog.line("[hold] click: playing S\(episode.season)E\(episode.number) from \(request.startMs) ms")
+        EvidenceLog.line("[episode] click: playing S\(episode.season)E\(episode.number) from \(request.startMs) ms")
         play(request)
     }
 }
@@ -341,10 +349,11 @@ private struct MarkRowLabel: View {
 }
 
 /// Frame 08's episode row. D027 adds the state column and the bar across the still.
-/// Unchanged in pass 2c: only what wraps it changed, so the row draws and focuses as before.
+/// D039: `focused` is passed in rather than read from the environment, which a plain focusable
+/// view does not provide. The drawing is exactly the pass 2/2b row.
 private struct EpisodeRowLabel: View {
     let episode: Episode
-    @Environment(\.isFocused) private var focused
+    let focused: Bool
 
     private var playback: Playback { episode.file.playback }
     private var share: Double? { Format.share(position: playback.position, duration: episode.file.duration) }

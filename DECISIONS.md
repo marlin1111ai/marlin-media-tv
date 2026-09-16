@@ -328,3 +328,52 @@ the report says so.
 
 - **D038** **A check is still owed:** Videos Recently Added and the video detail screen, once a
   video exists on the server. Neither has ever run on a device, because this library has no videos.
+
+## 2026-09-15 — pass 3 (the episode rows, Home and the clock)
+
+Evidence: `reports/2026-09-15-pass3-home-and-rows.md`. The owner tests this pass by hand, so it was
+built, installed and launched, with four screenshots and no test matrix.
+
+- **D039** **The episode row, fixed twice over.**
+  - **Its focus highlight is back.** A plain `.focusable()` view does not put `isFocused` into its
+    child's environment the way a Button's style does, so after pass 2c `EpisodeRowLabel` always saw
+    `false` and drew nothing. The row now takes `focused:` explicitly from `@FocusState`. The drawing
+    is the pass 2/2b row, unchanged.
+  - **The press decides itself.** The press-down instant is remembered, and the release is measured
+    against it: held **0.6 s or more** opens the mark menu and plays nothing; shorter plays or
+    resumes, as before. Pass 2c raced SwiftUI's callbacks instead — `onPressingChanged(false)`
+    arrives before `perform` — so a hold was taken as a click and started playback. Pass 2c's
+    press-down/press-up instrumentation is removed.
+
+- **D040** **Home is the app's first screen** (frames 00, 00b, 00c). MARLIN, then Movies / TV Shows /
+  Videos, which open that library tab; Menu on a library tab comes back to Home. Then the rows, each
+  scrolling sideways:
+  - **Continue watching** — every in-progress movie, episode and video mixed, newest first, the same
+    cards the library tabs use; a card plays its file from its saved spot. **Hidden when empty**
+    (frame 00c).
+  - **Movies · <total>** — up to 6: the in-progress ones first (most recently played first), then
+    the rest by title. A card opens the movie screen.
+  - **TV Shows · <total shows>** — up to 6 **episode** cards in frame 00b's wide card, each with
+    that episode's own still (the picture the show screen's episode list uses), the show's title and
+    "S# E# · episode title". The order: the episodes in progress, newest watched first; then, for
+    each show, the next episode after the last one it finished; then on down each show, a step at a
+    time, until the row is full. A show never watched joins from S1 E1, after the shows that have
+    been watched. A card plays that episode, resuming if it has a saved spot.
+  - **Videos · <total>** — up to 6, in-progress first and then by title; a card opens the video
+    screen. With no videos the heading still shows, with nothing under it.
+  - **Home re-reads itself every time it appears**, including on the way back from the player. That
+    needs every show's episodes, which the shows list does not carry, so Home fetches one
+    `GET /api/shows/{id}` per show alongside the lists.
+
+- **D041** **The clock.** The current date and time ("TUE 15 SEP" · "9:40 PM") at the top right —
+  `right: 80, top: 56` — on Home, the three library tabs and the movie, show and video screens. It
+  keeps time while it is on screen. **Not on the player** (frames 10–15 do not draw it). The **Sort
+  control moves 260 pt in from the right edge**, as the new frames 01–04 draw it, to clear it.
+
+- **D042** **The design is replaced.** `Design/Marlin Media tvOS Design2.zip` was unzipped into
+  `Design/`, replacing `Marlin Media.dc.html`, `Marlin Media Prototype.dc.html`, `support.js` and
+  `_ds/`, and the zip was deleted once the replacement was in place. The earlier
+  `Marlin Media tvOS Design.zip` is left as it was. What changed: **frames 00, 00b and 00c are new**;
+  frames 01, 02, 03, 04, 06, 07, 08, 09, 16 and 17 differ **only** by the clock (and 01–04 by the
+  Sort control's 260 pt shift); frames 10–15, the player, are unchanged. Nothing else in any frame
+  moved.

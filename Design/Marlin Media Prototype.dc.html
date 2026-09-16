@@ -25,6 +25,12 @@
 
   <div ref="{{ hostRef }}" style="width:100%;overflow:hidden;border-radius:12px;box-shadow:0 0 0 1px #3f424d;height:{{ hostHeight }}">
    <div style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#161826;transform-origin:top left;transform:scale({{ scale }})">
+    <sc-if value="{{ showClock }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;right:80px;top:56px;z-index:6;display:flex;align-items:baseline;gap:14px">
+        <span style="font:500 18px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;color:#75798c">{{ clockDate }}</span>
+        <span style="font:500 24px/1 var(--font-heading);color:#cfd3e5;font-variant-numeric:tabular-nums">{{ clockTime }}</span>
+      </div>
+    </sc-if>
 
     <!-- LOADING -->
     <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
@@ -73,6 +79,78 @@
       </div>
     </sc-if>
 
+    <!-- HOME -->
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:60px;padding:52px 80px 0">
+          <span style="font:500 24px/1 var(--font-heading);letter-spacing:.26em;color:#9184d9;text-transform:uppercase">Marlin</span>
+          <div style="display:flex;align-items:stretch;gap:16px">
+            <sc-for list="{{ homeButtons }}" as="b" hint-placeholder-count="3">
+              <div onClick="{{ b.go }}" style="cursor:pointer;padding:15px 32px;border-radius:10px;border:1px solid #595d6c;font:500 30px/1 var(--font-heading);color:#cfd3e5;white-space:nowrap" style-hover="border-color:#9184d9;color:#f5f4ff;background:rgba(145,132,217,.18)">{{ b.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:80px;top:150px;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:20px;padding-bottom:60px">
+          <sc-if value="{{ homeHasRow }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Continue watching</div>
+              <div style="display:flex;gap:32px;align-items:flex-start">
+                <sc-for list="{{ homeRow }}" as="c" hint-placeholder-count="5">
+                  <div onClick="{{ c.play }}" style="cursor:pointer;width:250px;flex:none" style-hover="transform:translateY(-6px)">
+                    <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center" style-hover="outline:4px solid #9184d9;outline-offset:6px;box-shadow:0 26px 70px rgba(0,0,0,.65), 0 0 70px rgba(145,132,217,.3)">
+                      <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.08)">{{ c.initial }}</span>
+                      <div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(233,233,237,.18)">
+                        <div style="height:5px;background:#9184d9;width:{{ c.pct }}"></div>
+                      </div>
+                    </div>
+                    <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ c.t }}</div>
+                    <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ c.line2 }}</div>
+                    <div style="margin-top:2px;font:400 19px/1.3 var(--font-body);color:#75798c">{{ c.line3 }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-for list="{{ homeShelves }}" as="sh" hint-placeholder-count="2">
+            <div>
+              <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">{{ sh.heading }}</div>
+              <div style="display:flex;gap:32px;align-items:flex-start">
+                <sc-for list="{{ sh.items }}" as="m" hint-placeholder-count="5">
+                  <div onClick="{{ m.open }}" style="cursor:pointer;width:250px;flex:none" style-hover="transform:translateY(-6px)">
+                    <div style="position:relative;height:375px;border-radius:8px;overflow:hidden;background:linear-gradient(155deg,#2b2741 0%,#1b1d2b 62%,#232532 100%);box-shadow:0 0 0 1px #3f424d;display:flex;align-items:center;justify-content:center" style-hover="outline:4px solid #9184d9;outline-offset:6px;box-shadow:0 26px 70px rgba(0,0,0,.65), 0 0 70px rgba(145,132,217,.3)">
+                      <span style="font:500 104px/1 var(--font-heading);color:rgba(233,233,237,.08)">{{ m.initial }}</span>
+                      <div style="position:absolute;top:12px;right:12px;display:flex;gap:7px">
+                        <sc-for list="{{ m.badges }}" as="bd" hint-placeholder-count="1">
+                          <span style="font:600 15px/1 var(--font-body);letter-spacing:.07em;padding:6px 9px;border-radius:4px;background:rgba(18,20,32,.78);border:1px solid #75798c;color:#e4e7f5">{{ bd }}</span>
+                        </sc-for>
+                      </div>
+                    </div>
+                    <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ m.t }}</div>
+                    <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ m.y }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+
+          <div>
+            <div style="font:500 20px/1 var(--font-heading);letter-spacing:.16em;text-transform:uppercase;color:#9397ab;margin-bottom:22px">Videos · {{ homeVideoCount }}</div>
+            <div style="display:flex;gap:30px;align-items:flex-start">
+              <sc-for list="{{ homeVideos }}" as="v" hint-placeholder-count="5">
+                <div onClick="{{ v.open }}" style="cursor:pointer;width:340px;flex:none" style-hover="transform:translateY(-6px)">
+                  <div style="height:191px;border-radius:8px;background:linear-gradient(150deg,#2b2741,#1b1d2b);box-shadow:0 0 0 1px #3f424d" style-hover="outline:4px solid #9184d9;outline-offset:6px;box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 60px rgba(145,132,217,.28)"></div>
+                  <div style="margin-top:14px;font:500 22px/1.25 var(--font-heading);color:#e9e9ed">{{ v.t }}</div>
+                  <div style="margin-top:4px;font:400 19px/1.3 var(--font-body);color:#9397ab">{{ v.spec }} · {{ v.dur }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
     <!-- LIBRARY -->
     <sc-if value="{{ isLibrary }}" hint-placeholder-val="{{ true }}">
       <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 12% 0%, #1d2033 0%, #161826 55%, #131522 100%);overflow:hidden">
@@ -85,7 +163,7 @@
               </sc-for>
             </div>
           </div>
-          <div style="position:relative">
+          <div style="position:relative;margin-right:260px">
             <div onClick="{{ toggleSort }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 26px;border-radius:10px;border:1px solid #595d6c;background:#1c1e2d;font:500 24px/1 var(--font-heading);color:#cfd3e5" style-hover="border-color:#9184d9;color:#f5f4ff">
               <span style="color:#75798c;letter-spacing:.1em;text-transform:uppercase;font-size:18px">Sort</span>
               <span>{{ sort }}</span>
@@ -447,7 +525,7 @@
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;videosEmpty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;videosEmpty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Prototype&quot;},&quot;homeEmpty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
 const ED = (name, res, hdr, codec, audio, subs, size) => ({ name, res, hdr, codec, audio, subs, size });
 
 const MOVIES = [
@@ -550,12 +628,13 @@ class Component extends DCLogic {
     screen: 'loading', tab: 'movies', sort: 'Recently Added', sortOpen: false,
     movieIdx: 0, showIdx: 0, videoIdx: 0, season: 2, pickerOpen: false,
     playing: false, pos: 0, duration: 7020, overlay: true, panel: null,
-    skip: null, frame: null, audioIdx: 0, subIdx: 0,
+    skip: null, frame: null, audioIdx: 0, subIdx: 0, clockNow: new Date(),
     now: { title: '', sub: '' }, scale: 1, watchedFlip: {}
   };
 
   componentDidMount() {
-    this.loadTimer = setTimeout(() => this.setState({ screen: 'library' }), 1400);
+    this.loadTimer = setTimeout(() => this.setState({ screen: 'home' }), 1400);
+    this.clockTick = setInterval(() => this.setState({ clockNow: new Date() }), 20000);
     this.tick = setInterval(() => {
       if (this.state.screen === 'player' && this.state.playing) {
         this.setState(s => ({ pos: Math.min(s.duration, s.pos + 1) }));
@@ -580,7 +659,7 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
-    clearTimeout(this.loadTimer); clearInterval(this.tick);
+    clearTimeout(this.loadTimer); clearInterval(this.tick); clearInterval(this.clockTick);
     clearTimeout(this.hideTimer); clearTimeout(this.skipTimer); clearTimeout(this.frameTimer);
     window.removeEventListener('keydown', this.onKey);
     if (this.ro) this.ro.disconnect();
@@ -649,7 +728,11 @@ class Component extends DCLogic {
       return;
     }
     if (s.screen === 'movie' && s.pickerOpen) { this.setState({ pickerOpen: false }); return; }
-    if (s.screen === 'library') { this.setState({ sortOpen: false }); return; }
+    if (s.screen === 'home') return;
+    if (s.screen === 'library') {
+      if (s.sortOpen) { this.setState({ sortOpen: false }); return; }
+      this.setState({ screen: 'home' }); return;
+    }
     this.setState({ screen: 'library', sortOpen: false });
   };
 
@@ -739,7 +822,52 @@ class Component extends DCLogic {
       pick: () => { this.setState({ subIdx: i, panel: null }); this.bumpOverlay(); }
     }));
 
+    const epTitle = (sh) => (SEV_EPS[sh.startSeason] && sh.t === 'Severance')
+      ? SEV_EPS[sh.startSeason][sh.progressEp - 1][0] : 'Episode ' + sh.progressEp;
+    const homeRefs = [['show', 0], ['video', 0], ['movie', 0], ['show', 1], ['movie', 2], ['movie', 4]];
+    const homeRow = homeRefs.map(([k, i]) => {
+      if (k === 'movie') {
+        const x = MOVIES[i];
+        return { t: x.t, initial: x.t[0], line2: this.mins(x.dur * (1 - x.prog)), line3: '',
+          pct: Math.round(x.prog * 100) + '%',
+          play: () => { this.setState({ movieIdx: i }); this.play(x.t, x.editions[0].name, x.dur, x.prog * x.dur, 'movie'); } };
+      }
+      if (k === 'show') {
+        const x = SHOWS[i];
+        return { t: x.t, initial: x.t[0], line2: 'S' + x.startSeason + ' E' + x.progressEp + ' · ' + epTitle(x), line3: '18 min left', pct: '58%',
+          play: () => { this.setState({ showIdx: i, season: x.startSeason }); this.play(x.t, 'S' + x.startSeason + ' E' + x.progressEp + ' · ' + epTitle(x), 2880, 1800, 'show'); } };
+      }
+      const x = VIDEOS[i];
+      const spec = x.spec.split(' · ').slice(0, 2).join(' · ');
+      return { t: x.t, initial: x.t[0], line2: this.mins(x.secs * (1 - x.prog)), line3: '', pct: Math.round(x.prog * 100) + '%',
+        play: () => { this.setState({ videoIdx: i }); this.play(x.t, spec, x.secs, x.prog * x.secs, 'video'); } };
+    });
+    const homeHasRow = !(this.props.homeEmpty ?? false);
+
+    const d = s.clockNow;
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     return {
+      showClock: s.screen !== 'player',
+      clockDate: days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()],
+      clockTime: ((d.getHours() % 12) || 12) + ':' + String(d.getMinutes()).padStart(2, '0') + ' ' + (d.getHours() < 12 ? 'AM' : 'PM'),
+      isHome: s.screen === 'home',
+      homeRow, homeHasRow,
+      homeShelves: [
+        { heading: 'Movies · ' + MOVIES.length,
+          items: MOVIES.slice(0, 6).map((x, i) => ({ t: x.t, y: x.y, initial: x.t[0], badges: tech(x),
+            open: () => this.setState({ screen: 'movie', movieIdx: i, pickerOpen: false }) })) },
+        { heading: 'TV Shows · ' + SHOWS.length,
+          items: SHOWS.slice(0, 6).map((x, i) => ({ t: x.t, y: x.y, initial: x.t[0], badges: tech(x),
+            open: () => this.setState({ screen: 'show', showIdx: i, season: x.startSeason }) })) }
+      ],
+      homeVideoCount: VIDEOS.length,
+      homeVideos: VIDEOS.map((v, i) => ({ t: v.t, spec: v.spec.split(' · ').slice(0, 2).join(' · '), dur: v.dur,
+        open: () => this.setState({ screen: 'video', videoIdx: i }) })),
+      homeButtons: [['movies', 'Movies'], ['tv', 'TV Shows'], ['videos', 'Videos']].map(([k, label]) => ({
+        label, go: () => this.setState({ screen: 'library', tab: k, sortOpen: false })
+      })),
       hostRef: this.fit,
       scale: s.scale,
       hostHeight: Math.round(1080 * s.scale) + 'px',
@@ -751,7 +879,7 @@ class Component extends DCLogic {
       isShow: s.screen === 'show',
       isVideo: s.screen === 'video',
       isPlayer: s.screen === 'player',
-      retry: () => { this.setState({ screen: 'loading' }); this.loadTimer = setTimeout(() => this.setState({ screen: 'library' }), 1400); },
+      retry: () => { this.setState({ screen: 'loading' }); this.loadTimer = setTimeout(() => this.setState({ screen: 'home' }), 1400); },
       browseCached: () => this.setState({ screen: 'library' }),
       back: this.back,
       tabs, sortOptions, sort: s.sort, sortOpen: s.sortOpen, sortCaret: s.sortOpen ? '▴' : '▾',

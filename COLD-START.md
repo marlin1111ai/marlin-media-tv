@@ -335,4 +335,35 @@ from working.** Decisions D031 (revised), D032a, D033 (revised); report
   (`Marlin Media TVUITests/Pass2cUITests.swift`) is not committed, nor is the owner's
   `Design/Marlin Media tvOS Design2.zip`.
 
+**Pass 3 (2026-09-15): the episode rows fixed, Home built, the clock added — all of it working.**
+Decisions D039–D042; report `reports/2026-09-15-pass3-home-and-rows.md`, evidence
+`reports/logs/3-*.log`, screenshots `reports/screenshots/p3/`. The owner tests this pass by hand,
+so it was built, installed and launched, with four screenshots and no matrix.
+- **The episode row is right again (D039).** Its focus highlight is back — a plain `.focusable()`
+  view does not hand `isFocused` to its child the way a Button's style does, so the row now takes
+  `focused:` from `@FocusState`. And the press decides itself: the press-down instant is remembered
+  and the release measured against it, so a hold opens the mark menu and plays nothing. **Proven on
+  Home Theater:** `[hold] menu for S1E2 file 9 after 1383 ms`. Pass 2c failed because SwiftUI ends
+  the press *at* `minimumDuration` — 601 ms against a 600 ms threshold — so the gesture's own
+  minimum is now set out of reach (3600 s) and only the measured length decides. Pass 2c's
+  instrumentation is gone.
+- **Home is the first screen (D040)**, frames 00/00b/00c: MARLIN and the three library buttons, then
+  Continue watching (every kind mixed, newest first, hidden when empty), Movies · N, TV Shows · N
+  (up to six **episode** cards in frame 00b's wide card, each with its own still, ordered
+  in-progress → next after the last finished → on down each show), and Videos · N. Menu on a
+  library tab returns to Home. Home re-reads itself every time it appears, which needs one
+  `GET /api/shows/{id}` per show for the episodes the shows list does not carry.
+- **The clock (D041)** — "TUE 15 SEP · 9:40 PM" at right 80, top 56 — is on Home, the three library
+  tabs and the movie, show and video screens, and **not** on the player. The Sort control moves
+  260 pt in from the right, as the new frames draw it.
+- **The design was replaced (D042):** `Design2.zip` unzipped into `Design/` over the old frames,
+  prototype, `support.js` and `_ds/`, and the zip deleted. **Frames 00, 00b, 00c are new; frames
+  01–09, 16 and 17 differ only by the clock (and 01–04 by the Sort shift); frames 10–15, the player,
+  are unchanged.**
+- **Committed locally on top of `ef9ce11`, not pushed** — the owner tests passes 2–3 together. Home
+  Theater is left running this build. The harnesses are not committed.
+- **Known and reported, not built:** at launch focus lands on a Movies card rather than the first
+  Continue Watching card, so Home opens slightly scrolled; frame 00's label says "first card
+  focused". Initial focus is not in the pass's list, so it was left alone.
+
 **Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.

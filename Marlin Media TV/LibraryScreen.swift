@@ -46,6 +46,12 @@ struct LibraryScreen: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // D041: the clock, where the new frames put it on every screen but the player. It goes on
+        // before `ignoresSafeArea` so that it sits 56 pt from the frame's own top, not 56 pt inside
+        // tvOS's safe area, which put it a header's height too low.
+        .overlay(alignment: .topTrailing) {
+            NowClock().padding(.trailing, 80).padding(.top, 56)
+        }
         .ignoresSafeArea()
     }
 
@@ -110,6 +116,9 @@ struct LibraryScreen: View {
             .focused($sortButtonFocused)
             .accessibilityIdentifier("sort")
             .accessibilityLabel("Sort \(model.sort.rawValue)")
+            // D041: the new frames move the control 260 pt in from the right edge, to clear the
+            // clock that now sits there.
+            .padding(.trailing, 260)
         }
     }
 
@@ -225,7 +234,7 @@ struct LibraryScreen: View {
 /// Frame 01's card for a movie or a video, frame 02's for an episode: the art with the position's
 /// bar across its foot, the title, the episode line for a show, and "N min left". Where the server
 /// reports no duration there is no line and no bar.
-private struct ContinueCardLabel: View {
+struct ContinueCardLabel: View {
     let entry: ContinueEntry
     @Environment(\.isFocused) private var focused
 
