@@ -279,4 +279,30 @@ evidence `reports/logs/2-*.log`, screenshots `reports/screenshots/p2/`.
   this build. `Marlin Media TVUITests/Diag2gUITests.swift` and the `PlayerHost.swift` Page Up/Down hook stay
   uncommitted, as before.
 
+**Pass 2b (2026-09-15): pass 2's follow-ups — one of three built and working, two STOPPED.**
+Decisions D031–D038; report `reports/2026-09-15-pass2b-followups.md`, evidence
+`reports/logs/2b-*.log`, screenshots `reports/screenshots/p2b/`.
+- **Works (D032): every detail screen re-reads its item when the player closes.** `ContentView`
+  counts the closes — a full-screen cover never takes its content off screen, so there is no
+  appearance callback — and the movie, show and video screens re-read on that count. Proven on Home
+  Theater: Start over on Divergent wrote `position=0.0`, played from 0 ms, and on the way back the
+  screen showed **Play** with no Start over, with `[detail] movie 1 re-read: position 0.0 watched
+  false` in the log.
+- **STOPPED (D031): the episode press-and-hold still plays instead of opening the mark menu.**
+  Candidate (a) — a `UILongPressGestureRecognizer` for the select press, on the window while the
+  show detail is up — was instrumented: it **attaches** but **never receives the press** (no
+  recogniser state is ever logged), because a focused SwiftUI Button consumes the select press
+  first. Candidate (b), a focusable non-Button row, is untried. No blind retry was made.
+- **STOPPED (D033): focus entering the Continue Watching row still does not land on the first
+  card.** `prefersDefaultFocus` in a focus scope does not govern directional entry: from the sort
+  control focus goes to the **rightmost** card, and re-entering goes to the card last left. The one
+  case the owner named (entering after the player closes) did land on the first card, but geometry
+  explains it, so it is not proof.
+- **No server writes of this pass's own:** every write in pass 2b came from the app's own buttons
+  while the tests ran.
+- **Committed locally on top of `b3f3b02`, not pushed** — the owner tests passes 2 and 2b together.
+  Home Theater is left running this build. The pass 2b harness
+  (`Marlin Media TVUITests/Pass2bUITests.swift`) is **not** committed, nor is the owner's
+  `Design/Marlin Media tvOS Design2.zip`.
+
 **Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.

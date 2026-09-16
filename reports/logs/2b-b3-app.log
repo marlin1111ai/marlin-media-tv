@@ -1,0 +1,11 @@
+9:40:52.362 PM [continue] 3 entries: movie/1@223s, episode/8@968s, movie/2@1821s
+9:40:52.378 PM [continue] 3 entries: movie/1@223s, episode/8@968s, movie/2@1821s
+9:41:16.379 PM [player] request Divergent — Divergent (2014).mkv · 4K HDR · DTS 7.1 — http://192.168.1.250:8093/stream/1
+9:41:16.379 PM [playback] file 1 saved position 223.52 s watched=false; starting at 223520 ms
+9:41:16.703 PM [player] length 8379371 ms
+9:41:16.719 PM [playback] seeking to the saved position 223520 ms (length 8379371 ms) tick=564235163620
+9:41:17.725 PM [playback] resume +1 s time=223982 ms (wanted 223520 ms, off by 462 ms) state Playing
+9:41:19.771 PM [playback] resume +3 s time=225815 ms (wanted 223520 ms, off by 2295 ms) state Playing
+9:41:26.584 PM [playback] PUT file 1 position=232.5 (every 10 s) → 200 position=232.531 watched=false last_played=2026-09-16T01:41:26Z
+9:41:35.778 PM [playback] PUT file 1 position=241.8 (exit) → 200 position=241.815 watched=false last_played=2026-09-16T01:41:35Z
+9:41:35.778 PM [continue] 3 entries: movie/1@232s, episode/8@968s, movie/2@1821s

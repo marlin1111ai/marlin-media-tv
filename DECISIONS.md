@@ -250,3 +250,50 @@ D032–D035; this app's only write is `PUT /api/files/{fileId}/playback`.
 
 - **D030** **A home page is wanted as its own design and its own pass, after pass 2.** It is not
   designed yet: the 17 frames have no home screen, and nothing of it is built here.
+
+## 2026-09-15 — pass 2b (pass 2 follow-ups)
+
+The owner's calls. Evidence, and which of them is actually working, is in
+`reports/2026-09-15-pass2b-followups.md`; two of the three builds below do **not** work yet and
+the report says so.
+
+- **D031** **Press-and-hold on an episode row opens the mark menu, and a click still plays or
+  resumes.** A different gesture was not allowed. **Not working yet.** Pass 2's candidate (a), a
+  `UILongPressGestureRecognizer` restricted to the select press, was implemented on the window
+  while the show detail is up, with `@FocusState` naming the row. Instrumented on Home Theater it
+  **attaches** (`[hold] recogniser added to the window`) but **never receives the press** — no
+  recogniser state is ever reported — so the hold still reaches the row's Button and plays the
+  episode. A focused SwiftUI Button consumes the select press before any window-level recogniser
+  sees it. Candidate (b), a focusable non-Button row with its own select handling, is untried and
+  is the next thing to try; it was not attempted here under this pass's stop rule.
+
+- **D032** **Every detail screen re-reads its item when the player closes**, so the Resume / Play
+  button, its bar, the watched pill, the episode states and the unwatched count are current on the
+  way back. `ContentView` counts the closes (a full-screen cover never takes its content off
+  screen, so there is no appearance callback to use) and hands the count to the movie, show and
+  video screens, which re-read on it. The show screen re-reads without its loading state, so the
+  list does not flash and the chosen season is kept.
+
+- **D033** **Focus entering the Continue Watching row lands on its first card.** **Not working
+  yet.** The row is a focus scope whose first card is `prefersDefaultFocus`, but on Home Theater
+  directional focus ignores it: entering the row from the sort control lands on the **rightmost**
+  card, and re-entering after moving along the row lands on the card that was left. tvOS picks the
+  nearest focusable in the direction of travel, and `prefersDefaultFocus` governs only initial and
+  programmatic focus. The one case the owner named — entering the row after the player closes —
+  did land on the first card, but geometry explains that (the Movies tab sits above the first
+  card), so it is not evidence that the fix works.
+
+- **D034** On a movie with several editions, **Start over and the mark buttons act on the followed
+  edition without the picker**, while Play / Resume opens the picker (pass 2 open question 3).
+
+- **D035** **Start over does not clear `watched`.** A rewatch therefore shows Resume together with
+  the "✓ Watched" pill, and only Mark unwatched clears the flag.
+
+- **D036** **The 90 % watched mark keeps VLCKit's `length`** — the file's own length, as the player
+  reports it — rather than the server's `duration`.
+
+- **D037** **No "clear playback state" control in the app.** The state pass 2 and 2b wrote while
+  testing is reset to zero once the owner has accepted both passes, as a later step.
+
+- **D038** **A check is still owed:** Videos Recently Added and the video detail screen, once a
+  video exists on the server. Neither has ever run on a device, because this library has no videos.

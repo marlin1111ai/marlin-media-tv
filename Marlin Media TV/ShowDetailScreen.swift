@@ -8,15 +8,26 @@
 //  Pass 2 (D027): "N unwatched" at the end of the meta row counts every episode of the show not
 //  marked watched (a partly watched one counts as unwatched); each row's right-hand column reads
 //  "Watched ✓", "N min left" with the bar across its still, or "Unwatched"; a click resumes at the
-//  saved position; and press-and-hold opens the mark overlay. Where a file's length is unknown
-//  there is no "N min left" and no bar.
+//  saved position; and press-and-hold opens the mark menu. Where a file's length is unknown there
+//  is no "N min left" and no bar.
+//
+//  Pass 2b (D031): the press-and-hold works through a `UILongPressGestureRecognizer` on the
+//  window, limited to the select press, with `@FocusState` naming the row it applies to.
+//  SwiftUI's own `.onLongPressGesture` never fires on a tvOS row Button — the Button consumes the
+//  select press and acts on release (pass 2), so a hold played the episode instead of opening the
+//  menu. The recogniser fires while the button is still held; the click that ends the hold is then
+//  swallowed by `holdFired` so the episode does not also play.
+//  Pass 2b (D032): the screen re-reads itself whenever the player closes.
 //
 
 import SwiftUI
+import UIKit
 
 struct ShowDetailScreen: View {
     let show: Show
     let api: APIClient
+    /// D032: ContentView's count of player closes.
+    let playerClosed: Int
     let play: (PlayRequest) -> Void
 
     private enum Phase: Equatable { case loading, loaded(Show), failed(String) }
@@ -26,6 +37,10 @@ struct ShowDetailScreen: View {
     @State private var thumbs: FileThumbs?
     /// D027: the episode whose press-and-hold menu is open.
     @State private var holdEpisode: Episode?
+    /// D031: the row the remote is on, the hold that has just fired, and whether the player is up.
+    @FocusState private var focusedEpisode: Int?
+    @State private var holdFired = false
+    @State private var playerUp = false
     @FocusState private var focusedSeason: Int?
 
     var body: some View {
@@ -64,7 +79,14 @@ struct ShowDetailScreen: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
+        // D031: the select-hold recogniser lives on the window while this screen is up.
+        .background(HoldReceiver(minimumDuration: 0.6) { holdBegan() })
         .task { await load() }
+        .onChange(of: playerClosed) { _, _ in
+            // D032: the player has closed — the positions it wrote are now the server's truth.
+            playerUp = false
+            Task { await reload() }
+        }
     }
 
     private var loadedDetail: Show? {
@@ -97,6 +119,19 @@ struct ShowDetailScreen: View {
             let message = (error as? APIError)?.localizedDescription ?? String(describing: error)
             print("[show] failed: \(message)")
             phase = .failed(message)
+        }
+    }
+
+    /// D032: re-read without the loading screen, so the list does not flash on the way back from
+    /// the player or after a mark. The chosen season is kept.
+    private func reload() async {
+        do {
+            let detail = try await api.show(id: show.id)
+            seasonId = seasonId ?? detail.seasons?.first?.id
+            phase = .loaded(detail)
+            EvidenceLog.line("[detail] show \(show.id) re-read: \(unwatchedCount(detail)) unwatched")
+        } catch {
+            EvidenceLog.line("[detail] could not re-read show \(show.id): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
         }
     }
 
@@ -176,11 +211,22 @@ struct ShowDetailScreen: View {
                     EpisodeRowLabel(episode: episode)
                 }
                 .buttonStyle(BareButtonStyle())
+                .focused($focusedEpisode, equals: episode.id)
                 .accessibilityIdentifier("episode.\(episode.season).\(episode.number)")
-                // D027: press-and-hold on the row opens the mark menu.
-                .onLongPressGesture(minimumDuration: 0.6) { holdEpisode = episode }
             }
         }
+    }
+
+    /// D031: the hold fired on whichever row the remote is on.
+    private func holdBegan() {
+        guard !playerUp, holdEpisode == nil,
+              let id = focusedEpisode,
+              let detail = loadedDetail,
+              let episode = (detail.seasons ?? []).flatMap(\.episodes).first(where: { $0.id == id })
+        else { return }
+        holdFired = true
+        holdEpisode = episode
+        EvidenceLog.line("[hold] mark menu for S\(episode.season)E\(episode.number) file \(episode.file.fileId) (watched=\(episode.file.playback.watched))")
     }
 
     /// D027: the mark menu, in the edition picker's style (frame 07).
@@ -225,17 +271,108 @@ struct ShowDetailScreen: View {
         Task {
             await PlaybackWrite.send(api, fileId: episode.file.fileId, position: 0, watched: watched,
                                      why: watched ? "mark watched (episode hold)" : "mark unwatched (episode hold)")
-            await load()
+            await reload()
         }
     }
 
     /// D027: a row with a saved position resumes there; one without plays from the start.
+    /// D031: a click that merely ended a press-and-hold does not play.
     private func start(_ episode: Episode) {
+        if holdFired {
+            holdFired = false
+            EvidenceLog.line("[hold] click that ended the hold swallowed (S\(episode.season)E\(episode.number))")
+            return
+        }
         guard let request = PlayRequest.episode(episode, of: show, thumbs: thumbs, resume: true) else {
             playError = "The server gave no usable stream URL for E\(episode.number): \(episode.file.stream)"
             return
         }
+        playerUp = true
         play(request)
+    }
+}
+
+// MARK: - The select press-and-hold (D031)
+
+/// A `UILongPressGestureRecognizer` for the **select press only**, added to the window while the
+/// screen that owns it is up. It has to be the window: SwiftUI puts a `.background` view beside the
+/// content rather than around it, so a recogniser there never sees the press, and a recogniser on
+/// the row's own Button is beaten by the Button's action. Pressing select briefly never starts it,
+/// so ordinary clicks are untouched.
+private struct HoldReceiver: UIViewRepresentable {
+    let minimumDuration: TimeInterval
+    let onHold: () -> Void
+
+    func makeCoordinator() -> Coordinator { Coordinator(onHold: onHold) }
+
+    func makeUIView(context: Context) -> UIView {
+        let view = HostView()
+        view.isUserInteractionEnabled = false
+        view.backgroundColor = .clear
+        let coordinator = context.coordinator
+        let duration = minimumDuration
+        view.movedToWindow = { window in coordinator.attach(to: window, minimumDuration: duration) }
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.onHold = onHold
+    }
+
+    static func dismantleUIView(_ uiView: UIView, coordinator: Coordinator) {
+        coordinator.detach()
+    }
+
+    final class Coordinator: NSObject {
+        var onHold: () -> Void
+        private weak var window: UIWindow?
+        private var recognizer: UILongPressGestureRecognizer?
+
+        init(onHold: @escaping () -> Void) { self.onHold = onHold }
+
+        func attach(to window: UIWindow?, minimumDuration: TimeInterval) {
+            guard let window, recognizer == nil else {
+                // Instrumentation only (pass 2b): says which of the two silent cases happened.
+                let why = window == nil ? "no window yet" : "already attached"
+                Task { @MainActor in EvidenceLog.line("[hold] attach skipped: \(why)") }
+                if window == nil { detach() }
+                return
+            }
+            let hold = UILongPressGestureRecognizer(target: self, action: #selector(fired(_:)))
+            hold.minimumPressDuration = minimumDuration
+            hold.allowedPressTypes = [NSNumber(value: UIPress.PressType.select.rawValue)]
+            hold.allowedTouchTypes = []          // the remote's select press, never the touch surface
+            window.addGestureRecognizer(hold)
+            self.recognizer = hold
+            self.window = window
+            Task { @MainActor in
+                EvidenceLog.line("[hold] recogniser added to the window (minimum \(minimumDuration) s, select press only)")
+            }
+        }
+
+        func detach() {
+            if let recognizer, let window { window.removeGestureRecognizer(recognizer) }
+            recognizer = nil
+            Task { @MainActor in EvidenceLog.line("[hold] recogniser removed") }
+        }
+
+        @objc func fired(_ gesture: UILongPressGestureRecognizer) {
+            // Instrumentation only: every state the recogniser reaches, so a recogniser that is
+            // attached but never sees the press can be told from one that fires and is refused.
+            let state = gesture.state.rawValue
+            Task { @MainActor in EvidenceLog.line("[hold] recogniser state \(state)") }
+            guard gesture.state == .began else { return }
+            onHold()
+        }
+    }
+
+    final class HostView: UIView {
+        var movedToWindow: ((UIWindow?) -> Void)?
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            movedToWindow?(window)
+        }
     }
 }
 

@@ -8,17 +8,23 @@
 //  with its in-button bar, "Start over" and "Mark watched" / "Mark unwatched". A video has one
 //  file, so there is no picker and nothing to follow.
 //
+//  Pass 2b (D032): the screen re-reads the video every time the player closes.
+//
+//  Not yet run on a device: this server has no videos (pass 2, least-sure 4).
+//
 
 import SwiftUI
 
 struct VideoDetailScreen: View {
     let video: Video
     let api: APIClient
+    /// D032: ContentView's count of player closes.
+    let playerClosed: Int
     let play: (PlayRequest) -> Void
 
     @State private var playError: String?
     @State private var thumbs: FileThumbs?
-    /// The video as the server last gave it — re-read after a playback write (D026).
+    /// The video as the server last gave it — re-read after a playback write (D026, D032).
     @State private var current: Video?
     @FocusState private var playFocused: Bool
 
@@ -38,10 +44,11 @@ struct VideoDetailScreen: View {
         }
     }
 
-    /// D026: re-read the video (the server has no single-video route, so the list is re-read).
+    /// D026/D032: re-read the video (the server has no single-video route, so the list is re-read).
     private func refresh() async {
         do {
             current = try await api.videos().first { $0.id == video.id }
+            EvidenceLog.line("[detail] video \(video.id) re-read: position \(shown.file.playback.position) watched \(shown.file.playback.watched)")
         } catch {
             EvidenceLog.line("[detail] could not re-read video \(video.id): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
         }
@@ -123,6 +130,9 @@ struct VideoDetailScreen: View {
         .ignoresSafeArea()
         .onAppear { playFocused = true }
         .task { await loadThumbs() }
+        .onChange(of: playerClosed) { _, _ in
+            Task { await refresh() }        // D032
+        }
     }
 
     private func pressStartOver() {

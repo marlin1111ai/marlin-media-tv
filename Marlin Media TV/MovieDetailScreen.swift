@@ -11,18 +11,23 @@
 //  the editions that have a saved position. Where the file's length is unknown there is no
 //  "N min left" and no bar.
 //
+//  Pass 2b (D032): the screen re-reads the movie every time the player closes, so Start over,
+//  a finished film or a 90 % mark is reflected in the button, the bar and the pill on the way back.
+//
 
 import SwiftUI
 
 struct MovieDetailScreen: View {
     let movie: Movie
     let api: APIClient
+    /// D032: ContentView's count of player closes.
+    let playerClosed: Int
     let play: (PlayRequest) -> Void
 
     @State private var pickerOpen = false
     @State private var playError: String?
     @State private var thumbs: FileThumbs?
-    /// The movie as the server last gave it — re-read after a playback write (D026).
+    /// The movie as the server last gave it — re-read after a playback write (D026, D032).
     @State private var current: Movie?
     @FocusState private var playFocused: Bool
     @FocusState private var pickerFocus: Int?
@@ -71,6 +76,9 @@ struct MovieDetailScreen: View {
         .ignoresSafeArea()
         .onAppear { playFocused = true }
         .task { await loadThumbs() }
+        .onChange(of: playerClosed) { _, _ in
+            Task { await refresh() }        // D032
+        }
         .onChange(of: pickerOpen) { _, open in
             if open {
                 Task { @MainActor in
@@ -233,9 +241,13 @@ struct MovieDetailScreen: View {
         }
     }
 
-    /// D026: re-read the movie so the pill, the button and the picker show what the server now holds.
+    /// D026/D032: re-read the movie so the pill, the button and the picker show what the server now holds.
     private func refresh() async {
-        do { current = try await api.movie(id: movie.id) } catch {
+        do {
+            current = try await api.movie(id: movie.id)
+            let state = followed?.file.playback
+            EvidenceLog.line("[detail] movie \(movie.id) re-read: position \(state?.position ?? 0) watched \(state?.watched ?? false)")
+        } catch {
             EvidenceLog.line("[detail] could not re-read movie \(movie.id): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
         }
     }

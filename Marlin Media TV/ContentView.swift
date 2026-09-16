@@ -9,6 +9,11 @@
 //  thumbnail index are fetched first — and the row is asked for again whenever the player closes,
 //  so a position written during playback is on the row when the library comes back.
 //
+//  Pass 2b (D032): `playerClosed` counts the closes and is handed to every detail screen. A
+//  full-screen cover never takes its content off screen, so a pushed detail screen gets no
+//  appearance callback when the player goes away; this counter is that signal, and each screen
+//  re-reads its own item from it.
+//
 
 import SwiftUI
 
@@ -22,6 +27,8 @@ struct ContentView: View {
     @State private var library = LibraryModel()
     @State private var path: [Destination] = []
     @State private var playRequest: PlayRequest?
+    /// D032: how many times the player has closed in this session.
+    @State private var playerClosed = 0
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -29,11 +36,11 @@ struct ContentView: View {
                 .navigationDestination(for: Destination.self) { destination in
                     switch destination {
                     case let .movie(movie):
-                        MovieDetailScreen(movie: movie, api: library.api) { playRequest = $0 }
+                        MovieDetailScreen(movie: movie, api: library.api, playerClosed: playerClosed) { playRequest = $0 }
                     case let .show(show):
-                        ShowDetailScreen(show: show, api: library.api) { playRequest = $0 }
+                        ShowDetailScreen(show: show, api: library.api, playerClosed: playerClosed) { playRequest = $0 }
                     case let .video(video):
-                        VideoDetailScreen(video: video, api: library.api) { playRequest = $0 }
+                        VideoDetailScreen(video: video, api: library.api, playerClosed: playerClosed) { playRequest = $0 }
                     }
                 }
         }
@@ -43,7 +50,11 @@ struct ContentView: View {
         }
         .onChange(of: playRequest) { _, request in
             // D025: back from the player — the position just written belongs on the row.
-            if request == nil { Task { await library.refreshContinueWatching() } }
+            // D032: and every detail screen re-reads itself off this counter.
+            if request == nil {
+                playerClosed += 1
+                Task { await library.refreshContinueWatching() }
+            }
         }
         .task { await library.load() }
     }

@@ -11,6 +11,10 @@
 //  moves up. The grid posters themselves carry no bar and no watched mark. The "Browse cached"
 //  button of frame 17 is still not here.
 //
+//  Pass 2b (D033): focus entering the row lands on its **first** card. The row is a focus scope
+//  and the first card is its preferred default focus; without that the focus engine picks the card
+//  nearest the header item focus came from, which on the TV Shows tab is the second card.
+//
 
 import SwiftUI
 
@@ -24,6 +28,8 @@ struct LibraryScreen: View {
     @FocusState private var focusedTab: LibraryTab?
     @FocusState private var sortFocus: SortOrder?
     @FocusState private var sortButtonFocused: Bool
+    /// D033: the row's own focus scope, so its first card can be the default.
+    @Namespace private var continueScope
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -131,6 +137,7 @@ struct LibraryScreen: View {
 
     /// D025: the row for the tab on screen, or nothing at all when the server lists no entry of
     /// that kind — no heading, no row, and the grid moves up to take the space.
+    /// D033: its first card is the scope's default focus.
     @ViewBuilder
     private var continueRow: some View {
         let entries = model.continueEntries(for: model.tab)
@@ -139,12 +146,13 @@ struct LibraryScreen: View {
                 Kicker(text: "Continue watching")
                 ScrollView(.horizontal) {
                     HStack(alignment: .top, spacing: 34) {
-                        ForEach(entries) { entry in
+                        ForEach(Array(entries.enumerated()), id: \.element.fileId) { index, entry in
                             Button { openEntry(entry) } label: {
                                 ContinueCardLabel(entry: entry)
                             }
                             .buttonStyle(BareButtonStyle())
                             .accessibilityIdentifier("continue.\(entry.fileId)")
+                            .prefersDefaultFocus(index == 0, in: continueScope)
                         }
                     }
                     .padding(.vertical, 8)
@@ -155,6 +163,7 @@ struct LibraryScreen: View {
             // Its own focus region, so moving down from the tabs enters the row instead of
             // restoring the grid's last focused poster and skipping past it.
             .focusSection()
+            .focusScope(continueScope)
         }
     }
 
