@@ -32,6 +32,11 @@ struct HomeScreen: View {
     let playEpisode: (HomeEpisode) -> Void
 
     @FocusState private var focusedTab: LibraryTab?
+    /// D043: which Continue Watching card has focus, so that the first one can be given it when the
+    /// app opens.
+    @FocusState private var focusedCard: Int?
+    /// D043: the launch focus is placed once in a session, and never again.
+    @State private var launchFocusPlaced = false
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -65,8 +70,34 @@ struct HomeScreen: View {
         }
         .ignoresSafeArea()
         // D040: Home is re-read every time it appears, and every time the player closes.
-        .onAppear { Task { await model.refresh() } }
+        .onAppear { Task { await model.refresh() }; placeLaunchFocus() }
         .onChange(of: playerClosed) { _, _ in Task { await model.refresh() } }
+        // D043: the in-progress list arrives after the first appearance, so the cards exist only
+        // once it has — that is where the launch focus is placed.
+        .onChange(of: model.continueWatching.count) { _, _ in placeLaunchFocus() }
+    }
+
+    /// D043: when the app opens, focus lands on the **first** Continue Watching card, as frame 00
+    /// draws it. It is placed once in a session — on the first list Home receives — so moving along
+    /// the row, coming back from the player and every later re-read are untouched. **With nothing in
+    /// progress there is no row and nothing is placed:** the focus engine keeps today's behaviour.
+    ///
+    /// The card is asked for until it takes focus, because the focus engine ignores a request for a
+    /// view that is not on screen yet and the row is built from a list that has just arrived. The
+    /// loop stops the moment any card of the row holds focus, so a viewer who moves first is not
+    /// pulled back.
+    private func placeLaunchFocus() {
+        guard !launchFocusPlaced, let first = model.continueWatching.first?.fileId else { return }
+        launchFocusPlaced = true
+        Task { @MainActor in
+            for _ in 0..<12 {
+                if focusedCard != nil { break }
+                focusedCard = first
+                try? await Task.sleep(for: .milliseconds(120))
+            }
+            EvidenceLog.line("[focus] launch: asked for the first Continue Watching card \(first); "
+                             + "focus is now \(focusedCard.map(String.init) ?? "outside the row")")
+        }
     }
 
     /// Frames 00/00b/00c: MARLIN, then the three library buttons.
@@ -99,6 +130,7 @@ struct HomeScreen: View {
                             }
                             .buttonStyle(BareButtonStyle())
                             .accessibilityIdentifier("home.continue.\(entry.fileId)")
+                            .focused($focusedCard, equals: entry.fileId)
                         }
                     }
                 }

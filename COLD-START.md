@@ -364,6 +364,37 @@ so it was built, installed and launched, with four screenshots and no matrix.
   Theater is left running this build. The harnesses are not committed.
 - **Known and reported, not built:** at launch focus lands on a Movies card rather than the first
   Continue Watching card, so Home opens slightly scrolled; frame 00's label says "first card
-  focused". Initial focus is not in the pass's list, so it was left alone.
+  focused". Initial focus is not in the pass's list, so it was left alone. **Built in pass 3b
+  (D043).**
+
+**Pass 3b (2026-09-15): the owner's three fixes after testing pass 3 — two built, one found already
+done.** Decisions D043–D045; report `reports/2026-09-15-pass3b-fixes.md`, evidence
+`reports/logs/3b-run1.log`, screenshots `reports/screenshots/p3b/`. The owner tests by hand, so it
+was built, installed and launched, with two device screenshots and no matrix.
+- **Launch focus (D043).** The app now opens with focus on the **first Continue Watching card**, as
+  frame 00 draws it — pass 3's open question 1. Home's cards carry `@FocusState`, and the first card
+  is asked for every 120 ms until it takes focus (the row is built from a list that arrives after
+  Home's first appearance, and the focus engine ignores a request for a view not yet on screen); the
+  request is placed **once per session** and stops as soon as any card of the row has focus, so the
+  row, the return from the player and Home's re-reads are untouched. **With nothing in progress
+  nothing is placed.** Proven on Home Theater: `[focus] launch: asked for the first Continue Watching
+  card 4; focus is now 4` and `p3b-2-home-launch-focus.png` (Wonder Woman ringed, the row at the top).
+- **Frames 16 and 17 already carry the clock (D044).** Pass 3's report was wrong about this: D041's
+  overlay sits on the container, outside the phase switch, in both `HomeScreen` and `LibraryScreen`,
+  so the loading and error views are drawn under it at the frames' own `right: 80, top: 56`. **No
+  code was needed, and neither state could be photographed** — the loading phase is over before the
+  first painted frame, and the error screen needs the server unreachable. Code trace, not device
+  proof.
+- **The player's clock while paused (D045).** The same pair, style and place as every other screen,
+  shown on `!isPlaying` (frame 13's own condition) and hidden while a track panel is open, because
+  frames 11/12 occupy that corner. Proven on Home Theater: `p3b-3-player-paused-clock.png` (Divergent
+  paused at 00:16, the clock at the top right). `PlayerModel.swift` and `PlayerHost.swift` were not
+  touched; `PlayerScreen.swift` changed for this step only.
+- **No server write of this pass's own:** the harness played Divergent from 0 and paused at 15.6 s,
+  under D028's 120 s floor, so the app wrote nothing (`position 15.6 s not written (pause): under
+  120 s`).
+- **Committed locally on top of `a99cccc`, not pushed** — the owner tests passes 2–3b together. Home
+  Theater is left running this build. The harnesses (`Pass3bShotsUITests.swift` and the earlier ones)
+  and the `PlayerHost.swift` hook stay uncommitted.
 
 **Pass 1l (2026-09-15): pushed.** The owner tested native frame-back while paused on Home Theater and **accepted it** (D008 revised, D019, D020). `main` was pushed to `origin` as a fast-forward, no force: `b22f9c9..6bfdbad`, six commits (passes 1f–1k). After a fetch, local `main` and `origin/main` were both `6bfdbad69e9f`. This note's commit was pushed the same way, so HEAD is on `origin/main`. `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`), and nothing under `Frameworks/` has ever been tracked or pushed.

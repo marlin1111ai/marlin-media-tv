@@ -23,6 +23,9 @@ struct PlayerScreen: View {
             ZStack {
                 if let pill = model.skipPill, model.scrub == nil { SkipFeedback(text: pill.text, forward: pill.forward) }
                 if !model.isPlaying, model.errorText == nil, model.scrub == nil { PausedCenter(framePill: model.framePill) }
+                // D045: the clock, while paused only. Hidden while a track panel is open, because
+                // frames 11/12 put the panel in that same corner.
+                if !model.isPlaying, model.errorText == nil, model.panel == nil { pausedClock }
                 if model.scrub == nil, model.overlayVisible || model.panel != nil { overlay }
                 if let scrub = model.scrub {
                     ScrubOverlay(scrub: scrub, lengthMs: model.lengthMs,
@@ -39,6 +42,17 @@ struct PlayerScreen: View {
         .onExitCommand { model.handle(.menu) }   // Menu with a panel open closes the panel; otherwise exits (pass 1d)
         .onDisappear { model.dismiss() }
         .accessibilityIdentifier("player")
+    }
+
+    /// D045: the clock at the player's top right **while paused** — the same pair, the same style and
+    /// the same place (right 80, top 56) as Home, the library tabs and the detail screens (D041).
+    /// While playing there is none, as frames 10–15 draw it; this revises D041's "not on the player".
+    private var pausedClock: some View {
+        NowClock()
+            .padding(.trailing, 80)
+            .padding(.top, 56)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .transition(.opacity)
     }
 
     /// Frame 10.

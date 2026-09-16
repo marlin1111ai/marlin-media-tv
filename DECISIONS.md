@@ -370,10 +370,70 @@ built, installed and launched, with four screenshots and no test matrix.
   keeps time while it is on screen. **Not on the player** (frames 10–15 do not draw it). The **Sort
   control moves 260 pt in from the right edge**, as the new frames 01–04 draw it, to clear it.
 
-- **D042** **The design is replaced.** `Design/Marlin Media tvOS Design2.zip` was unzipped into
+- **D042 (see also pass 3b below)** **The design is replaced.** `Design/Marlin Media tvOS Design2.zip` was unzipped into
   `Design/`, replacing `Marlin Media.dc.html`, `Marlin Media Prototype.dc.html`, `support.js` and
   `_ds/`, and the zip was deleted once the replacement was in place. The earlier
   `Marlin Media tvOS Design.zip` is left as it was. What changed: **frames 00, 00b and 00c are new**;
   frames 01, 02, 03, 04, 06, 07, 08, 09, 16 and 17 differ **only** by the clock (and 01–04 by the
   Sort control's 260 pt shift); frames 10–15, the player, are unchanged. Nothing else in any frame
   moved.
+
+## 2026-09-15 — pass 3b (the owner's three fixes)
+
+The owner's calls, given after testing pass 3. Evidence:
+`reports/2026-09-15-pass3b-fixes.md`, screenshots `reports/screenshots/p3b/`.
+
+- **D043** **When the app opens, focus lands on the first Continue Watching card** — frame 00's own
+  label ("first card focused"), and pass 3's open question 1. Before this, tvOS chose for itself and
+  picked a Movies card, so Home opened slightly scrolled with the top row cut.
+
+  **The mechanism.** Every Continue Watching card on Home carries `@FocusState`
+  (`.focused($focusedCard, equals: entry.fileId)`), as the library tabs' cards already did for D033.
+  The first card is **asked for until it takes focus** — the focus engine ignores a request for a
+  view that is not on screen yet, and the row is built from the in-progress list, which arrives after
+  Home's first appearance — so the request is repeated every 120 ms, at most 12 times, and stops the
+  moment any card of the row holds focus.
+
+  **Placed once per session.** A `launchFocusPlaced` flag means it happens on the first list Home
+  receives and never again: moving along the row, coming back from the player and Home's own re-reads
+  (D040) are untouched, and a viewer who moves before the card arrives is not pulled back.
+
+  **With nothing in progress there is no row and nothing is placed** — the focus engine keeps
+  today's behaviour, as the owner asked. This is Home only; D033's rule for the library tabs (focus
+  *entering* the row from outside moves to the first card) is unchanged and not copied here.
+
+- **D044** **The clock is on the loading and "can't reach server" screens (frames 16 and 17), and no
+  code was needed for it.** Pass 3 reported it as not built; that report was wrong. The clock overlay
+  D041 added sits on the **container**, outside the phase switch, in both screens that can show those
+  states — `HomeScreen.swift` (the overlay is applied to the whole `ZStack`, after the
+  `loading / failed / loaded` switch and before `ignoresSafeArea`) and `LibraryScreen.swift` (the
+  same) — so `LibraryLoadingView` (frame 16) and `LibraryErrorView` (frame 17) are drawn beneath it
+  and carry the clock at `right: 80, top: 56`, which is exactly where the new frames 16 and 17 put
+  it (`position:absolute;right:80px;top:56px;z-index:6`, the same 18 px/500 `.1em` date and 24 px/500
+  tabular time as every other frame).
+
+  **Not photographed on the device, and why.** Neither state can be reached on Home Theater without
+  changing something that is out of scope: the loading phase is over before the app paints its first
+  frame (the session recording's own frames show tvOS at 2.80 s and Marlin's Home, already populated,
+  at 2.85 s — the loading screen never appears), and the error screen needs the server unreachable,
+  which would mean either a server write, a change to `ServerConfig.baseURL` or pulling Home Theater
+  off the network. It is a **code trace, not device proof** — recorded as such in the pass 3b report.
+
+- **D045** **The clock is on the player while paused, and only while paused.** This **revises D041's
+  "not on the player"**: frames 10–15 draw no clock, and the owner's call of 2026-09-15 adds one for
+  the paused state.
+
+  **What shows.** The same `NowClock` pair, the same style, and the same place as every other screen
+  — `right: 80, top: 56` (`PlayerScreen.swift`, `pausedClock`). **While playing there is none.** The
+  condition is the one frame 13's pause mark already uses, `!model.isPlaying`, so the clock and the
+  pause mark appear and go together, and it needs no new state in `PlayerModel.swift` (untouched).
+
+  **Hidden while a track panel is open.** Frames 11 and 12 put the panel in that same top-right
+  corner (760 pt wide, `top: 90`, `trailing: 80`), so the clock would sit on top of it; with
+  `model.panel != nil` it is not drawn. It **does** show during a paused scrub (D021), where the bar
+  and the thumbnail are at the foot of the screen and nothing collides.
+
+  **Nothing else in the player changed.** The clock is added to the visuals-only `ZStack`, which is
+  `allowsHitTesting(false)`, so it takes no press, no touch and no focus; D008's skips, the frame
+  step, the panels and D021's scrub are untouched, and `PlayerModel.swift` and `PlayerHost.swift`
+  were not edited.
