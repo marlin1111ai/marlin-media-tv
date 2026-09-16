@@ -76,6 +76,11 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   Design2 changed: frames 00, 00b, 00c are new; 01–04, 06–09, 16 and 17 differ only by the clock
   (and 01–04 by the sort control's 260 pt shift); 10–15, the player, are unchanged.
   Build what the frames show; design nothing (D006).
+- **The app icon's source:** `Design/tvos icons/Marlin Media tvOS Design.zip` (2.4 MB, tracked from
+  pass 4), a second Claude Design export whose `icons/` folder holds the layered tvOS icon as three
+  size pairs — `icon-400x240`, `icon-800x480`, `icon-1280x768`, each `-back` and `-front`, all with
+  alpha. Its `-flat` files and `preview-b.png` are previews and are **not** used (D048). It is a
+  different file from `Design/Marlin Media tvOS Design.zip`, which is the pass-1 frames.
 - **Device:** Apple TV 4K (3rd generation, `AppleTV14,1`), named **Home Theater**, tvOS 26.6,
   Developer Mode enabled, paired with this Mac over the local network (D005) — all five re-read
   from `xcrun devicectl` on 2026-09-16. The bedroom Apple TV is not used.
@@ -121,8 +126,12 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
 - **No CocoaPods, no xcodegen, no brew installs.** The project file was written by hand
   (objectVersion 71, file-system-synchronized groups); Xcode opens it normally. Everything in
   `Marlin Media TV/` is therefore in the app target by virtue of being in the folder.
-- **Fonts:** the system font. The design names Inter; no font is bundled, and there is no asset
-  catalog and so no app icon (both still open questions in the pass-1 report).
+- **Fonts:** the system font. The design names Inter; no font is bundled (still an open question in
+  the pass-1 report).
+- **Asset catalog:** `Marlin Media TV/Assets.xcassets`, added in pass 4 and holding one thing, the
+  layered tvOS app icon `AppIcon.brandassets` (D048). `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`
+  on both configurations of the app target is what points at it. There is no accent colour, no
+  launch image and no other asset — the UI's colours are `Theme.swift`'s tokens, not the catalog.
 
 ## Build, install, run (all from the repo root)
 
@@ -140,6 +149,14 @@ off with
 `xcrun devicectl device copy from --device <id> --domain-type appDataContainer --domain-identifier com.marlin1111.marlin-media-tv --source Library/Caches/marlin-media-tv.log --destination <file>`.
 `EvidenceLog` opens the file on its **first line**, not when a player starts, because the detail
 screens write with no player up (pass 2).
+
+**Photographing the device without a harness** (pass 4):
+`xcrun devicectl device capture screenshot --device <id> --destination <file.png>` takes a
+3840 × 2160 PNG of whatever is on the screen, **including tvOS's own Home screen and any other
+app** — which the UI-test harnesses cannot reach, because XCUITest only ever sees the app under
+test. `devicectl device info processes --device <id>` says what is running. Use this for anything
+outside Marlin Media TV; use a harness when the shot has to be taken at a particular point in the
+app's own flow.
 
 **Evidence harnesses** (the Marlin DVR TV convention — per-pass throwaways, not a standing test
 suite). Each drives the real remote through `XCUIRemote` on Home Theater and photographs the
@@ -233,6 +250,13 @@ Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app ta
   the app's bracketed lines interleaved, also echoed to the console (D011).
 
 Outside the Swift files:
+- `Marlin Media TV/Assets.xcassets` — the asset catalog, whose only content is
+  `AppIcon.brandassets`: the tvOS Home screen icon (`App Icon.imagestack`, 400 × 240 @1x and
+  800 × 480 @2x) and the App Store icon (`App Icon - App Store.imagestack`, 1280 × 768), each a
+  **two-layer** stack, Front over Back, with no Middle slot. The Top Shelf image slots are declared
+  and deliberately empty. Sources and the rest of the rule are D048. Being inside
+  `Marlin Media TV/`, it joins the app target through the synchronized group; the build setting
+  `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` selects it.
 - `Frameworks/VLCKit.xcframework` — the custom VLCKit (D012/D013), linked and embedded (code-sign
   on copy) by the project; not in git. Rebuild with `tools/vlckit-truehd/build.sh`.
 - `Info.plist` carries `NSAppTransportSecurity` → `NSAllowsLocalNetworking`, so plain HTTP to
@@ -240,13 +264,12 @@ Outside the Swift files:
 
 ## Current state
 
-As of **pass 3c (2026-09-15)**, the newest pass. Nothing since it has been built, installed or
-launched.
+As of **pass 4 (2026-09-16)**, the newest pass.
 
 ### Built and owner-accepted
 
-Every feature below has been tested by the owner on Home Theater and accepted; nothing is waiting
-on an owner test.
+Everything in this list but the last item has been tested by the owner on Home Theater and
+accepted. **Pass 4's app icon is built and proven on the device but not yet owner-tested.**
 
 - **The library and the player** (pass 1): the three library tabs, movie, show and video detail,
   the edition picker, and VLCKit playing the four MKVs and a Magicians episode directly — the
@@ -274,6 +297,12 @@ on an owner test.
 - **The clock** (D041, D044, D045): on Home, the three library tabs, the movie, show and video
   screens, frames 16 and 17, and the player **while paused only**. Frames 16 and 17 are a code
   trace, not device proof — open item 6.
+- **The app icon** (D048, pass 4, **awaiting the owner's look**): the layered tvOS icon from the
+  Claude Design export, Front over Back, on the Home screen icon and the App Store icon. Proven on
+  Home Theater by a device screenshot of tvOS's own Home screen
+  (`reports/screenshots/p4/p4-1-appletv-home-screen.png`), where the app now shows the artwork
+  instead of the generic tile. The parallax lift a focused icon gets was **not** seen, because
+  photographing it needs the icon focused and nothing here can press the remote's Home button.
 
 Known and accepted as behaviour rather than defects, not open: **D020's two** — Play after any
 frame step drops the pictures below the demuxer's clock start (21–45 pictures, about 0.9–1.5 s),
@@ -282,7 +311,8 @@ paused if a subtitle track is selected.
 
 ### Pushed
 
-Everything on `main` is on `origin/main`; nothing is waiting to be pushed.
+Everything on `main` is on `origin/main` **except pass 4's own commit**, which is deliberately
+committed and not pushed (the pass said so).
 
 - Passes 1–1e up to `b22f9c9` (pass 1e rerun 4).
 - Passes 1f–1k as `b22f9c9..6bfdbad`, six commits (pass 1l).
@@ -291,8 +321,10 @@ Everything on `main` is on `origin/main`; nothing is waiting to be pushed.
   `ef9ce11` (2c), `a99cccc` (3), `896ee12` (3b) — each a fast-forward, no force, no merges (D046).
   After that push, local `main`, `origin/main` and `git ls-remote origin main` were all
   `896ee1293ac9`.
-- `896ee12` is the newest commit carrying **app source**. Pass 3c's own notebook and report commit
-  `d64679a` changed no Swift file, and neither does this rewrite.
+- `896ee12` is the newest commit carrying **Swift** source. Pass 3c's notebook commit `d64679a`,
+  the COLD-START rewrite `ceae8c2` and pass 4's commit changed no Swift file — pass 4 changed the
+  asset catalog and two lines of `project.pbxproj`, which is a build input, not app code.
+- `ceae8c2` (the COLD-START rewrite) is the newest commit on `origin/main`.
 - `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`). Nothing under `Frameworks/`
   is tracked on any ref, so the 725 MB framework has never been pushed.
 
@@ -312,17 +344,18 @@ These stay out of git on purpose and are expected in `git status`:
 The owner's `Design/Marlin Media tvOS Design2.zip` is not in the folder at all: pass 3 unzipped it
 and deleted the zip (D042).
 
-Two further untracked paths appeared on 2026-09-16 while this section was being written, from the
-owner's own work and recorded in no pass: `icon pixel/Marlin Media.pxd` and
-`Design/tvos icons/Marlin Media tvOS Design.zip` (2.4 MB, a different file from the pass-1
-`Design/Marlin Media tvOS Design.zip`). They were not opened, moved or committed here. They look
-like app-icon work, which is open item 19; whoever picks that up should ask before assuming.
+Three further untracked paths appeared on 2026-09-16 from the owner's own work, outside any pass.
+**One of them is now tracked:** `Design/tvos icons/Marlin Media tvOS Design.zip` is the app icon's
+source and pass 4 committed it (D048). The other two are **still untracked and still nobody's
+decision** — `icon pixel/Marlin Media.pxd` (the icon's Pixelmator document, ~2 MB) and `Notes/`.
+Neither was opened, moved or committed; whoever picks them up should ask first.
 
 ### What Home Theater runs
 
-The **pass 3b build** — `896ee12`'s app source, built from the working tree and so carrying the
-uncommitted `PlayerHost.swift` hook. Pass 3b installed it and left it running; pass 3c touched no
-source and built nothing, so that is still what is on the device.
+The **pass 4 build** — `896ee12`'s Swift source plus pass 4's asset catalog and app-icon build
+setting, built from the working tree and so still carrying the uncommitted `PlayerHost.swift` hook.
+Pass 4 installed it, launched it and left it running. No Swift file has changed since pass 3b, so
+the app behaves exactly as the owner accepted it; only the icon is new.
 
 ### The server's state
 
@@ -417,10 +450,26 @@ Each is recorded as open in DECISIONS.md or in a pass report; the source follows
 
 18. **Inter is not bundled** — the system font is used at the frames' sizes and weights. —
     `reports/2026-09-13-pass1-scaffold-and-player.md` open question 8.
-19. **There is no asset catalog and so no app icon**; the tvOS Home screen shows the generic tile. —
-    same report, open question 11.
-20. **Frame 17's "Browse cached" button and its "Last successful sync … cached" line are not
+19. **Frame 17's "Browse cached" button and its "Last successful sync … cached" line are not
     built**, because there is no cache. — same report, open question 9.
+
+    *Closed:* pass 1's open question 11, "no asset catalog and so no app icon", is **answered by
+    D048** — the catalog and the icon exist and are on the device.
+
+**The app icon (pass 4)**
+
+20. **The Top Shelf images are still empty slots.** `Top Shelf Image.imageset` and
+    `Top Shelf Image Wide.imageset` are declared and carry no file, so tvOS draws its default when
+    the app is the focused one on the top row. The export has no top-shelf artwork. Ask Claude
+    Design for 1920 × 720 / 2320 × 720 (and their @2x), or leave it? — `DECISIONS.md` D048;
+    `reports/2026-09-16-pass4-app-icon.md`.
+21. **The App Store icon has never been rendered.** It is built as a two-layer 1280 × 768 stack,
+    but `tv-marketing` assets are stripped from a device build, so nothing here can show it. It
+    would first appear in an App Store Connect upload. — same sources.
+22. **The focused icon's parallax was not photographed.** A tvOS icon separates its layers only
+    while focused, and reaching that state needs a Home-button press on the remote, which neither
+    `devicectl` nor `XCUIRemote` can send from outside the app. The layer split is proven by the
+    catalog and the compiled `Assets.car`, not by a photograph of the effect. — same sources.
 
 ## Pass history
 
@@ -789,3 +838,32 @@ the pass 3b build, which is now the pushed `main`.
 - **Still uncommitted, unchanged, and deliberate:** the `PlayerHost.swift` Page Up / Down hook and
   the five UI-test harnesses (`Diag2gUITests.swift`, `Pass2bUITests.swift`, `Pass2cUITests.swift`,
   `Pass3ShotsUITests.swift`, `Pass3bShotsUITests.swift`).
+
+### Pass 4 — the app icon (`reports/2026-09-16-pass4-app-icon.md`)
+
+**Pass 4 (2026-09-16): the tvOS app icon — built, on the device, awaiting the owner.** Decision
+D048; report `reports/2026-09-16-pass4-app-icon.md`, screenshots `reports/screenshots/p4/`. This
+closes pass 1's open question 11 ("no asset catalog, no app icon"). **No Swift file was touched.**
+- **The catalog is new.** `Marlin Media TV/Assets.xcassets/AppIcon.brandassets`, the project's first
+  asset catalog, holding only the icon: `App Icon.imagestack` (400 × 240 @1x, 800 × 480 @2x) and
+  `App Icon - App Store.imagestack` (1280 × 768), each a **two-layer** stack — Front over Back — and
+  **neither carries a Middle slot**, which was removed rather than left empty. The six layer files
+  come from `Design/tvos icons/Marlin Media tvOS Design.zip`, a second Claude Design export (D006);
+  its `-flat` files and `preview-b.png` are previews and were not used. The zip is now tracked.
+- **How it reaches the target.** `Marlin Media TV/` is a file-system-synchronized group, so the
+  catalog joined the app target by being in the folder; the only project change was
+  `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` on the app target's Debug and Release
+  configurations — **two added lines, and nothing else in `project.pbxproj` moved.**
+- **Proven on Home Theater.** `BUILD SUCCEEDED` with no warnings; `actool` ran with `--app-icon
+  AppIcon`; the built `Info.plist` carries `CFBundlePrimaryIcon = "App Icon"` and the compiled
+  `Assets.car` lists `App Icon` as an `ImageStack` with `App Icon/Back/Content` and
+  `App Icon/Front/Content` at tv 1x and 2x. Installed, launched (`[library] loaded 3 movies,
+  2 shows, 0 videos`, `[continue] 0 entries` — the D047 reset still in place), and **photographed:
+  tvOS's own Home screen shows the artwork where the generic tile used to be**.
+- **The screenshot route is new** and worth keeping: `xcrun devicectl device capture screenshot`
+  photographs anything on the device, tvOS's Home screen included, which no XCUITest harness can
+  reach.
+- **Top Shelf left alone,** as the pass required: both slots are declared and empty, and the build
+  did not need them.
+- **Committed, not pushed** — the owner looks first. Home Theater is left running this build. The
+  `PlayerHost.swift` hook and the five harnesses stay uncommitted, unchanged.

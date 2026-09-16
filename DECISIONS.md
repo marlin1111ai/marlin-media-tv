@@ -478,3 +478,68 @@ nothing was built.
   and `watched`. The one visible trace is D026/D034's *followed* edition, chosen by `last_played` —
   on Stargate that is still Extended (file 2 stamped, file 3 still null), exactly as before. A true
   virgin state would need a server-side clear, which is the server repo's call, not the client's.
+
+## 2026-09-16 — pass 4 (the app icon)
+
+Evidence: `reports/2026-09-16-pass4-app-icon.md`, screenshots `reports/screenshots/p4/`. No Swift
+file was touched. This answers pass 1's open question 11 (no asset catalog, so no app icon).
+
+- **D048** **The app has a layered tvOS icon, from Claude Design (D006).**
+
+  **Where it came from.** `Design/tvos icons/Marlin Media tvOS Design.zip` — a second Claude Design
+  export, separate from the frames, delivered by the owner on 2026-09-16 and **now tracked in the
+  repo** so the icon's source travels with it. Six files from its `icons/` folder are used, and only
+  those six:
+
+  | catalog slot | file | pixels |
+  |---|---|---|
+  | App Icon · Back · 1x | `icon-400x240-back.png` | 400 × 240 |
+  | App Icon · Back · 2x | `icon-800x480-back.png` | 800 × 480 |
+  | App Icon · Front · 1x | `icon-400x240-front.png` | 400 × 240 |
+  | App Icon · Front · 2x | `icon-800x480-front.png` | 800 × 480 |
+  | App Icon – App Store · Back · 1x | `icon-1280x768-back.png` | 1280 × 768 |
+  | App Icon – App Store · Front · 1x | `icon-1280x768-front.png` | 1280 × 768 |
+
+  The export's `icon-*-flat.png` files and `preview-b.png` are **flattened previews and are not
+  used** — a tvOS icon must stay in layers or it cannot do the focus parallax. All six carry alpha.
+
+  **The shape.** `Marlin Media TV/Assets.xcassets/AppIcon.brandassets`, the project's first asset
+  catalog, holding the icon and nothing else (no accent colour, no launch image; the UI's colours
+  stay in `Theme.swift`). Two image stacks, each of **exactly two layers, Front over Back**:
+  `App Icon.imagestack` at 400 × 240 (idiom `tv`, 1x and 2x) and
+  `App Icon - App Store.imagestack` at 1280 × 768 (idiom `tv-marketing`, 1x).
+  **The Middle layer slot Xcode's template creates was removed, not left empty and not filled** —
+  the owner's call for this pass, and the export supplies two layers, not three.
+
+  **The Top Shelf images are declared and deliberately empty.** `Top Shelf Image.imageset` and
+  `Top Shelf Image Wide.imageset` carry their standard 1x/2x slots with no file. The build does not
+  need them (it succeeded with no warning), and the export has no top-shelf artwork. Open.
+
+  **How it reaches the target.** `Marlin Media TV/` is a `PBXFileSystemSynchronizedRootGroup`, so
+  the catalog joined the app target simply by being in that folder — no file reference was added.
+  The only project edit is `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` on the app target's Debug
+  and Release configurations: **two inserted lines in `project.pbxproj`, nothing else moved**, and
+  the UI-test target's configurations were not touched.
+
+  **Proof on Home Theater** (build, install, launch, photograph; no test matrix):
+  - `** BUILD SUCCEEDED **` with **no warnings and no errors**; `actool` invoked with
+    `--app-icon AppIcon`.
+  - The built `Info.plist` carries `CFBundleIcons → CFBundlePrimaryIcon = "App Icon"`, and
+    `assetutil` on the app's `Assets.car` lists `App Icon` as an `ImageStack` with
+    `App Icon/Back/Content` and `App Icon/Front/Content` at tv 1x and tv 2x.
+  - Installed and launched; the app came up unchanged (`[library] loaded 3 movies, 2 shows,
+    0 videos`, `[continue] 0 entries`, D047's reset still in place).
+  - **Photographed on the device:** `reports/screenshots/p4/p4-1-appletv-home-screen.png` — tvOS's
+    own Home screen with the artwork in the app's place, where the generic tile used to be — and
+    `p4-2-icon-closeup.png`, that icon at native resolution.
+  - **Not shown:** the focus parallax (it needs the icon focused, which needs a Home-button press
+    that nothing here can send) and the App Store icon (`tv-marketing` assets are stripped from a
+    device build). Both are traced from the catalog and `Assets.car`, not photographed.
+
+  **A route worth keeping, found here:** `xcrun devicectl device capture screenshot --device <id>
+  --destination <file.png>` photographs whatever is on the device, **tvOS's own Home screen and
+  other apps included**. The UI-test harnesses cannot do this — XCUITest only ever sees the app
+  under test. `devicectl device info processes` says what is running.
+
+  **Not pushed.** Committed on `main` and held there for the owner to look at the icon on the
+  television first, as every feature pass has been.
