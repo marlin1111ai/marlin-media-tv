@@ -76,14 +76,29 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   Design2 changed: frames 00, 00b, 00c are new; 01–04, 06–09, 16 and 17 differ only by the clock
   (and 01–04 by the sort control's 260 pt shift); 10–15, the player, are unchanged.
   Build what the frames show; design nothing (D006).
-- **The app icon's source:** `Design/tvos icons/Marlin Media tvOS Design.zip` (2.4 MB, tracked from
-  pass 4), a second Claude Design export whose `icons/` folder holds the layered tvOS icon as three
-  size pairs — `icon-400x240`, `icon-800x480`, `icon-1280x768`, each `-back` and `-front`, all with
-  alpha. Its `-flat` files and `preview-b.png` are previews and are **not** used (D048). It is a
-  different file from `Design/Marlin Media tvOS Design.zip`, which is the pass-1 frames.
-- **Device:** Apple TV 4K (3rd generation, `AppleTV14,1`), named **Home Theater**, tvOS 26.6,
-  Developer Mode enabled, paired with this Mac over the local network (D005) — all five re-read
-  from `xcrun devicectl` on 2026-09-16. The bedroom Apple TV is not used.
+- **The app icon's and Top Shelf's source:** `Design/tvos icons/Marlin Media tvOS Design.zip`
+  (7.25 MB, tracked from pass 4 and **replaced by a newer export in pass 5**). Its `icons/` folder
+  holds 14 files:
+  - the layered app icon as three size pairs — `icon-400x240`, `icon-800x480`, `icon-1280x768`,
+    each `-back` and `-front`, all with alpha (D048). Pass 5's export left these **byte-identical**
+    to pass 4's, so the icon stacks were not touched.
+  - the four Top Shelf banners, new in pass 5 — `topshelf-1920x720`, `topshelf-3840x1440`,
+    `topshelf-wide-2320x720`, `topshelf-wide-4640x1440`, every one fully opaque (D049).
+  - `-flat` files and `preview-b.png`, which are flattened previews and are **not** used.
+
+  It is a different file from `Design/Marlin Media tvOS Design.zip`, which is the pass-1 frames.
+- **Devices.** Two physical Apple TVs are paired with this Mac, and they are **not** equals:
+  - **Home Theater** — Apple TV 4K (3rd generation, `AppleTV14,1`, arm64e), tvOS 26.6, Developer
+    Mode enabled, on the local network. **The dev/test device (D005), and still the only one.**
+    Every build, matrix, log and screenshot of evidence comes from here.
+  - **Master Bedroom ATV** — Apple TV 4K (1st generation, `AppleTV6,2`, arm64), tvOS 26.6,
+    Developer Mode enabled, on the local network. **It carries the app as a convenience for the
+    household, at the owner's request (D050, pass 5) — it is not a test device.** Nothing is
+    proven there, no evidence is taken there, and it is not reinstalled on as a matter of course.
+    Before pass 5 this box was off-limits entirely; D050 is the narrow exception and does not
+    reopen it for testing.
+
+  All the facts above were read from `xcrun devicectl` on 2026-09-16.
 - **Xcode:** 27.0 (27A266a), tvOS 27.0 SDK (24J360) — since 2026-09-14 (pass 1e rerun; supersedes
   26.6 (17F113) / tvOS 26.5 SDK). Bundle id `com.marlin1111.marlin-media-tv`, team `C879JNVK7Z`,
   automatic signing (both read from Marlin DVR TV). The UI-test target is
@@ -128,10 +143,11 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   `Marlin Media TV/` is therefore in the app target by virtue of being in the folder.
 - **Fonts:** the system font. The design names Inter; no font is bundled (still an open question in
   the pass-1 report).
-- **Asset catalog:** `Marlin Media TV/Assets.xcassets`, added in pass 4 and holding one thing, the
-  layered tvOS app icon `AppIcon.brandassets` (D048). `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`
-  on both configurations of the app target is what points at it. There is no accent colour, no
-  launch image and no other asset — the UI's colours are `Theme.swift`'s tokens, not the catalog.
+- **Asset catalog:** `Marlin Media TV/Assets.xcassets`, added in pass 4, holding one thing:
+  `AppIcon.brandassets` — the layered tvOS app icon (D048) and, since pass 5, the two Top Shelf
+  banners (D049). `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` on both configurations of the app
+  target is what points at it. There is no accent colour, no launch image and no other asset — the
+  UI's colours are `Theme.swift`'s tokens, not the catalog.
 
 ## Build, install, run (all from the repo root)
 
@@ -149,6 +165,12 @@ off with
 `xcrun devicectl device copy from --device <id> --domain-type appDataContainer --domain-identifier com.marlin1111.marlin-media-tv --source Library/Caches/marlin-media-tv.log --destination <file>`.
 `EvidenceLog` opens the file on its **first line**, not when a player starts, because the detail
 screens write with no player up (pass 2).
+
+**Building for the other Apple TV.** The same command with
+`-destination 'platform=tvOS,name=Master Bedroom ATV'` builds and installs on the bedroom box
+(D050). Do that **only when the owner asks**: Home Theater is the dev/test device (D005), and the
+bedroom box is in household use — launching there puts the app on a television someone may be
+watching.
 
 **Photographing the device without a harness** (pass 4):
 `xcrun devicectl device capture screenshot --device <id> --destination <file.png>` takes a
@@ -251,12 +273,17 @@ Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app ta
 
 Outside the Swift files:
 - `Marlin Media TV/Assets.xcassets` — the asset catalog, whose only content is
-  `AppIcon.brandassets`: the tvOS Home screen icon (`App Icon.imagestack`, 400 × 240 @1x and
-  800 × 480 @2x) and the App Store icon (`App Icon - App Store.imagestack`, 1280 × 768), each a
-  **two-layer** stack, Front over Back, with no Middle slot. The Top Shelf image slots are declared
-  and deliberately empty. Sources and the rest of the rule are D048. Being inside
-  `Marlin Media TV/`, it joins the app target through the synchronized group; the build setting
-  `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` selects it.
+  `AppIcon.brandassets`:
+  - the tvOS Home screen icon (`App Icon.imagestack`, 400 × 240 @1x and 800 × 480 @2x) and the App
+    Store icon (`App Icon - App Store.imagestack`, 1280 × 768), each a **two-layer** stack, Front
+    over Back, with no Middle slot (D048);
+  - the **Top Shelf banners** (D049, pass 5) — `Top Shelf Image.imageset` at 1920 × 720 @1x and
+    3840 × 1440 @2x, and `Top Shelf Image Wide.imageset` at 2320 × 720 @1x and 4640 × 1440 @2x,
+    four flat opaque PNGs straight from the export. These are what tvOS draws above the Home
+    screen's top row when the app is the focused one there.
+
+  Being inside `Marlin Media TV/`, it joins the app target through the synchronized group; the
+  build setting `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` selects it.
 - `Frameworks/VLCKit.xcframework` — the custom VLCKit (D012/D013), linked and embedded (code-sign
   on copy) by the project; not in git. Rebuild with `tools/vlckit-truehd/build.sh`.
 - `Info.plist` carries `NSAppTransportSecurity` → `NSAllowsLocalNetworking`, so plain HTTP to
@@ -264,12 +291,13 @@ Outside the Swift files:
 
 ## Current state
 
-As of **pass 4 (2026-09-16)**, the newest pass.
+As of **pass 5 (2026-09-16)**, the newest pass.
 
 ### Built and owner-accepted
 
-Everything in this list but the last item has been tested by the owner on Home Theater and
-accepted. **Pass 4's app icon is built and proven on the device but not yet owner-tested.**
+Everything in this list down to the clock has been tested by the owner on Home Theater and
+accepted. **Pass 4's app icon and pass 5's Top Shelf banners are built and proven on the device
+but not yet owner-tested.**
 
 - **The library and the player** (pass 1): the three library tabs, movie, show and video detail,
   the edition picker, and VLCKit playing the four MKVs and a Magicians episode directly — the
@@ -303,6 +331,11 @@ accepted. **Pass 4's app icon is built and proven on the device but not yet owne
   (`reports/screenshots/p4/p4-1-appletv-home-screen.png`), where the app now shows the artwork
   instead of the generic tile. The parallax lift a focused icon gets was **not** seen, because
   photographing it needs the icon focused and nothing here can press the remote's Home button.
+- **The Top Shelf banners** (D049, pass 5, **awaiting the owner's look**): the four flat opaque
+  PNGs from the export fill `Top Shelf Image` and `Top Shelf Image Wide`, closing what was open
+  item 20. Proven on Home Theater by a device screenshot of tvOS's Home screen with the app
+  focused and the banner drawn above the top row
+  (`reports/screenshots/p5/p5-1-home-theater-topshelf.png`).
 
 Known and accepted as behaviour rather than defects, not open: **D020's two** — Play after any
 frame step drops the pictures below the demuxer's clock start (21–45 pictures, about 0.9–1.5 s),
@@ -311,8 +344,8 @@ paused if a subtitle track is selected.
 
 ### Pushed
 
-Everything on `main` is on `origin/main` **except pass 4's own commit**, which is deliberately
-committed and not pushed (the pass said so).
+Everything on `main` is on `origin/main` **except the pass 4 and pass 5 commits**, which are
+deliberately committed and not pushed (both passes said so).
 
 - Passes 1–1e up to `b22f9c9` (pass 1e rerun 4).
 - Passes 1f–1k as `b22f9c9..6bfdbad`, six commits (pass 1l).
@@ -322,9 +355,11 @@ committed and not pushed (the pass said so).
   After that push, local `main`, `origin/main` and `git ls-remote origin main` were all
   `896ee1293ac9`.
 - `896ee12` is the newest commit carrying **Swift** source. Pass 3c's notebook commit `d64679a`,
-  the COLD-START rewrite `ceae8c2` and pass 4's commit changed no Swift file — pass 4 changed the
-  asset catalog and two lines of `project.pbxproj`, which is a build input, not app code.
-- `ceae8c2` (the COLD-START rewrite) is the newest commit on `origin/main`.
+  the COLD-START rewrite `ceae8c2`, pass 4's `1a4d4ab` and pass 5's commit changed no Swift file —
+  pass 4 changed the asset catalog and two lines of `project.pbxproj`, and pass 5 only the
+  catalog's two Top Shelf slots.
+- `ceae8c2` (the COLD-START rewrite) is the newest commit on `origin/main`; **passes 4 and 5 are
+  committed and unpushed**, waiting on the owner.
 - `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`). Nothing under `Frameworks/`
   is tracked on any ref, so the 725 MB framework has never been pushed.
 
@@ -350,12 +385,17 @@ source and pass 4 committed it (D048). The other two are **still untracked and s
 decision** — `icon pixel/Marlin Media.pxd` (the icon's Pixelmator document, ~2 MB) and `Notes/`.
 Neither was opened, moved or committed; whoever picks them up should ask first.
 
-### What Home Theater runs
+### What the Apple TVs run
 
-The **pass 4 build** — `896ee12`'s Swift source plus pass 4's asset catalog and app-icon build
-setting, built from the working tree and so still carrying the uncommitted `PlayerHost.swift` hook.
-Pass 4 installed it, launched it and left it running. No Swift file has changed since pass 3b, so
-the app behaves exactly as the owner accepted it; only the icon is new.
+Both carry the **pass 5 build** — `896ee12`'s Swift source plus the pass 4 icon, the pass 5 Top
+Shelf banners and the app-icon build setting, built from the working tree and so still carrying the
+uncommitted `PlayerHost.swift` hook. No Swift file has changed since pass 3b, so the app behaves
+exactly as the owner accepted it; only the icon and the banners are new.
+
+- **Home Theater** — installed, launched and left running by pass 5, as by every pass before it.
+- **Master Bedroom ATV** — installed, launched and left running by pass 5, the first time the app
+  has been put there deliberately (D050). It is **not** kept in step with Home Theater: later
+  passes install there only if the owner asks again.
 
 ### The server's state
 
@@ -456,13 +496,16 @@ Each is recorded as open in DECISIONS.md or in a pass report; the source follows
     *Closed:* pass 1's open question 11, "no asset catalog and so no app icon", is **answered by
     D048** — the catalog and the icon exist and are on the device.
 
-**The app icon (pass 4)**
+**The app icon and Top Shelf (passes 4 and 5)**
 
-20. **The Top Shelf images are still empty slots.** `Top Shelf Image.imageset` and
-    `Top Shelf Image Wide.imageset` are declared and carry no file, so tvOS draws its default when
-    the app is the focused one on the top row. The export has no top-shelf artwork. Ask Claude
-    Design for 1920 × 720 / 2320 × 720 (and their @2x), or leave it? — `DECISIONS.md` D048;
-    `reports/2026-09-16-pass4-app-icon.md`.
+20. **Which Top Shelf size tvOS actually chose was not established.** The catalog offers both the
+    1920 × 720 pair and the 2320 × 720 "wide" pair; the Home Theater screenshot proves a banner is
+    drawn, but nothing in it says which imageset fed it, and `assetutil` lists both. — `DECISIONS.md`
+    D049; `reports/2026-09-16-pass5-topshelf-and-bedroom.md`.
+
+    *Closed:* pass 4's open item, "the Top Shelf images are still empty slots", is **answered by
+    D049** — all four banners are in place and one is on screen.
+
 21. **The App Store icon has never been rendered.** It is built as a two-layer 1280 × 768 stack,
     but `tv-marketing` assets are stripped from a device build, so nothing here can show it. It
     would first appear in an App Store Connect upload. — same sources.
@@ -470,6 +513,20 @@ Each is recorded as open in DECISIONS.md or in a pass report; the source follows
     while focused, and reaching that state needs a Home-button press on the remote, which neither
     `devicectl` nor `XCUIRemote` can send from outside the app. The layer split is proven by the
     catalog and the compiled `Assets.car`, not by a photograph of the effect. — same sources.
+
+**The bedroom Apple TV (pass 5)**
+
+23. **The app on Master Bedroom ATV will go stale and nothing watches it.** It was installed once,
+    at the owner's request (D050); no later pass reinstalls there unless asked, so it will drift
+    behind `main` silently. Reinstall on request, on a schedule, or leave it to rot? —
+    `DECISIONS.md` D050; `reports/2026-09-16-pass5-topshelf-and-bedroom.md`.
+24. **Its provisioning profile will expire.** A development-signed build stops launching after the
+    profile lapses (typically a week for a free profile, a year for a paid team). The owner will see
+    the app refuse to open rather than any warning. — same sources.
+25. **Nothing about the app has been tested on `AppleTV6,2` hardware.** It launched and drew Home,
+    but the 1st-generation Apple TV 4K is a slower A10X, and no playback, seek, frame step, scrub or
+    TrueHD path has ever run there. D005 keeps Home Theater as the only test device, so these are
+    untested, not known-good. — same sources.
 
 ## Pass history
 
@@ -867,3 +924,35 @@ closes pass 1's open question 11 ("no asset catalog, no app icon"). **No Swift f
   did not need them.
 - **Committed, not pushed** — the owner looks first. Home Theater is left running this build. The
   `PlayerHost.swift` hook and the five harnesses stay uncommitted, unchanged.
+
+### Pass 5 — the Top Shelf banners, and the app on the bedroom Apple TV (`reports/2026-09-16-pass5-topshelf-and-bedroom.md`)
+
+**Pass 5 (2026-09-16): the Top Shelf banners land, and the app goes on Master Bedroom ATV at the
+owner's request.** Decisions D049, D050; report `reports/2026-09-16-pass5-topshelf-and-bedroom.md`,
+screenshots `reports/screenshots/p5/`. **No Swift file was touched, and neither app icon stack was
+touched.**
+- **The export was replaced (D049).** The owner put a newer Claude Design export at
+  `Design/tvos icons/Marlin Media tvOS Design.zip` (2.4 MB → 7.25 MB), adding the four Top Shelf
+  banners to the ten files pass 4 saw. **The six icon layers came back byte-identical** to the
+  committed ones — checked by SHA-256 — so the icon stacks were left alone.
+- **The Top Shelf slots are filled.** `Top Shelf Image` takes `topshelf-1920x720.png` @1x and
+  `topshelf-3840x1440.png` @2x; `Top Shelf Image Wide` takes `topshelf-wide-2320x720.png` @1x and
+  `topshelf-wide-4640x1440.png` @2x. All four are the size their name claims and **fully opaque**
+  (minimum alpha 255 over every pixel). Nothing else in the catalog changed.
+- **Proven on Home Theater.** `BUILD SUCCEEDED`; `Assets.car` grew 575 KB → 2.3 MB and now lists
+  `Top Shelf Image` at 1920 × 720 / 3840 × 1440 and `Top Shelf Image Wide` at 2320 × 720 /
+  4640 × 1440. Installed, launched (`[library] loaded 3 movies, 2 shows, 0 videos`), and
+  **photographed with the banner actually on screen** — the app was the focused tile on tvOS's top
+  row and the banner was drawn above it (`p5-1-home-theater-topshelf.png`).
+- **The bedroom Apple TV now has the app (D050).** The owner confirmed it explicitly, reversing the
+  standing "not used" line. `Master Bedroom ATV` is an Apple TV 4K 1st generation (`AppleTV6,2`,
+  arm64), **tvOS 26.6, Developer Mode enabled, paired and connected** — so it cleared every gate.
+  The same working tree built for it, installed and launched: same `[library]` line, Home drawn
+  correctly (`p5-2-bedroom-app-running.png`). **It is not a test device** — D005 is unchanged and
+  Home Theater remains the only place evidence is taken.
+- **The bedroom Top Shelf could not be photographed.** A newly installed tvOS app lands at the end
+  of the app grid, not the top row, and nothing here can press the remote to move focus there
+  (`p5-3-bedroom-home-screen.png` shows a different app focused). The banner is proven on Home
+  Theater only.
+- **Committed, not pushed** — the owner looks first. Both Apple TVs are left running this build.
+  The `PlayerHost.swift` hook and the five harnesses stay uncommitted, unchanged.

@@ -543,3 +543,64 @@ file was touched. This answers pass 1's open question 11 (no asset catalog, so n
 
   **Not pushed.** Committed on `main` and held there for the owner to look at the icon on the
   television first, as every feature pass has been.
+
+## 2026-09-16 — pass 5 (the Top Shelf banners, and the bedroom Apple TV)
+
+Evidence: `reports/2026-09-16-pass5-topshelf-and-bedroom.md`, screenshots `reports/screenshots/p5/`.
+No Swift file was touched, and neither app icon stack was touched.
+
+- **D049** **The Top Shelf banners come from the Claude Design export (D006), as flat images.**
+
+  **The source was replaced.** The owner put a newer export at
+  `Design/tvos icons/Marlin Media tvOS Design.zip` on 2026-09-16 (2 461 833 → 7 254 893 bytes),
+  adding four Top Shelf files to the ten pass 4 used. **The six app-icon layers in the new export
+  are byte-identical to the committed ones** (SHA-256 compared, all six), so D048's image stacks are
+  untouched and only the two Top Shelf imagesets changed.
+
+  **What went where.** The four files, used exactly as delivered — no crop, scale or recolour:
+
+  | imageset | scale | file | pixels | opaque |
+  |---|---|---|---|---|
+  | `Top Shelf Image` | 1x | `topshelf-1920x720.png` | 1920 × 720 | yes |
+  | `Top Shelf Image` | 2x | `topshelf-3840x1440.png` | 3840 × 1440 | yes |
+  | `Top Shelf Image Wide` | 1x | `topshelf-wide-2320x720.png` | 2320 × 720 | yes |
+  | `Top Shelf Image Wide` | 2x | `topshelf-wide-4640x1440.png` | 4640 × 1440 | yes |
+
+  Every one carries an alpha channel whose minimum value over every pixel is 255 — flat and fully
+  opaque, which is what a Top Shelf image must be, since tvOS composites it over its own background.
+  The `-flat` icon files and `preview-b.png` remain unused (D048).
+
+  **Proof on Home Theater.** `BUILD SUCCEEDED`; the app's `Assets.car` grew from 575 208 to
+  2 335 208 bytes and `assetutil` lists `Top Shelf Image` at tv 1x 1920 × 720 and tv 2x
+  3840 × 1440, and `Top Shelf Image Wide` at tv 1x 2320 × 720 and tv 2x 4640 × 1440. Installed,
+  launched, and **photographed with the banner on screen** — the app happened to be the focused
+  tile on tvOS's top row after launching, so `reports/screenshots/p5/p5-1-home-theater-topshelf.png`
+  shows the banner drawn above the row. **Which of the two imagesets tvOS chose for that draw is
+  not established** and is this decision's open question.
+
+- **D050** **The app is installed on Master Bedroom ATV, at the owner's request. It is not a test
+  device, and D005 is unchanged.**
+
+  **This reverses a standing line, deliberately.** COLD-START.md said "The bedroom Apple TV is not
+  used", and on 2026-09-14 the owner had stopped a bedroom run mid-pass. On 2026-09-16 the owner
+  confirmed the install explicitly, so the app is now on that box **as a convenience for the
+  household, not as a second test target**.
+
+  **The device**, read from `xcrun devicectl` on 2026-09-16: name `Master Bedroom ATV`, Apple TV 4K
+  **1st generation** (`AppleTV6,2`, arm64 — Home Theater is `AppleTV14,1`, arm64e), **tvOS 26.6**,
+  **Developer Mode enabled**, paired and connected over the local network. It cleared every gate, so
+  the pass proceeded. The same working tree was built for it with
+  `-destination 'platform=tvOS,name=Master Bedroom ATV'`, installed and launched: the first
+  `[library]` line matched Home Theater's exactly, and Home drew correctly
+  (`reports/screenshots/p5/p5-2-bedroom-app-running.png`).
+
+  **What this does not change.**
+  - **D005 stands:** Home Theater is the dev/test device. No evidence, matrix, log or screenshot of
+    proof is taken from the bedroom box, and no pass reinstalls there unless the owner asks again.
+  - **Nothing is known about the app on `AppleTV6,2` hardware.** It launched and drew Home; no
+    playback, seek, frame step, scrub, display-matching or TrueHD path has ever run on that slower
+    A10X. Untested, not known-good.
+  - **The install will go stale and its provisioning profile will expire.** Nothing watches either;
+    the owner will simply find an old build, or one that refuses to launch. Open questions.
+  - **The Top Shelf banner could not be photographed there** — a newly installed app lands at the
+    end of the app grid, not the top row, and nothing here can press the remote to move focus.
