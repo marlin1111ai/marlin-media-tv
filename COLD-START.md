@@ -299,9 +299,10 @@ Outside the Swift files:
 
 ## Current state
 
-As of **pass 7c (2026-09-19)**, the newest pass. Pass 7 was the cleanup and the owner's calls on
+As of **pass 7d (2026-09-19)**, the newest pass. Pass 7 was the cleanup and the owner's calls on
 every open item (D052–D066); pass 7b, notebook only, recorded the last of them (D067); pass 7c,
-notebook only, read this file in full against D052–D067 and corrected the lines that disagreed.
+notebook only, read this file in full against D052–D067 and corrected the lines that disagreed;
+pass 7d, notebook only, added the two "superseded" notes `DECISIONS.md` was missing.
 
 ### Built and owner-accepted
 
@@ -379,6 +380,9 @@ Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
   agree.
 - **Pass 7c as one notebook commit on top of `d813054`**, which is pass 7b's commit
   (`f4fafa1..d813054`) — a fast-forward, no force; the three SHAs were compared after the push and
+  agree.
+- **Pass 7d as one notebook commit on top of `ee3613b`**, which is pass 7c's commit
+  (`d813054..ee3613b`) — a fast-forward, no force; the three SHAs were compared after the push and
   agree.
 - **`e7676fa` is the last commit that holds `reports/screenshots/` and `reports/logs/` (D066).**
   Every path this notebook or any report cites under those two folders resolves only there:
@@ -974,5 +978,20 @@ was touched; nothing was built, installed or launched; neither Apple TV and noth
 - **The pass 7b report's two line-number citations are corrected** to the file as pass 7b committed
   it: lines 121–122 and 174–175.
 - **Committed and pushed** as one fast-forward commit on top of `d813054` (pass 7b). Still
+  uncommitted, unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the
+  owner's `icon pixel/` and `Notes/` (D063).
+
+### Pass 7d — the two "superseded" notes in DECISIONS.md (`reports/2026-09-19-pass7d-notebook.md`)
+
+**Pass 7d (2026-09-19): notebook only.** No new decision. Report
+`reports/2026-09-19-pass7d-notebook.md`. No file outside `DECISIONS.md`, this file and the report
+was written; nothing was built, installed or launched; neither Apple TV and nothing under
+`~/vlckit-build` was touched.
+- **`DECISIONS.md` gained the two notes its own rule calls for** ("a superseded decision stays in
+  place with a note"), in the style D008 carries, and no other line of it changed. **D045**'s
+  "while paused, and only while paused" is marked superseded in part by D054 (pass 7): the clock
+  shows whenever the film is not playing, scrub and buffering included. **D064**'s item "10 OPEN" is
+  marked closed by D067 (pass 7b): the evidence log stays on. The original wording of both stays.
+- **Committed and pushed** as one fast-forward commit on top of `ee3613b` (pass 7c). Still
   uncommitted, unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the
   owner's `icon pixel/` and `Notes/` (D063).

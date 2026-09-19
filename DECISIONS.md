@@ -421,7 +421,8 @@ The owner's calls, given after testing pass 3. Evidence:
 
 - **D045** **The clock is on the player while paused, and only while paused.** This **revises D041's
   "not on the player"**: frames 10–15 draw no clock, and the owner's call of 2026-09-15 adds one for
-  the paused state.
+  the paused state. **Superseded in part 2026-09-19 (pass 7):** the clock shows whenever the film is
+  not playing, scrub and buffering included — D054 under pass 7.
 
   **What shows.** The same `NowClock` pair, the same style, and the same place as every other screen
   — `right: 80, top: 56` (`PlayerScreen.swift`, `pausedClock`). **While playing there is none.** The
@@ -711,7 +712,8 @@ After these, the only items left open are the ones marked **PARKED** or **OPEN**
     today.
   - 9: D059.
   - 10 **OPEN:** keep the evidence log on, or switch it off in the everyday app — the owner
-    decides from pass 7's numbers (`reports/2026-09-19-pass7-cleanup.md` §2).
+    decides from pass 7's numbers (`reports/2026-09-19-pass7-cleanup.md` §2). **Closed 2026-09-19
+    (pass 7b):** the log stays on in the everyday app — D067 under pass 7b.
   - 11: the audio panel shows what VLC reports.
 
 - **D065** **Closed on the owner's word from everyday use** (§10b 27–31): the Continue Watching
