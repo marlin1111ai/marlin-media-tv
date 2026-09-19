@@ -731,3 +731,16 @@ After these, the only items left open are the ones marked **PARKED** or **OPEN**
     a reboot cleared, so neither can be added to the repo any more — and its README finding,
     `tools/vlckit-truehd/README.md:10` describing patch 0020 as undecided, which pass 7 corrected
     to D019.
+
+## 2026-09-19 — pass 7b (the evidence log)
+
+The owner's call of 2026-09-19 on the last open item, the recon's §10b 10 (left open by D064).
+Notebook only; what was done is in `reports/2026-09-19-pass7b-notebook.md`.
+
+- **D067** **The evidence log stays on in the everyday app. Closed.** `EvidenceLog.swift` is left
+  as it is. What pass 7 measured, carried with the call: **each launch replaces**
+  `Library/Caches/marlin-media-tv.log` (`EvidenceLog.swift:31`), and **nothing caps its size** — it
+  grows for as long as that launch lives, with VLCKit's debug logger on the same handle. On Home
+  Theater on 2026-09-19 it was **53 049 bytes over 25.3 s** from launch, two short plays inside it
+  — a burst, 7.2 MB an hour at that rate; pass 1k's full logs of about 220 s of film ran at
+  **0.7–0.9 MB an hour**. **A whole film's worth was never measured.**

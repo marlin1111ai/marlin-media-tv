@@ -94,7 +94,9 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   - **Master Bedroom ATV** — Apple TV 4K (1st generation, `AppleTV6,2`, arm64), tvOS 26.6,
     Developer Mode enabled, on the local network. **It carries the app as a convenience for the
     household, at the owner's request (D050, pass 5) — it is not a test device.** Nothing is
-    proven there, no evidence is taken there, and it is not reinstalled on as a matter of course.
+    proven there and no evidence is taken there. **Every push pass that follows the owner's
+    acceptance of a pass that changed the app also installs the accepted build there — install
+    only, no launch (D061).**
     Before pass 5 this box was off-limits entirely; D050 is the narrow exception and does not
     reopen it for testing.
 
@@ -142,8 +144,8 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
 - **No CocoaPods, no xcodegen, no brew installs.** The project file was written by hand
   (objectVersion 71, file-system-synchronized groups); Xcode opens it normally. Everything in
   `Marlin Media TV/` is therefore in the app target by virtue of being in the folder.
-- **Fonts:** the system font. The design names Inter; no font is bundled (still an open question in
-  the pass-1 report).
+- **Fonts:** the system font. The design names Inter; no font is bundled — the system font stays
+  and Inter is overruled (D059).
 - **Asset catalog:** `Marlin Media TV/Assets.xcassets`, added in pass 4, holding one thing:
   `AppIcon.brandassets` — the layered tvOS app icon (D048) and, since pass 5, the two Top Shelf
   banners (D049). `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` on both configurations of the app
@@ -193,8 +195,9 @@ and `xcrun xcresulttool export attachments --path <x.xcresult> --output-path <di
 - **Deliberately uncommitted**, with the `PlayerHost.swift` Page Up / Page Down hook they need:
   `Diag2gUITests.swift`, `Pass2bUITests.swift`, `Pass2cUITests.swift`, `Pass3ShotsUITests.swift`,
   `Pass3bShotsUITests.swift`. They exist only to script touch-surface drags, which `XCUIRemote`
-  cannot perform. Copies of the pass 2g pair are committed as evidence:
-  `reports/logs/2g-harness-Diag2gUITests.swift.txt` and `reports/logs/2g-harness-hook.diff`.
+  cannot perform. The evidence copies of the pass 2g pair,
+  `reports/logs/2g-harness-Diag2gUITests.swift.txt` and `reports/logs/2g-harness-hook.diff`, live
+  in history at `e7676fa` (D066).
 
 ## How the app is put together
 
@@ -235,7 +238,8 @@ Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app ta
   05 (the sort control open), 16 (loading) and 17 (can't reach server). Tabs and seasons switch on
   click (the prototype's behaviour); the sort menu is **Title / Year / Recently Added**; each tab
   carries a Continue Watching row above its grid holding only that tab's kind, and focus entering
-  that row lands on its first card (D033). Frame 17's "Browse cached" button is still not built.
+  that row lands on its first card (D033). Frame 17's "Browse cached" button is not built: no cache
+  and no button, the frame overruled (D059).
 - `MovieDetailScreen.swift` — frames 06 (movie detail) and 07 (edition picker), with the watched
   pill, "Resume · N min left" and its in-button bar, "Start over", "Mark watched / unwatched" and
   the multi-edition rule (D026, D034).
@@ -243,7 +247,8 @@ Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app ta
   row, the per-episode state column, a click that resumes at the saved position and a
   press-and-hold that opens the mark menu (D027, D031, D039).
 - `VideoDetailScreen.swift` — frame 09, behaving exactly as the movie detail but with one file, so
-  no picker and nothing to follow. **Never run on a device** — this library has no videos (D038).
+  no picker and nothing to follow. The owner reports videos run fine on the device, which
+  discharges D038's owed check (D052).
 - `NowClock.swift` — the date-and-time pair the new frames put at the top right (D041). It draws
   only the pair; the placement (`right: 80, top: 56`) belongs to each screen. It ticks once a
   second while it is on screen.
@@ -267,8 +272,8 @@ Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app ta
 
 **Support**
 - `Theme.swift` — the Nocturne tokens from `Design/_ds/…/styles.css` plus the values the frames use
-  inline; screens are 1920 × 1080 at 1×, content 80 pt from the sides. (Its header comment still
-  says "the 17 frames", from before D042 replaced the export.)
+  inline; screens are 1920 × 1080 at 1×, content 80 pt from the sides. (Its header comment says
+  "the 20 frames" of the Design2 export, D042 — corrected in pass 7, D065.)
 - `EvidenceLog.swift` — one log file per launch in `Library/Caches`, VLCKit's own debug logger and
   the app's bracketed lines interleaved, also echoed to the console (D011).
 
@@ -292,8 +297,8 @@ Outside the Swift files:
 
 ## Current state
 
-As of **pass 7 (2026-09-19)**, the newest pass — the cleanup, and the owner's calls on every open
-item (D052–D066).
+As of **pass 7b (2026-09-19)**, the newest pass. Pass 7 was the cleanup and the owner's calls on
+every open item (D052–D066); pass 7b, notebook only, recorded the last of them (D067).
 
 ### Built and owner-accepted
 
@@ -366,6 +371,9 @@ Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
   of 770 files from `reports/` (D066), the two one-line text fixes, the notebook and the pass 7
   report. After the push, local `main`, `origin/main` and `git ls-remote origin main` were compared
   and agree; the SHA is in the pass's closing message, since a commit cannot name itself.
+- **Pass 7b as one notebook commit on top of `f4fafa1`**, which is pass 7's commit
+  (`e7676fa..f4fafa1`) — a fast-forward, no force; the three SHAs were compared after the push and
+  agree.
 - **`e7676fa` is the last commit that holds `reports/screenshots/` and `reports/logs/` (D066).**
   Every path this notebook or any report cites under those two folders resolves only there:
   `git show e7676fa:reports/logs/<file>`. The one file still in the tree is
@@ -423,8 +431,8 @@ owner's own viewing, so Home opens with a Continue Watching row again.
 
 ### Open items
 
-The owner ruled on every open item on 2026-09-19 (D052–D066): 48 of the recon's 56 are closed.
-**Four entries remain — three parked (seven of the recon's numbers) and one open.**
+The owner ruled on every open item on 2026-09-19 (D052–D067): 49 of the recon's 56 are closed.
+**Three entries remain, all parked (seven of the recon's numbers). Nothing is open.**
 
 1. **PARKED — the scrub thumbnails (D055).** Waiting on the server (marlin-media) generating
    thumbnails when it scans a file in, which the owner is taking to that project. When it lands:
@@ -440,31 +448,6 @@ The owner ruled on every open item on 2026-09-19 (D052–D066): 48 of the recon'
    Not built. — D064.
 3. **PARKED — badges on shows, possibly later.** `/api/shows` carries no per-file resolution or
    HDR. The owner reports the posters show no badges at all today. — D064.
-4. **OPEN — the evidence log: keep it on, or switch it off in the everyday app?** The owner
-   decides from pass 7's numbers. Each launch **replaces** `Library/Caches/marlin-media-tv.log`
-   (`EvidenceLog.swift:31`, `createFile` with no contents), and **nothing caps its size** — it
-   grows for as long as that launch lives, with VLCKit's debug log on the same handle. Read off
-   Home Theater on 2026-09-19: 53 049 bytes over 25.3 s from launch, two short plays inside it —
-   7.2 MB an hour at that rate, which is a burst rate, not a steady one; pass 1k's full logs of
-   ~220 s of paused-and-playing film ran at 0.7–0.9 MB an hour. — D064;
-   `reports/2026-09-19-pass7-cleanup.md` §2.
-
-### Lines above this section that pass 7 made out of date
-
-Pass 7 was told to rewrite this section and the `~/vlckit-build` size line, and nothing else. These
-lines higher up now disagree with it, and **this section wins**:
-
-- *Where things are → Devices:* Master Bedroom ATV "is not reinstalled on as a matter of course" —
-  D061 now installs every accepted build there.
-- *Toolchain facts:* patch 0021's text "survives only as `reports/logs/2f-0021-…diff.txt`" — in
-  history at `e7676fa` (D066). *Fonts:* "still an open question" — closed, D059.
-- *Build, install, run → Evidence harnesses:* the pass 2g copies "are committed as evidence" — in
-  history at `e7676fa`.
-- *How the app is put together:* `LibraryScreen.swift`, "Browse cached" "still not built" — it will
-  not be (D059); `VideoDetailScreen.swift`, "Never run on a device" — the owner reports it runs
-  (D052); `Theme.swift`, "still says "the 17 frames"" — corrected in pass 7.
-- Every `reports/logs/…` and `reports/screenshots/…` path anywhere in this file, `DECISIONS.md`
-  and the reports: see **Pushed** above.
 
 ## Pass history
 
@@ -950,3 +933,20 @@ was installed or launched on either Apple TV.**
 - **Committed and pushed** as one fast-forward commit on top of `e7676fa`. Still uncommitted,
   unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the owner's
   `icon pixel/` and `Notes/` (D063).
+
+### Pass 7b — the evidence log decided, and six stale lines corrected (`reports/2026-09-19-pass7b-notebook.md`)
+
+**Pass 7b (2026-09-19): notebook only.** Decision D067; report
+`reports/2026-09-19-pass7b-notebook.md`. No Swift, project, asset, design, recipe or harness file
+was touched; nothing was built, installed or launched; neither Apple TV and nothing under
+`~/vlckit-build` was touched.
+- **The evidence log stays on in the everyday app (D067)** — the owner's call on the one item pass 7
+  left open. It carries pass 7's measurements, and that a whole film's worth was never measured.
+  **Open items now holds three entries, all parked.**
+- **The six lines pass 7 listed as out of date are corrected**, each to what its decision says: the
+  bedroom Apple TV's installs (D061), the fonts (D059), the pass 2g evidence copies (D066), frame
+  17's "Browse cached" button (D059), the video detail screen (D052) and `Theme.swift`'s header
+  comment (D065). The listing itself is gone from Current state.
+- **Committed and pushed** as one fast-forward commit on top of `f4fafa1` (pass 7). Still
+  uncommitted, unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the
+  owner's `icon pixel/` and `Notes/` (D063).
