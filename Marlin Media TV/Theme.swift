@@ -2,7 +2,7 @@
 //  Theme.swift
 //  Marlin Media TV
 //
-//  Nocturne design tokens (Design/_ds/…/styles.css) plus the values the 17 frames in
+//  Nocturne design tokens (Design/_ds/…/styles.css) plus the values the 20 frames in
 //  Design/"Marlin Media.dc.html" use inline. Screens are 1920 × 1080 at 1×; content sits
 //  80 pt from the sides. Fonts are the system font (no bundled Inter — see the pass-1 report).
 //

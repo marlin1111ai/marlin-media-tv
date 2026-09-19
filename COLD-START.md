@@ -136,7 +136,8 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   clears that folder, while VideoLAN's script applies every `*.patch` it finds there. **A withdrawn
   patch must be deleted by hand** — pass 2g found an orphaned `0021-….patch` still sitting there,
   which the recipe would otherwise have re-applied.
-  `~/vlckit-build` was 22 GB on 2026-09-13 (not re-measured since).
+  `~/vlckit-build` is **19 135 087 445 bytes in 256 944 files (17.8 GB; `du` 18 G)**, measured on 2026-09-19
+  after pass 7 deleted the recon's §6b leftovers from it (D062). It was 22 GB on 2026-09-13.
 - **Minimum tvOS:** 26.0 exactly (`TVOS_DEPLOYMENT_TARGET = 26.0`, D004). Both Apple TVs run 26.6.
 - **No CocoaPods, no xcodegen, no brew installs.** The project file was written by hand
   (objectVersion 71, file-system-synchronized groups); Xcode opens it normally. Everything in
@@ -291,7 +292,8 @@ Outside the Swift files:
 
 ## Current state
 
-As of **pass 6 (2026-09-16)**, the newest pass.
+As of **pass 7 (2026-09-19)**, the newest pass — the cleanup, and the owner's calls on every open
+item (D052–D066).
 
 ### Built and owner-accepted
 
@@ -303,13 +305,15 @@ waiting on an owner test.**
   overlay, the −10 s / +30 s skips, pause, the audio and subtitle panels, and Menu closing an open
   panel. The custom VLCKit decodes TrueHD to 8-channel PCM (D012, D015), MKV seeks use the file's
   cues (D014), tvOS matches the display to the stream (D016), and the VideoToolbox reorder fix
-  ended Wonder Woman's judder (D017).
+  ended Wonder Woman's judder (D017). **Videos run on the device too, on the owner's report
+  (D052)** — no pass has photographed them.
 - **Native frame-back while paused** (D008 revised, D019, D020): a left/right click steps exactly
   one picture, both ways, on avcodec and VideoToolbox streams. Accepted and pushed in pass 1l.
 - **The paused touch-surface scrub with timeline thumbnails** (D021 revised again, D022): a swipe
   or drag while paused moves the target and the server's nearest still, the picture holds, click or
-  Play/Pause lands and plays, Menu cancels and stays paused. The owner tried the gesture by hand
-  and accepted it; pushed in pass 2h.
+  Play/Pause lands and plays, Menu cancels and stays paused, and arrow clicks are ignored while a
+  scrub is up (D056). The owner tried the gesture by hand and accepted it; pushed in pass 2h. **The
+  thumbnails' next step is parked on the server (D055).**
 - **Playback state** (D023–D029, D032, D034–D036): Recently Added on all three tabs, the Continue
   Watching row on Home and each library tab, Resume / Start over / the watched pill / Mark watched
   and unwatched on the movie and video details, "N unwatched" and the per-episode state column on
@@ -320,26 +324,31 @@ waiting on an owner test.**
 - **The Continue Watching focus rule** (D033) on the library tabs, and **launch focus on the first
   Continue Watching card** (D043) on Home.
 - **Home as the app's first screen** (D040), frames 00/00b/00c, with Menu on a library tab
-  returning to it.
-- **The clock** (D041, D044, D045): on Home, the three library tabs, the movie, show and video
-  screens, frames 16 and 17, and the player **while paused only**. Frames 16 and 17 are a code
-  trace, not device proof — open item 6.
-- **The app icon** (D048, pass 4): the layered tvOS icon from the
-  Claude Design export, Front over Back, on the Home screen icon and the App Store icon. Proven on
-  Home Theater by a device screenshot of tvOS's own Home screen
-  (`reports/screenshots/p4/p4-1-appletv-home-screen.png`), where the app now shows the artwork
-  instead of the generic tile. The parallax lift a focused icon gets was **not** seen, because
-  photographing it needs the icon focused and nothing here can press the remote's Home button.
-- **The Top Shelf banners** (D049, pass 5): the four flat opaque
-  PNGs from the export fill `Top Shelf Image` and `Top Shelf Image Wide`, closing what was open
-  item 20. Proven on Home Theater by a device screenshot of tvOS's Home screen with the app
-  focused and the banner drawn above the top row
-  (`reports/screenshots/p5/p5-1-home-theater-topshelf.png`).
+  returning to it. **It stays as built (D053):** one `GET /api/shows/{id}` per show every time it
+  appears, the wide episode cards on the TV Shows row (frames 00b/00c overruled there), the Videos
+  heading always showing, and a header that scrolls with the rows.
+- **The clock** (D041, D044, D045, D054): on Home, the three library tabs, the movie, show and
+  video screens, frames 16 and 17 (a code trace, accepted as such), and the player **whenever the
+  film is not playing — paused, scrubbing or buffering**.
+- **The app icon** (D048, pass 4): the layered tvOS icon from the Claude Design export, Front over
+  Back, on the Home screen icon and the App Store icon.
+- **The Top Shelf banners** (D049, pass 5): the four flat opaque PNGs from the export fill
+  `Top Shelf Image` and `Top Shelf Image Wide`.
 
-Known and accepted as behaviour rather than defects, not open: **D020's two** — Play after any
-frame step drops the pictures below the demuxer's clock start (21–45 pictures, about 0.9–1.5 s),
-and patch 0020's remaining gap, where a plain pause taken after a frame step can read ahead while
-paused if a subtitle track is selected.
+**Where the frames are overruled (D059):** the system font stays and Inter is not bundled; there is
+no cache and no "Browse cached" button on frame 17; the rating chip shows the TMDB score, not frame
+06's "R". The audio panel shows what VLC reports (D064).
+
+**Known and accepted as behaviour rather than defects, not open:**
+- **D020's two** — Play after any frame step drops the pictures below the demuxer's clock start
+  (21–45 pictures, about 0.9–1.5 s), and patch 0020's remaining gap, where a plain pause taken
+  after a frame step can read ahead while paused if a subtitle track is selected.
+- **D056's** — a pause after a scrub landing lets the demuxer read at 1× while paused, up to about
+  36 s of stream; one picture late or dropped at audio start while tvOS switches display mode;
+  audio start unmeasured and accepted by ear; and the list of one-offs D056 names, each reopened
+  only if the owner sees it again.
+- **Nothing goes to VideoLAN (D057).** The draft stays at
+  `reports/logs/1k-upstream-videolan-draft.md`, unsent.
 
 ### Pushed
 
@@ -348,21 +357,26 @@ Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
 - Passes 1–1e up to `b22f9c9` (pass 1e rerun 4).
 - Passes 1f–1k as `b22f9c9..6bfdbad`, six commits (pass 1l).
 - Passes 2a–2g as `e9df636..1e13538`, seven commits (pass 2h).
-- **Passes 2–3b as `3597d0a..896ee12`, five commits** — `b3f3b02` (pass 2), `8def8cd` (2b),
-  `ef9ce11` (2c), `a99cccc` (3), `896ee12` (3b) — each a fast-forward, no force, no merges (D046).
-  After that push, local `main`, `origin/main` and `git ls-remote origin main` were all
-  `896ee1293ac9`.
-- **Passes 4 and 5 as `ceae8c2..6de2d9b`, two commits** — `1a4d4ab` (pass 4, the app icon) and
-  `6de2d9b` (pass 5, the Top Shelf banners and the bedroom install) — a fast-forward, no force, no
-  merges (D051). After that push, local `main`, `origin/main` and `git ls-remote origin main` were
-  all `6de2d9b4029516c6f8c1ad65c1b789bbc5188553`.
-- `896ee12` is still the newest commit carrying **Swift** source. Everything after it — pass 3c's
-  notebook commit `d64679a`, the COLD-START rewrite `ceae8c2`, pass 4's `1a4d4ab`, pass 5's
-  `6de2d9b` and pass 6's own commit — changed no Swift file: pass 4 added the asset catalog and two
-  lines of `project.pbxproj`, pass 5 filled the catalog's two Top Shelf slots, and passes 3c and 6
-  are notebook-only.
+- Passes 2–3b as `3597d0a..896ee12`, five commits (pass 3c, D046).
+- Passes 4 and 5 as `ceae8c2..6de2d9b`, two commits (pass 6, D051); pass 6's own notebook commit
+  is `033c587`.
+- The stale-files recon as `033c587..e7676fa`, one commit holding one file,
+  `reports/2026-09-19-stale-files-recon.md`.
+- **Pass 7 as one commit on top of `e7676fa`**, a fast-forward, no force, no merges: the removal
+  of 770 files from `reports/` (D066), the two one-line text fixes, the notebook and the pass 7
+  report. After the push, local `main`, `origin/main` and `git ls-remote origin main` were compared
+  and agree; the SHA is in the pass's closing message, since a commit cannot name itself.
+- **`e7676fa` is the last commit that holds `reports/screenshots/` and `reports/logs/` (D066).**
+  Every path this notebook or any report cites under those two folders resolves only there:
+  `git show e7676fa:reports/logs/<file>`. The one file still in the tree is
+  `reports/logs/1k-upstream-videolan-draft.md`.
+- `896ee12` is still the newest commit that changed Swift **code**. Pass 7's commit touches one
+  Swift file, `Theme.swift`, and only its header comment ("the 17 frames" → "the 20 frames").
 - `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`). Nothing under `Frameworks/`
-  is tracked on any ref, so the 725 MB framework has never been pushed.
+  is tracked on any ref, so the 725 MB framework has never been pushed. **Since pass 7 it is the
+  only copy of the framework on this Mac**: the byte-identical one under `~/vlckit-build` was
+  deleted as a duplicate. `PACKAGE_ONLY=1 tools/vlckit-truehd/build.sh` remakes it in about 30 s
+  from the static libraries that were kept.
 
 ### Deliberately uncommitted
 
@@ -370,166 +384,87 @@ These stay out of git on purpose and are expected in `git status`:
 
 - `Marlin Media TV/PlayerHost.swift` — the Page Up / Page Down hook (pass 2g), the only
   modification to a tracked file. It exists to script touch-surface drags through the model,
-  because `XCUIRemote` has no touch-surface API. A copy is committed as
-  `reports/logs/2g-harness-hook.diff`.
+  because `XCUIRemote` has no touch-surface API. Its evidence copy,
+  `reports/logs/2g-harness-hook.diff`, is in history at `e7676fa` (D066).
 - Five UI-test harnesses, all in `Marlin Media TVUITests/`: `Diag2gUITests.swift`,
   `Pass2bUITests.swift`, `Pass2cUITests.swift`, `Pass3ShotsUITests.swift`,
-  `Pass3bShotsUITests.swift`. A copy of the pass 2g one is committed as
-  `reports/logs/2g-harness-Diag2gUITests.swift.txt`.
+  `Pass3bShotsUITests.swift`. The pass 2g one has an evidence copy in history at `e7676fa`
+  (`reports/logs/2g-harness-Diag2gUITests.swift.txt`); **the other four exist nowhere but the
+  working tree.**
+- **`icon pixel/` and `Notes/` — the owner's own files, deliberately outside git (D063).** They
+  are not opened, moved, staged or committed by any pass.
 
 The owner's `Design/Marlin Media tvOS Design2.zip` is not in the folder at all: pass 3 unzipped it
-and deleted the zip (D042).
-
-Three further untracked paths appeared on 2026-09-16 from the owner's own work, outside any pass.
-**One of them is now tracked and pushed:** `Design/tvos icons/Marlin Media tvOS Design.zip` is the
-source of both the app icon and the Top Shelf banners — pass 4 committed it (D048) and pass 5
-committed the owner's newer export over it (D049). The other two are **still untracked and still
-nobody's decision** — `icon pixel/Marlin Media.pxd` (the icon's Pixelmator document, ~2 MB) and
-`Notes/`. Neither was opened, moved or committed; whoever picks them up should ask first.
+and deleted the zip (D042). The older `Design/Marlin Media tvOS Design.zip` is tracked and stays.
 
 ### What the Apple TVs run
 
-Both carry the **pass 5 build**, which is now the pushed `main` (`6de2d9b`) — `896ee12`'s Swift
-source plus the pass 4 icon, the pass 5 Top Shelf banners and the app-icon build setting, built from
-the working tree and so still carrying the uncommitted `PlayerHost.swift` hook. No Swift file has
-changed since pass 3b. Pass 6 touched no source and built nothing, so this is still what is on both
-devices.
+Both carry the **pass 5 build** — `896ee12`'s Swift source plus the pass 4 icon, the pass 5 Top
+Shelf banners and the app-icon build setting, built from the working tree and so carrying the
+uncommitted `PlayerHost.swift` hook. Pass 7 built once on the Mac to prove the cleanup broke
+nothing (`** BUILD SUCCEEDED **`) and **installed and launched nowhere**; that build differs from
+the one on the devices by one comment line.
 
-- **Home Theater** — installed, launched and left running by pass 5, as by every pass before it.
-- **Master Bedroom ATV** — installed, launched and left running by pass 5, the first time the app
-  has been put there deliberately (D050). It is **not** kept in step with Home Theater: later
-  passes install there only if the owner asks again.
+- **Home Theater** — the dev/test device (D005). In the owner's everyday use: its app log of
+  2026-09-19 17:53 shows the owner's own launch and two short plays.
+- **Master Bedroom ATV** — carries the app for the household (D050). **Standing rule (D061): every
+  push pass that follows the owner's acceptance of a pass that changed the app also installs the
+  accepted build there — install only, no launch.** That install is also what renews its
+  provisioning profile; if the app ever refuses to open there, the remedy is a reinstall. D005 is
+  unchanged: no evidence is taken there. The owner reports playback works on it.
 
 ### The server's state
 
-The library, counted by `GET /api/health` on 2026-09-15 (pass 2 recon): **3 movies, 2 shows,
-3 seasons, 16 episodes, 0 videos, 0 unmatched**, on 20 files. That is why D038's video check
-has never run.
-
-Pass 3c reset the playback state the test passes had written (D047). Files 1, 2, 4, 5 and 8 are all
-back to `position 0, watched false`, no other file was ever touched, and
-`GET /api/continue-watching` is **`[]`**. So the app now opens with **no Continue Watching row** on
-Home (frame 00c) or on any library tab, and D043's launch focus deliberately places nothing — that
-branch is the one in play and it has not been seen on the device. `last_played` survives on the
-five, stamped to the reset's own instant, which leaves Stargate's *followed* edition (D026/D034)
-still Extended, exactly as before.
+Not re-read by pass 7. The last read is pass 2 recon's `GET /api/health` of 2026-09-15 — 3 movies,
+2 shows, 3 seasons, 16 episodes, **0 videos** — and the owner's report that videos run on the
+device (D052) means that count is out of date. Pass 3c's reset (D047) is history too: the app's log
+of 2026-09-19 shows `[continue] 3 entries: movie/3@3026s, movie/4@3851s, episode/17@1008s`, the
+owner's own viewing, so Home opens with a Continue Watching row again.
 
 ### Open items
 
-Each is recorded as open in DECISIONS.md or in a pass report; the source follows it.
+The owner ruled on every open item on 2026-09-19 (D052–D066): 48 of the recon's 56 are closed.
+**Four entries remain — three parked (seven of the recon's numbers) and one open.**
 
-**The library's coverage**
+1. **PARKED — the scrub thumbnails (D055).** Waiting on the server (marlin-media) generating
+   thumbnails when it scans a file in, which the owner is taking to that project. When it lands:
+   **the app fetches the index for the file actually played, and asks again at scrub start until
+   the server reports `complete`.** Until then the app is as pass 2g left it — one index per detail
+   screen, for a movie's first edition or a show's first episode of season 1, never re-fetched, so
+   any other edition or episode plays with no thumbnails and a file's first visit shows none.
+   Parked with it, undecided: the stills are letterboxed into the server's 320 × 214 tile (crop in
+   the client, or leave it?); nothing logs which still is drawn; and the thumbnail has only ever
+   run on Stargate with a warm server.
+2. **PARKED — an edition with no name.** The owner chose **"show nothing where an edition has no
+   name"** (today the row and the overlay show the file name, e.g. `Wonder Woman (2017).mkv`).
+   Not built. — D064.
+3. **PARKED — badges on shows, possibly later.** `/api/shows` carries no per-file resolution or
+   HDR. The owner reports the posters show no badges at all today. — D064.
+4. **OPEN — the evidence log: keep it on, or switch it off in the everyday app?** The owner
+   decides from pass 7's numbers. Each launch **replaces** `Library/Caches/marlin-media-tv.log`
+   (`EvidenceLog.swift:31`, `createFile` with no contents), and **nothing caps its size** — it
+   grows for as long as that launch lives, with VLCKit's debug log on the same handle. Read off
+   Home Theater on 2026-09-19: 53 049 bytes over 25.3 s from launch, two short plays inside it —
+   7.2 MB an hour at that rate, which is a burst rate, not a steady one; pass 1k's full logs of
+   ~220 s of paused-and-playing film ran at 0.7–0.9 MB an hour. — D064;
+   `reports/2026-09-19-pass7-cleanup.md` §2.
 
-1. **Videos have never run on a device.** Recently Added on the Videos tab and the whole video
-   detail screen are traced from the code, because this library has no videos. — `DECISIONS.md`
-   D038; `reports/2026-09-15-pass3c-push-and-reset.md` open question 2.
+### Lines above this section that pass 7 made out of date
 
-**Home (raised in pass 3, untouched through 3b and 3c)**
+Pass 7 was told to rewrite this section and the `~/vlckit-build` size line, and nothing else. These
+lines higher up now disagree with it, and **this section wins**:
 
-2. **Home fetches one `GET /api/shows/{id}` per show every time it appears** — two requests on this
-   library, about 34 on the owner's full one. Cache them, or ask only when the shows list changes?
-   — `reports/2026-09-15-pass3-home-and-rows.md` open question 3.
-3. **The TV Shows row uses the wide episode card** the brief asked for, while frames 00b/00c draw
-   that row as posters. The brief won, but the app and the frames now differ there. — same report,
-   open question 4.
-4. **With no videos the Videos heading shows above an empty space**, as asked. Is that the wanted
-   look once a video exists, or should the row hide the way Continue watching does? — same report,
-   open question 5.
-5. **Nothing pins Home's header**; the rows are one vertical scroll, and frames 00 and 00b are two
-   scrolled states of the same screen. Is the header meant to stay put? — same report, open
-   question 6.
-
-**The clock**
-
-6. **Frames 16 and 17 carry the clock by code trace, not device proof.** Neither state can be
-   reached on Home Theater without something out of scope — the loading phase is over before the
-   first painted frame, and the error screen needs the server unreachable. — `DECISIONS.md` D044;
-   `reports/2026-09-15-pass3b-fixes.md` open question 1.
-7. **The paused clock shows during a scrub, and while the player is buffering or opening**
-   (`!isPlaying` is true then too). Neither was separately asked for, and the frames say nothing
-   either way because they draw no clock on the player at all. —
-   `reports/2026-09-15-pass3b-fixes.md` open questions 2 and 3.
-
-**The scrub thumbnails (pass 2g)**
-
-8. **"The file that would play" is a guess on multi-file screens.** One index per screen means a
-   movie's first edition and a show's first episode of season 1; play any other edition or episode
-   and there are simply no thumbnails. Fetch per selection, or lazily when the player opens? —
-   `DECISIONS.md` D021 (revised again); `reports/2026-09-15-pass2g-scrub-thumbnails.md` §6.1.
-9. **A file's first visit shows no stills at all**, because that first index request is what starts
-   generation on the server. Accept "second visit onwards", or re-ask when the player opens? — same
-   report, §6.2.
-10. **The stills are letterboxed** into the server's 320 × 214 tile. Crop them in the client, or
-    leave the server's tile as it is? — same report, §6.3.
-11. **Nothing logs which still is drawn.** The proof that it follows the target is the screenshots
-    alone. — same report, §6.5.
-
-**The player**
-
-12. **A pause after a scrub landing lets the demuxer read at 1× while paused**, up to about 36 s of
-    stream. No seek is involved and no landing moved. Observed, not decided. — `DECISIONS.md` D021
-    ("Observed, not decided", carried through the pass 2c and 2d entries).
-13. **Start-up late pictures.** Wonder Woman and Magicians each show one picture late or dropped at
-    the moment the audio output starts, while tvOS switches display mode. Accept as start-up
-    behaviour, or a later diagnosis pass? — `reports/2026-09-14-pass1e-reorder-fix.md` §R4-6
-    question 1.
-14. **Wonder Woman's displayed picture rendered 24 s late at one resume**, against a clock from the
-    last step. One run, not reproduced on the other films, not instrumented. —
-    `reports/2026-09-14-pass1k-frame-back-close.md` open question 2.
-15. **Audio start is still unmeasured.** It needs either a timestamped app log line, an instrumented
-    build, or measuring outside the device. — same report, open question 3.
-
-**Outside the app**
-
-16. **The VideoLAN report is drafted and not submitted.** "Submit it, and in whose name?" — draft
-    `reports/logs/1k-upstream-videolan-draft.md`;
-    `reports/2026-09-14-pass1k-frame-back-close.md` open question 4.
-17. **`last_played` was not cleared by the reset** and cannot be: the server stamps it on every
-    write and the PUT body carries no way to null it. A true virgin state needs a server-side clear
-    or a `last_played` field on the PUT — a request to the server repo, not a client change. —
-    `DECISIONS.md` D047; `reports/2026-09-15-pass3c-push-and-reset.md` open question 1.
-
-**Never settled since pass 1**
-
-18. **Inter is not bundled** — the system font is used at the frames' sizes and weights. —
-    `reports/2026-09-13-pass1-scaffold-and-player.md` open question 8.
-19. **Frame 17's "Browse cached" button and its "Last successful sync … cached" line are not
-    built**, because there is no cache. — same report, open question 9.
-
-    *Closed:* pass 1's open question 11, "no asset catalog and so no app icon", is **answered by
-    D048** — the catalog and the icon exist and are on the device.
-
-**The app icon and Top Shelf (passes 4 and 5)**
-
-20. **Which Top Shelf size tvOS actually chose was not established.** The catalog offers both the
-    1920 × 720 pair and the 2320 × 720 "wide" pair; the Home Theater screenshot proves a banner is
-    drawn, but nothing in it says which imageset fed it, and `assetutil` lists both. — `DECISIONS.md`
-    D049; `reports/2026-09-16-pass5-topshelf-and-bedroom.md`.
-
-    *Closed:* pass 4's open item, "the Top Shelf images are still empty slots", is **answered by
-    D049** — all four banners are in place and one is on screen.
-
-21. **The App Store icon has never been rendered.** It is built as a two-layer 1280 × 768 stack,
-    but `tv-marketing` assets are stripped from a device build, so nothing here can show it. It
-    would first appear in an App Store Connect upload. — same sources.
-22. **The focused icon's parallax was not photographed.** A tvOS icon separates its layers only
-    while focused, and reaching that state needs a Home-button press on the remote, which neither
-    `devicectl` nor `XCUIRemote` can send from outside the app. The layer split is proven by the
-    catalog and the compiled `Assets.car`, not by a photograph of the effect. — same sources.
-
-**The bedroom Apple TV (pass 5)**
-
-23. **The app on Master Bedroom ATV will go stale and nothing watches it.** It was installed once,
-    at the owner's request (D050); no later pass reinstalls there unless asked, so it will drift
-    behind `main` silently. Reinstall on request, on a schedule, or leave it to rot? —
-    `DECISIONS.md` D050; `reports/2026-09-16-pass5-topshelf-and-bedroom.md`.
-24. **Its provisioning profile will expire.** A development-signed build stops launching after the
-    profile lapses (typically a week for a free profile, a year for a paid team). The owner will see
-    the app refuse to open rather than any warning. — same sources.
-25. **Nothing about the app has been tested on `AppleTV6,2` hardware.** It launched and drew Home,
-    but the 1st-generation Apple TV 4K is a slower A10X, and no playback, seek, frame step, scrub or
-    TrueHD path has ever run there. D005 keeps Home Theater as the only test device, so these are
-    untested, not known-good. — same sources.
+- *Where things are → Devices:* Master Bedroom ATV "is not reinstalled on as a matter of course" —
+  D061 now installs every accepted build there.
+- *Toolchain facts:* patch 0021's text "survives only as `reports/logs/2f-0021-…diff.txt`" — in
+  history at `e7676fa` (D066). *Fonts:* "still an open question" — closed, D059.
+- *Build, install, run → Evidence harnesses:* the pass 2g copies "are committed as evidence" — in
+  history at `e7676fa`.
+- *How the app is put together:* `LibraryScreen.swift`, "Browse cached" "still not built" — it will
+  not be (D059); `VideoDetailScreen.swift`, "Never run on a device" — the owner reports it runs
+  (D052); `Theme.swift`, "still says "the 17 frames"" — corrected in pass 7.
+- Every `reports/logs/…` and `reports/screenshots/…` path anywhere in this file, `DECISIONS.md`
+  and the reports: see **Pushed** above.
 
 ## Pass history
 
@@ -981,3 +916,37 @@ nothing was built, installed or launched, and no device was touched.**
   and the three bedroom items all still stand.
 - **Still uncommitted, unchanged, and deliberate:** the `PlayerHost.swift` Page Up / Down hook and
   the five UI-test harnesses, plus the owner's `icon pixel/` and `Notes/`.
+
+### Pass 7 — the cleanup, and the owner's calls on every open item (`reports/2026-09-19-pass7-cleanup.md`)
+
+**Pass 7 (2026-09-19): the stale files deleted, the evidence files taken out of the tree, and every
+open item ruled on.** Decisions D052–D066; report `reports/2026-09-19-pass7-cleanup.md`. It follows
+the read-only recon of the same day, `reports/2026-09-19-stale-files-recon.md` (commit `e7676fa`,
+no pass number and no note of its own here), whose §6 was this pass's delete list and whose §10a /
+§10b numbering the owner's calls use. **No Swift code changed — one comment line did — and nothing
+was installed or launched on either Apple TV.**
+- **Deleted, permanently (D062): 9 082 files, 7 062 841 475 bytes**, every one re-verified against
+  the recon first and none skipped. In the repo 1 638 files / 2 943 524 268 bytes — the stock VLCKit
+  Swift package left in `build/DerivedData/SourcePackages` since pass 1 (2.74 GB), the tvOS 26.5
+  `.xctestrun`, five `build/*.out` captures and two `.DS_Store`. Under `~/vlckit-build` 7 444 files /
+  4 119 317 207 bytes — VLCKit's two `.xcarchive` packaging intermediates (2.94 GB), the
+  byte-identical second copy of the framework (725 MB, re-hashed by SHA-256 before it went),
+  `host-test-1i` (196 MB), seven loose build outputs and 46 Finder `.DS_Store`. The volume's used
+  space fell by 6 187 192 KB. **`~/vlckit-build` is kept** and is now 17.8 GB; everything the recon
+  listed as in use or to keep was re-counted afterwards at its exact recon size.
+- **The screenshots and logs are out of the tree (D066):** `git rm` of all 569 files under
+  `reports/screenshots/` and 201 of the 202 under `reports/logs/` — 770 files, 459 748 317 bytes —
+  leaving `reports/logs/1k-upstream-videolan-draft.md` and every written report. **`e7676fa` is
+  the last commit that holds them.**
+- **Two text fixes:** `Theme.swift:5` says "the 20 frames" (D042), and
+  `tools/vlckit-truehd/README.md:10` says patch 0020 was decided as D019 in pass 1k.
+- **The evidence log, read only:** each launch replaces it and nothing caps it; Home Theater's
+  current one was 53 049 bytes over 25.3 s. The on-or-off decision is the owner's — open item 4.
+- **Built once, not installed:** `** BUILD SUCCEEDED **` with the package folder gone, and
+  `SourcePackages` did not come back.
+- **The owner's calls closed 48 of the recon's 56 open items.** Seven are parked — five of them
+  the scrub thumbnails — and one is open: four entries under **Open items**. The new standing rule is D061: a push pass that follows the owner's acceptance of
+  a pass that changed the app also installs on Master Bedroom ATV, install only.
+- **Committed and pushed** as one fast-forward commit on top of `e7676fa`. Still uncommitted,
+  unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the owner's
+  `icon pixel/` and `Notes/` (D063).

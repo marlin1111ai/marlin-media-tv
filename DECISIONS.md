@@ -631,3 +631,103 @@ separate report — the evidence is passes 4 and 5's own
   items D049 and D050 left open: which Top Shelf imageset tvOS chose, the App Store icon that has
   never been rendered, the icon parallax that was never photographed, and the bedroom install's
   staleness, expiring profile and wholly untested `AppleTV6,2` playback path. Those stand.
+
+## 2026-09-19 — pass 7 (the cleanup, and the owner's calls on every open item)
+
+The owner's calls of 2026-09-19, given against the numbering of
+`reports/2026-09-19-stale-files-recon.md` — §10a is the 25 items COLD-START.md carried as open,
+§10b the 31 the recon found beside them. What was done is in `reports/2026-09-19-pass7-cleanup.md`.
+After these, the only items left open are the ones marked **PARKED** or **OPEN** below.
+
+- **D052** **Videos run on the device — D038's owed check is discharged.** The owner reports that
+  videos run fine on the device (§10a 1).
+
+- **D053** **Home stays as it is built** (§10a 2–5).
+  - Home's one `GET /api/shows/{id}` per show, every time it appears, stays as is.
+  - The TV Shows row keeps the wide episode cards; **frames 00b/00c are overruled for that row.**
+  - The Videos heading always shows.
+  - Home's header scrolls with the rows.
+
+- **D054** **The clock** (§10a 6–7). The code trace for frames 16 and 17 (D044) is accepted. On the
+  player the clock shows **whenever the film is not playing, scrub and buffering included**.
+
+- **D055** **PARKED: the scrub thumbnails** (§10a 8, 9, 10, 11; §10b 26). They wait on the server
+  (marlin-media) generating thumbnails when it scans a file in, which the owner is taking to that
+  project. The owner's direction for when it lands: **the app fetches the index for the file
+  actually played, and asks again at scrub start until the server reports `complete`.** The
+  letterboxed stills (10) and the missing "which still is drawn" log line (11) are undecided and
+  parked with them, as is the thumbnail's untested ground — one film, a warm server (§10b 26).
+
+- **D056** **The player, accepted as it is.**
+  - §10a 12, the paused read at 1× after a scrub landing: accepted as known behaviour.
+  - §10a 13, the start-up late pictures: accepted as start-up behaviour.
+  - §10a 14, Wonder Woman's picture 24 s late at one resume: a one-off, reopened only if the owner
+    sees it.
+  - §10a 15, audio start: unmeasured, accepted by ear.
+  - §10b 21: arrow clicks stay ignored while a scrub is up.
+  - **Accepted as they are** (§10b 12, 14, 19, 20, 24): the MKV decision by path suffix; the
+    display request landing ~0.1 s after play on HEVC MKVs; libvlc's own minimum of tvOS 11.0
+    inside a `minos 26.0` framework; D019's unsynchronised pointer read; `test_src_clock_clock`
+    failing on the host build.
+  - **One-offs, reopened only if the owner sees them** (§10b 13, 15, 16, 17, 22, 23, 25): the
+    Stargate Theatrical deinterlace burst; the AC-3 route flap; whether Magicians reached 0019's
+    guard; Stargate's two start-up drops; the lost Play/Pause press and the 14 pictures dropped
+    beside it; the one old-position picture in 3 of 32 landings; the MP4 clock gap and frozen time
+    (D022).
+
+- **D057** **Nothing is submitted to VideoLAN** — neither the frame-step report nor a report of
+  the `dpb.c` defect with patch 0019 (§10a 16, §10b 18). The draft stays in the repo at
+  `reports/logs/1k-upstream-videolan-draft.md`.
+
+- **D058** **`last_played` surviving the D047 reset is closed** (§10a 17).
+
+- **D059** **Three places where the frames are overruled.**
+  - The system font stays; **Inter is overruled** (§10a 18).
+  - No cache and no "Browse cached" button; **frame 17's button is overruled** (§10a 19).
+  - The TMDB score stays on the rating chip; **frame 06's "R" is overruled** (§10b 9).
+
+- **D060** **The icon and Top Shelf items are closed** (§10a 20, 21, 22): which Top Shelf imageset
+  tvOS chose, the App Store icon never rendered, the parallax never photographed.
+
+- **D061** **STANDING RULE — the bedroom Apple TV gets every accepted build. This revises D050's
+  "only if the owner asks".** Every push pass that follows the owner's acceptance of a pass that
+  changed the app also installs the accepted build on Master Bedroom ATV — **install only, no
+  launch** (§10a 23). **D005 is unchanged, and no evidence is taken there.**
+  - Each such install renews the provisioning profile; if the app ever refuses to open there, the
+    remedy is a reinstall (§10a 24).
+  - The owner reports that playback works on the bedroom box (§10a 25).
+
+- **D062** **`~/vlckit-build` is kept; only the recon's §6b leftovers are deleted** (§10b 1, which
+  closes §10b 2). Its size after pass 7's deletions: **19 135 087 445 bytes in 256 944 files
+  (17.8 GB; `du` 18 G)**, measured 2026-09-19 (§10b 4).
+
+- **D063** **`icon pixel/` and `Notes/` are the owner's files and stay untracked, deliberately
+  outside git** (§10b 3).
+
+- **D064** **Pass 1's unanswered questions** (§10b 6–11).
+  - 6: the owner has never seen subtitles start by themselves; no change.
+  - 7 **PARKED:** the owner chose **"show nothing where an edition has no name"**; not built.
+  - 8 **PARKED:** show badges, possibly later. The owner reports the posters show no badges at all
+    today.
+  - 9: D059.
+  - 10 **OPEN:** keep the evidence log on, or switch it off in the everyday app — the owner
+    decides from pass 7's numbers (`reports/2026-09-19-pass7-cleanup.md` §2).
+  - 11: the audio panel shows what VLC reports.
+
+- **D065** **Closed on the owner's word from everyday use** (§10b 27–31): the Continue Watching
+  focus with three or more cards and on the other tabs; the TV row's order; the launch focus with
+  nothing in progress and its retry window; the paused clock with a panel open and during a scrub,
+  and the minute rollover; the app's behaviour after the D047 reset. §10b 5, `Theme.swift`'s
+  "17 frames" comment, is closed by pass 7's edit.
+
+- **D066** **The screenshots and logs are removed from `reports/`, at the owner's direction, on
+  2026-09-19.** Every tracked file under `reports/screenshots/` (569) and `reports/logs/` (201 of
+  202) is removed from the tree; `reports/logs/1k-upstream-videolan-draft.md` stays (D057), and the
+  written reports `reports/*.md` stay. **They live in history: `e7676fa` is the last commit that
+  holds them**, and every path the notebook cites under `reports/screenshots/` or `reports/logs/`
+  resolves only there (`git show e7676fa:<path>`).
+  - Also recorded: the recon's two "closed by events" items — pass 1e's uncommitted seek and
+    frame-step screenshots and pass 4's 22 MB full-resolution frame were in session scratch, which
+    a reboot cleared, so neither can be added to the repo any more — and its README finding,
+    `tools/vlckit-truehd/README.md:10` describing patch 0020 as undecided, which pass 7 corrected
+    to D019.
