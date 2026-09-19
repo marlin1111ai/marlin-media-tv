@@ -118,8 +118,8 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   (VideoToolbox picture-reorder fix, D017) and **0020** (no paused read-ahead after a frame step,
   D019). The four patch files this repo owns are in `tools/vlckit-truehd/`; a fifth, 0021, was
   written in pass 2f and **dropped** in pass 2g (D022), so the recipe is 20 patches and the patch
-  text survives only as
-  `reports/logs/2f-0021-es_out-no-late-pcr-compensation-while-paused.diff.txt`.
+  text lives in history at `e7676fa`, as
+  `reports/logs/2f-0021-es_out-no-late-pcr-compensation-while-paused.diff.txt` (D066).
   Current framework (full recipe, pass 2g, 20 `Applying:` lines, libvlc clean at `6d623583`):
   contribs and libvlc compiled clean on Xcode 27.0 / tvOS SDK 27.0, packaged with VLCKit's project
   tvOS target set to 26.0 (`MinimumOSVersion` 26.0, `LC_BUILD_VERSION minos 26.0 sdk 27.0`, D018),
@@ -171,9 +171,10 @@ screens write with no player up (pass 2).
 
 **Building for the other Apple TV.** The same command with
 `-destination 'platform=tvOS,name=Master Bedroom ATV'` builds and installs on the bedroom box
-(D050). Do that **only when the owner asks**: Home Theater is the dev/test device (D005), and the
-bedroom box is in household use — launching there puts the app on a television someone may be
-watching.
+(D050). **Every push pass that follows the owner's acceptance of a pass that changed the app
+installs the accepted build there — install only, no launch (D061).** Home Theater is the dev/test
+device (D005), and the bedroom box is in household use — launching there puts the app on a
+television someone may be watching.
 
 **Photographing the device without a harness** (pass 4):
 `xcrun devicectl device capture screenshot --device <id> --destination <file.png>` takes a
@@ -264,8 +265,9 @@ Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app ta
   drawable. An edge click is a `UIPress`; a swipe is not a press at all; the scrub pan runs
   alongside the swipe recognizers and begins only while paused. **This file is the one with the
   uncommitted Page Up / Page Down harness hook in the working tree** — HEAD's copy has no hook.
-- `PlayerScreen.swift` — frames 10–15 plus the scrub bar and its thumbnail, and the paused clock
-  (D045). Visuals only: the whole stack is `allowsHitTesting(false)` and nothing in it is focusable.
+- `PlayerScreen.swift` — frames 10–15 plus the scrub bar and its thumbnail, and the clock, which
+  shows whenever the film is not playing, scrub and buffering included (D045, D054). Visuals only:
+  the whole stack is `allowsHitTesting(false)` and nothing in it is focusable.
 - `ThumbStrip.swift` — the server's timeline stills: the index model (`ThumbIndex`, `ThumbSheet`),
   the arithmetic that turns a target time into a sheet and a tile, the sheet fetches and the draw.
   Where a still does not exist, nothing is drawn (D021).
@@ -297,8 +299,9 @@ Outside the Swift files:
 
 ## Current state
 
-As of **pass 7b (2026-09-19)**, the newest pass. Pass 7 was the cleanup and the owner's calls on
-every open item (D052–D066); pass 7b, notebook only, recorded the last of them (D067).
+As of **pass 7c (2026-09-19)**, the newest pass. Pass 7 was the cleanup and the owner's calls on
+every open item (D052–D066); pass 7b, notebook only, recorded the last of them (D067); pass 7c,
+notebook only, read this file in full against D052–D067 and corrected the lines that disagreed.
 
 ### Built and owner-accepted
 
@@ -373,6 +376,9 @@ Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
   and agree; the SHA is in the pass's closing message, since a commit cannot name itself.
 - **Pass 7b as one notebook commit on top of `f4fafa1`**, which is pass 7's commit
   (`e7676fa..f4fafa1`) — a fast-forward, no force; the three SHAs were compared after the push and
+  agree.
+- **Pass 7c as one notebook commit on top of `d813054`**, which is pass 7b's commit
+  (`f4fafa1..d813054`) — a fast-forward, no force; the three SHAs were compared after the push and
   agree.
 - **`e7676fa` is the last commit that holds `reports/screenshots/` and `reports/logs/` (D066).**
   Every path this notebook or any report cites under those two folders resolves only there:
@@ -948,5 +954,25 @@ was touched; nothing was built, installed or launched; neither Apple TV and noth
   17's "Browse cached" button (D059), the video detail screen (D052) and `Theme.swift`'s header
   comment (D065). The listing itself is gone from Current state.
 - **Committed and pushed** as one fast-forward commit on top of `f4fafa1` (pass 7). Still
+  uncommitted, unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the
+  owner's `icon pixel/` and `Notes/` (D063).
+
+### Pass 7c — COLD-START read in full against D052–D067 (`reports/2026-09-19-pass7c-notebook.md`)
+
+**Pass 7c (2026-09-19): notebook only.** No decision; `DECISIONS.md` was not edited. Report
+`reports/2026-09-19-pass7c-notebook.md`. No Swift, project, asset, design, recipe or harness file
+was touched; nothing was built, installed or launched; neither Apple TV and nothing under
+`~/vlckit-build` was touched.
+- **The two lines pass 7b reported are corrected:** patch 0021's text lives in history at `e7676fa`
+  (D066), and "Building for the other Apple TV" states D061's rule in place of "only when the owner
+  asks".
+- **This file was then read in full, top to bottom, against D052–D067, one decision at a time.**
+  One further line contradicted a decision and is corrected: `PlayerScreen.swift`'s "the paused
+  clock (D045)" now says the clock shows whenever the film is not playing (D054). For the other
+  fifteen decisions no contradicting line is left. Pass history notes were read and, as records,
+  not edited.
+- **The pass 7b report's two line-number citations are corrected** to the file as pass 7b committed
+  it: lines 121–122 and 174–175.
+- **Committed and pushed** as one fast-forward commit on top of `d813054` (pass 7b). Still
   uncommitted, unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the
   owner's `icon pixel/` and `Notes/` (D063).

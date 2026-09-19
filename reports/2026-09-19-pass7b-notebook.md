@@ -58,7 +58,7 @@ other.
 
 **Further lines that disagree with D052–D066 — reported, not edited:**
 
-- **A seventh, which pass 7's own listing already held.** *Toolchain facts*, lines 119–120: patch
+- **A seventh, which pass 7's own listing already held.** *Toolchain facts*, lines 121–122: patch
   0021's "text survives only as
   `reports/logs/2f-0021-es_out-no-late-pcr-compensation-while-paused.diff.txt`". That file left the
   tree in pass 7 and lives at `e7676fa` (D066). **My count was wrong in pass 7:** its report said
@@ -66,7 +66,7 @@ other.
   included. The six corrected here are the six the report named. With the listing gone, this line
   is covered only by the general statement under **Pushed** — every `reports/logs/…` path resolves
   at `e7676fa`.
-- **An eighth, new.** *Build, install, run → "Building for the other Apple TV"*, lines 171–173:
+- **An eighth, new.** *Build, install, run → "Building for the other Apple TV"*, lines 174–175:
   "Do that **only when the owner asks**: Home Theater is the dev/test device (D005), and the
   bedroom box is in household use". D061 now has the push pass install there without a separate
   ask. Pass 7 did not list it; I found it by searching the upper sections for wording about the
@@ -184,8 +184,8 @@ deleted at the end.
 
 ## Open questions
 
-1. **The two further stale lines** (§2): the 0021 "survives only as" line at 119–120 and the "only
-   when the owner asks" paragraph at 171–173. Correct them in the next notebook pass? Suggested
+1. **The two further stale lines** (§2): the 0021 "survives only as" line at 121–122 and the "only
+   when the owner asks" paragraph at 174–175. Correct them in the next notebook pass? Suggested
    wording, each to its decision and nothing more: "…and the patch text lives in history at
    `e7676fa` (D066)"; and "The push pass that follows the owner's acceptance of a pass that changed
    the app installs there, install only, no launch (D061); anything else there, only when the owner
