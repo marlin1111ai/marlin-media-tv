@@ -516,7 +516,9 @@ struct PosterGrid<Lead: View, Content: View>: View {
             .padding(.horizontal, 80)
             .padding(.bottom, 80)
         }
-        .scrollClipDisabled()
+        // The grid scrolls **clipped**, as the old Home's rows did: with clipping disabled a row
+        // scrolled away drew over the header above it. The sideways rows inside keep their
+        // unclipped edges, so a focused card's lift and glow are not cut off.
     }
 }
 
@@ -609,7 +611,7 @@ private struct VideoList<Lead: View>: View {
             .padding(.horizontal, 80)
             .padding(.bottom, 80)
         }
-        .scrollClipDisabled()
+        // Clipped, like the poster grid: a row scrolled away must not draw over the header.
     }
 }
 
