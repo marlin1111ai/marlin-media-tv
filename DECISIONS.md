@@ -11,7 +11,7 @@ marlin1111ai/marlin-media (DECISIONS.md there) and are referenced by their numbe
 - **D003** VLCKit via VideoLAN SPM 4.0.0-a24; fallback if the alpha fails is CocoaPods 3.7.3.
 - **D004** minimum tvOS 26.0.
 - **D005** dev/test device is Home Theater.
-- **D006** all UI from Claude Design exports (carries marlin-media D009).
+- **D006** all UI from Claude Design exports (carries marlin-media D009). **Exceptions by the owner's decision, 2026-10-04:** the five apps' icons and banners are the old artwork re-lettered (D072), and Marlin Music's and Marlin Adult's screens follow the frames' look with no frames of their own (D073).
 - **D007** server address fixed, no settings screen.
 - **D008** skips −10 s / +30 s while playing; frame step on click while paused, forward exact, back approximate (carries marlin-media D005). **Superseded in part 2026-09-14 (pass 1k):** the back step is VLC's native previous-frame, exact — D008 (revised) under pass 1k.
 - **D009** resume/watched state and Recently Added are in — server request sent 2026-09-13, client wires them once served.
@@ -345,7 +345,10 @@ built, installed and launched, with four screenshots and no test matrix.
     arrives before `perform` — so a hold was taken as a click and started playback. Pass 2c's
     press-down/press-up instrumentation is removed.
 
-- **D040** **Home is the app's first screen** (frames 00, 00b, 00c). MARLIN, then Movies / TV Shows /
+- **D040** **Home is the app's first screen** (frames 00, 00b, 00c). **Superseded 2026-10-04 (D069):
+  the combined Home screen is gone and each of the five apps opens on its own library. The TV
+  row's order below lives on as Marlin TV Shows' Up next row, without the episodes in progress.**
+  MARLIN, then Movies / TV Shows /
   Videos, which open that library tab; Menu on a library tab comes back to Home. Then the rows, each
   scrolling sideways:
   - **Continue watching** — every in-progress movie, episode and video mixed, newest first, the same
@@ -383,7 +386,9 @@ built, installed and launched, with four screenshots and no test matrix.
 The owner's calls, given after testing pass 3. Evidence:
 `reports/2026-09-15-pass3b-fixes.md`, screenshots `reports/screenshots/p3b/`.
 
-- **D043** **When the app opens, focus lands on the first Continue Watching card** — frame 00's own
+- **D043** **When the app opens, focus lands on the first Continue Watching card** — **carried over
+  2026-10-04 (D069): there is no Home any more, and the rule and the mechanism below now belong to
+  each app's first screen, `LibraryScreen`** — frame 00's own
   label ("first card focused"), and pass 3's open question 1. Before this, tvOS chose for itself and
   picked a Movies card, so Home opened slightly scrolled with the top row cut.
 
@@ -485,7 +490,9 @@ nothing was built.
 Evidence: `reports/2026-09-16-pass4-app-icon.md`, screenshots `reports/screenshots/p4/`. No Swift
 file was touched. This answers pass 1's open question 11 (no asset catalog, so no app icon).
 
-- **D048** **The app has a layered tvOS icon, from Claude Design (D006).**
+- **D048** **The app has a layered tvOS icon, from Claude Design (D006).** **Since 2026-10-04 there
+  are five apps and five icons, the same artwork re-lettered (D072); the old app's set left the
+  project with it (D070).**
 
   **Where it came from.** `Design/tvos icons/Marlin Media tvOS Design.zip` — a second Claude Design
   export, separate from the frames, delivered by the owner on 2026-09-16 and **now tracked in the
@@ -551,6 +558,7 @@ Evidence: `reports/2026-09-16-pass5-topshelf-and-bedroom.md`, screenshots `repor
 No Swift file was touched, and neither app icon stack was touched.
 
 - **D049** **The Top Shelf banners come from the Claude Design export (D006), as flat images.**
+  **Since 2026-10-04 each of the five apps has its own pair, re-lettered (D072).**
 
   **The source was replaced.** The owner put a newer export at
   `Design/tvos icons/Marlin Media tvOS Design.zip` on 2026-09-16 (2 461 833 → 7 254 893 bytes),
@@ -643,7 +651,9 @@ After these, the only items left open are the ones marked **PARKED** or **OPEN**
 - **D052** **Videos run on the device — D038's owed check is discharged.** The owner reports that
   videos run fine on the device (§10a 1).
 
-- **D053** **Home stays as it is built** (§10a 2–5).
+- **D053** **Home stays as it is built** (§10a 2–5). **Superseded 2026-10-04 (D069): Home is gone.
+  Of the four lines below, the first two live on in Marlin TV Shows' Up next row; the last two went
+  with the screen.**
   - Home's one `GET /api/shows/{id}` per show, every time it appears, stays as is.
   - The TV Shows row keeps the wide episode cards; **frames 00b/00c are overruled for that row.**
   - The Videos heading always shows.
@@ -693,7 +703,9 @@ After these, the only items left open are the ones marked **PARKED** or **OPEN**
 - **D061** **STANDING RULE — the bedroom Apple TV gets every accepted build. This revises D050's
   "only if the owner asks".** Every push pass that follows the owner's acceptance of a pass that
   changed the app also installs the accepted build on Master Bedroom ATV — **install only, no
-  launch** (§10a 23). **D005 is unchanged, and no evidence is taken there.**
+  launch** (§10a 23). **D005 is unchanged, and no evidence is taken there.** **2026-10-04 (D071):
+  the rule now covers all five apps, and Marlin Adult — which lives on the bedroom box only — was
+  installed there before its acceptance, that being the one place the owner tests it.**
   - Each such install renews the provisioning profile; if the app ever refuses to open there, the
     remedy is a reinstall (§10a 24).
   - The owner reports that playback works on the bedroom box (§10a 25).
@@ -746,3 +758,110 @@ Notebook only; what was done is in `reports/2026-09-19-pass7b-notebook.md`.
   Theater on 2026-09-19 it was **53 049 bytes over 25.3 s** from launch, two short plays inside it
   — a burst, 7.2 MB an hour at that rate; pass 1k's full logs of about 220 s of film ran at
   **0.7–0.9 MB an hour**. **A whole film's worth was never measured.**
+
+## 2026-10-04 — the owner directs the work, and Marlin Media becomes five apps
+
+The owner's calls of 2026-10-04, made in the chat. What was done is in COLD-START.md's pass
+history under the same date; no report file was written (D068).
+
+- **D068** **The owner directs the work directly; there is no foreman.** The owner's words: "I'm
+  dropping the foreman. From now on I direct the work myself and you report only to me." The rules
+  are `CLAUDE.md` at the repo root, written from the owner's text: plain English and no code in
+  messages; one question at a time, with two or three options and a recommendation; build only
+  what was asked; a short plan and the owner's OK before a feature; a test checklist after every
+  build; commit locally and **never push until the owner says "push it"**; a list of every file
+  touched at the end of a report; test files and scratch deleted each time. `/wrap`
+  (`.claude/commands/wrap.md`) ends a session: open questions, commit, cleanup, this notebook,
+  commit, the scope list, and whether it is safe to push.
+  - **Where the owner's word and a file in the repo disagree, the owner is asked which wins.**
+  - The numbered passes and their `reports/` files end with pass 7d. Work is recorded in
+    COLD-START.md and here, by date. (Builder's reading: nothing in the owner's rules asks for a
+    report file.)
+  - The owner's rules file for all projects (outside this repo) was trimmed the same day of its
+    pass and pasted-brief wording. What it still says that bears here: do only what is asked; no
+    installs without the owner's word; build into the shared `build/` folder and never delete it;
+    verify on the real build; stop and report on a failure; verify a push by comparing SHAs; no
+    secrets or device IDs in the repo.
+
+- **D069** **Marlin Media on the Apple TV is five apps, one per kind, on the one server.** The
+  owner's brief: "I want the Apple TV app split the same way I just split the PC box app." Marlin
+  Movies, Marlin TV Shows, Marlin Videos, Marlin Music and Marlin Adult; server 0.10.0, no server
+  change (the server's D064/D065; the PC box's D54–D58). Decided in the brief:
+  - Each app opens straight onto its own library, with its own Continue Watching row. **No
+    combined home screen** — this supersedes D040's "Home is the app's first screen" and D053.
+  - Marlin TV Shows also has an **Up next** row, the next episode of each show: D040's TV-row
+    order with the episodes in progress left to Continue Watching, up to six.
+  - Movies, TV Shows and Videos keep the screens and the player they had.
+  - **One shared code base, "so a fix lands in all five."**
+  - Builder's calls, told with the plan or in the report: one project with five targets on the one
+    source folder; the kind named by the `MARLIN_APP` build setting through Info.plist's
+    `MarlinApp`, an unknown kind stopping the app at launch; five new bundle ids; the app's word in
+    the header where the tabs were; D043's launch focus and D033's row rule carried to each app's
+    first screen; the first screen re-reads itself each time it appears and when the player
+    closes, as Home did.
+
+- **D070** **The five replace the old app, once accepted** — the owner's answer to "replaced or
+  kept": "Replace after I accept." The old Marlin Media TV app stayed on both boxes while the five
+  were tested. On the acceptance (D074) it was removed from both, and its icon set
+  (`AppIcon.brandassets`) and its two committed test scripts (`EvidenceUITests.swift`,
+  `Pass2UITests.swift`) left the project. Its bundle id `com.marlin1111.marlin-media-tv` is
+  retired.
+
+- **D071** **Marlin Adult is a normal app, kept out of sight by where it is installed: the bedroom
+  Apple TV only.** The owner's answers: "Normal app, chosen TVs only" and "bedroom gets adult home
+  thearether does not". It is not hidden inside another app and has no code.
+  - **Its check, and D005.** D005 makes Home Theater the only test device and D061 keeps the
+    bedroom box install-only, so an app that lives only in the bedroom had nowhere to be checked.
+    Asked which wins, the owner chose: **it goes onto Home Theater briefly, at a time the owner
+    picks, is checked, and is removed straight away.** Done on 2026-10-04. Any later check of
+    Marlin Adult is done the same way, and only on the owner's word.
+  - **Its acceptance, and D061.** It was installed on the bedroom box before it was accepted,
+    because that is the only place the owner tests it.
+  - **What it is** (the brief): the Movies screens on the server's separate adult routes, showing
+    date, studio and performers; "Keep adult titles out of logs." As built: `/api/adult/` routes
+    and no others, and the other four apps refuse those routes; the meta row is date · studio ·
+    length with the performers under it; its Continue Watching row is made from the titles' own
+    positions, because the server keeps no continue list for adult; its log carries ids, never a
+    title, studio, performer, file name or track name, and no VLCKit lines — VLC's own lines can
+    carry a title embedded in the file.
+  - **Builder's call, told to the owner:** it is checked without pictures — counts and yes/no
+    answers, and the log searched with only the number of hits printed. No picture of the bedroom
+    box's screen is ever taken.
+
+- **D072** **Icons and Top Shelf banners: simple ones, drawn now** — the owner's answer: "Simple
+  drawn ones now." Each app's set is the old artwork with its own words in place of "MARLIN
+  MEDIA". An exception to D006 by the owner's choice; D048's and D049's shapes are kept. Designed
+  ones may replace them later.
+
+- **D073** **Marlin Music** (the brief): "Albums and Artists, an album page with its tracks, and a
+  Now Playing screen. It keeps playing while I browse. Nothing is saved to the server for music."
+  - Builder's calls, put to the owner with the plan and not objected to: Music and Adult have no
+    design frames and are built in the frames' look, as the PC box did (an exception to D006);
+    music plays through VLCKit, the films' engine, because one album is in APE, which tvOS's own
+    player does not read; **leaving the app stops the music**, as Home does on the PC box.
+  - Builder's calls in the build: the remote's Play/Pause works from any screen of the app; a Now
+    Playing button stands in the headers and on the album page while music is playing or paused;
+    Previous goes to the track's start after 3 s and to the track before until then; the sort
+    control belongs to the albums, and artists are by name; an artist's card shows the cover of
+    that artist's first album that has one, the server having no artist pictures; the app refuses
+    any playback write.
+
+- **D074** **One build and one test** — the owner's words, as the PC box's D57. All five were
+  built, the builder checked them on Home Theater, and the owner tested once. **The owner's
+  acceptance, verbatim:** "all work" (Movies, TV Shows, Videos and Music on Home Theater) and
+  "1 works" (Marlin Adult on the bedroom box). On it the other four went onto the bedroom box
+  (D061), the old app came off both (D070), and the owner said to push.
+
+- **D075** **A row scrolled away is cut off below the header.** In every library, moving focus
+  down slid the row above up over the MARLIN header; the old app's tabs did the same. Put to the
+  owner as fix or leave, the answer was to fix it. The grid and the video list scroll clipped, as
+  the old Home's rows did.
+
+- **D076** **The old harnesses and the harness hook are deleted** — the owner's answer at wrap-up:
+  "Delete them." The five uncommitted UI-test harnesses of passes 2a–3b (`Diag2gUITests`,
+  `Pass2bUITests`, `Pass2cUITests`, `Pass3ShotsUITests`, `Pass3bShotsUITests`) and the Page Up /
+  Page Down hook in `PlayerHost.swift` drove the old app's Home screen and tabs and could no longer
+  run. The hook and the pass 2g harness stay in history at `e7676fa` (D066); the other four
+  existed nowhere else and are gone. The working tree now matches `main` but for the owner's
+  `icon pixel/` and `Notes/` (D063). The UI-test target stays in the project with no file: a
+  harness is written for a check and deleted after it.

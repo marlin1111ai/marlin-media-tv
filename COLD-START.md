@@ -4,45 +4,73 @@ Read this and DECISIONS.md before any work; do not re-derive what they settle. P
 reports live in `reports/`. **Current state** is where the project stands now; **Pass history**
 holds every pass note, oldest first.
 
+**How the work is run (D068, since 2026-10-04):** the owner directs it in the chat, with no
+foreman. The rules are in `CLAUDE.md` at the repo root; `/wrap` (`.claude/commands/wrap.md`) ends a
+session and brings this notebook up to date. Commit locally; **never push until the owner says
+"push it".** The numbered passes and their `reports/` files end with pass 7d — work after that is
+recorded here and in `DECISIONS.md` by date, and no report file is written unless the owner asks.
+
 ## What this is
 
-The tvOS client for **marlin-media**, the home media server (repo marlin1111ai/marlin-media;
-Go, SQLite, TMDB metadata, direct-play streaming). The app opens on a Home screen and shows the
-server's movies, TV shows and videos, and plays the original files with VLCKit — the server never
-transcodes; it serves the file bytes with HTTP Range support at `/stream/{fileId}`.
+Five tvOS apps for **marlin-media**, the home media server (repo marlin1111ai/marlin-media; Go,
+SQLite, TMDB metadata, direct-play streaming), built from this one project on one shared code base
+(D069): **Marlin Movies, Marlin TV Shows, Marlin Videos, Marlin Music and Marlin Adult**, one per
+kind of the one server. Until 2026-10-04 it was a single app, Marlin Media TV, with a combined
+Home screen; that app is off both Apple TVs and out of the project (D070). Each app opens straight
+onto its own library and plays the original files with VLCKit — the server never transcodes; it
+serves the file bytes with HTTP Range support.
 
-Since pass 2 it also carries the server's playback state (D023–D029): Continue Watching, Resume
-with "N min left", Start over, watched marks, the per-episode state column and a Recently Added
-sort. Reading that state is `GET /api/continue-watching` plus the `playback` block the server puts
-on every file of an item (`MediaFile.playback` — editions, episodes and videos alike); writing it
-is `PUT /api/files/{fileId}/playback`, the app's only write.
+Marlin Movies, Marlin TV Shows and Marlin Videos carry the server's playback state (D023–D029):
+Continue Watching, Resume with "N min left", Start over, watched marks, the per-episode state
+column and a Recently Added sort; Marlin TV Shows adds an Up next row. Reading that state is
+`GET /api/continue-watching` plus the `playback` block the server puts on every file of an item
+(`MediaFile.playback` — editions, episodes and videos alike); writing it is
+`PUT /api/files/{fileId}/playback`. **Marlin Adult** is the Movies screens on the server's separate
+adult routes, with its own playback state there (D071). **Marlin Music** plays albums and saves
+nothing to the server (D073).
 
 ## Where things are
 
 - **Server:** `http://192.168.1.250:8093`, fixed in `ServerConfig.baseURL` (D007: no settings
-  screen). Never the marlinpc dev copy. Image **0.3.0** when it was last read (`GET /api/health`,
-  pass 2 recon 2026-09-15 — the app itself never calls `/api/health`). **Every call the app
-  makes**, read from the source:
-  - `GET /api/movies` and `GET /api/movies/{id}` — the movie list, and one movie with its
-    editions (`ServerAPI.swift:67–68`).
-  - `GET /api/shows` and `GET /api/shows/{id}` — the show list, and one show with its seasons and
-    episodes. The list carries no episodes, so Home asks for one `GET /api/shows/{id}` **per show,
-    every time it appears** (D040), and the show screen asks for its own (`ServerAPI.swift:69–70`,
-    `LibraryModel.swift:131`).
-  - `GET /api/videos` (`ServerAPI.swift:71`).
-  - `GET /api/continue-watching?limit=200` — the server's in-progress list (`position > 0` and not
-    watched), newest `last_played` first, one entry per file, decoded as `ContinueEntry`. A failure
-    here is a log line and an absent row, not a library failure (D024, `ServerAPI.swift:82`).
-  - `PUT /api/files/{fileId}/playback` with `{position?, watched?}` — **the app's first and only
+  screen). Never the marlinpc dev copy. Image **0.10.0** when it was last read (`GET /api/health`,
+  2026-10-04 — the apps themselves never call `/api/health`). **Every call the apps make**, read
+  from the source (`APIClient` in `ServerAPI.swift`). The client knows which app it serves and
+  **refuses a route across the adult line before it leaves the Apple TV**: Marlin Adult sends
+  nothing outside `/api/adult/`, and the other four send nothing inside it (D071).
+  - **Marlin Movies:** `GET /api/movies` and `GET /api/movies/{id}` — the movie list, and one movie
+    with its editions.
+  - **Marlin TV Shows:** `GET /api/shows` and `GET /api/shows/{id}` — the show list, and one show
+    with its seasons and episodes. The list carries no episodes, so the first screen asks for one
+    `GET /api/shows/{id}` **per show, every time it appears**, for the Up next row (D040's order,
+    D069), and the show screen asks for its own.
+  - **Marlin Videos:** `GET /api/videos`.
+  - **Those three:** `GET /api/continue-watching?limit=200` — the server's in-progress list
+    (`position > 0` and not watched), newest `last_played` first, one entry per file, decoded as
+    `ContinueEntry`; each app shows only its own kind. A failure here is a log line and an absent
+    row, not a library failure (D024).
+  - **Those three:** `PUT /api/files/{fileId}/playback` with `{position?, watched?}` — **their only
     write** (D024, D028). An omitted key means "leave unchanged"; the server stamps `last_played`
     itself and answers with the block it stored. Every write goes through `PlaybackWrite.send`,
-    which logs the request and the answer; **a failed write is a log line and nothing else**
-    (`ServerAPI.swift:88–101`, `PlaybackWrite` at `:149`).
-  - `GET /stream/{fileId}` — the original file, Range-served, handed to VLCKit. The path is the
-    item's own `file.stream`, resolved against the base URL (`Models.swift:50–52`).
-  - `GET /api/artwork/…` — posters, backdrops and episode stills, as server-relative paths carried
-    in the JSON and resolved the same way (`ServerImage.swift`, `Artwork` in `Models.swift`).
-  - the timeline stills of image 0.3.0 (pass 2g):
+    which logs the request and the answer; **a failed write is a log line and nothing else**.
+  - **Marlin Music:** `GET /api/albums`, `GET /api/albums/{id}` (one album with its tracks) and
+    `GET /api/artists`. An artist's albums are picked out of the album list by `artist_id`; the
+    server's `/api/artists/{id}` and `/api/tracks` are not used. **No write of any kind** — the
+    client refuses a playback write in this app (D073).
+  - **Marlin Adult:** `GET /api/adult/titles` and `GET /api/adult/titles/{id}` — the movie shape
+    without the TMDB fields, plus `studio`, `release_date`, `performers` and `overview` since
+    server 0.10.0 — and `PUT /api/adult/files/{fileId}/playback`, the same body and the same 90 %
+    rule. **The server keeps no continue list for adult**: the app's Continue Watching row is made
+    from the titles' own `playback` blocks (D071).
+  - the stream — `GET /stream/{fileId}`, or `/api/adult/stream/{fileId}` for an adult file — the
+    original file, Range-served, handed to VLCKit. The path is the item's own `stream` field,
+    resolved against the base URL (`Models.swift:50–52`); a music track carries one too.
+  - `GET /api/artwork/…` (and `/api/adult/artwork/…`, and an album's `cover`) — posters,
+    backdrops, episode stills and covers, as server-relative paths carried in the JSON and resolved
+    the same way (`ServerImage.swift`, `Artwork` in `Models.swift`, `AlbumArtwork` in
+    `MusicModels.swift`).
+  - the timeline stills, there since image 0.3.0 (pass 2g), for the three film apps and Marlin
+    Adult (whose index is `/api/adult/files/{fileId}/thumbs`; its sheet URLs come back under
+    `/api/adult/thumbs/`):
     - `GET /api/files/{fileId}/thumbs` — the index: `interval` (10 s), `tile_width` (320),
       `tile_height` (214 on the films measured), `columns` (6), `rows` (5), `per_sheet` (30),
       `count`, `state` (`none` | `generating` | `complete` | `failed`) and `sheets`, an array of the
@@ -50,7 +78,7 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
       the first index request, so the first caller usually gets `generating` with `sheets: []`; a
       file with no usable duration returns `none`, and `failed` re-queues on request. An unknown
       file id is `404 {"error":"file not found"}`. Asked for **once when a detail screen opens**,
-      for the file that would play, and never polled or re-fetched (D021, `ServerAPI.swift:76`).
+      for the file that would play, and never polled or re-fetched (D021, `APIClient.thumbs`).
     - `GET /api/thumbs/{fileId}/{n}.jpg` — one sprite sheet, 6 × 5 tiles, row-major and
       chronological (1920 × 1070 for a 320 × 214 tile, ~90 KB, `Cache-Control: max-age=86400`).
       The index's `sheet.url` carries a `?v=` cache-buster. Fetched as needed for display, on
@@ -75,7 +103,8 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   the two `.dc.html`, `support.js` and the five under `_ds/`). What
   Design2 changed: frames 00, 00b, 00c are new; 01–04, 06–09, 16 and 17 differ only by the clock
   (and 01–04 by the sort control's 260 pt shift); 10–15, the player, are unchanged.
-  Build what the frames show; design nothing (D006).
+  Build what the frames show; design nothing (D006). **Marlin Music's and Marlin Adult's screens
+  have no frames:** by the owner's decision they follow the frames' look (D073).
 - **The app icon's and Top Shelf's source:** `Design/tvos icons/Marlin Media tvOS Design.zip`
   (7.25 MB, tracked from pass 4 and **replaced by a newer export in pass 5**). Its `icons/` folder
   holds 14 files:
@@ -87,24 +116,39 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   - `-flat` files and `preview-b.png`, which are flattened previews and are **not** used.
 
   It is a different file from `Design/Marlin Media tvOS Design.zip`, which is the pass-1 frames.
+
+  **The five apps' sets (D072, 2026-10-04)** are that artwork re-lettered. In each
+  `AppIcon-<Kind>.brandassets` the back layers are byte-identical copies, and the front layers and
+  the four Top Shelf banners carry the same marlin artwork with "MARLIN MEDIA" replaced by the
+  app's own words — MARLIN MOVIES, MARLIN TV SHOWS, MARLIN VIDEOS, MARLIN MUSIC, MARLIN ADULT — in
+  Verdana Bold, black, at the old lettering's size and baseline, centred on the picture. They were
+  drawn by a one-off script that was not kept. The owner may replace them with designed ones later.
 - **Devices.** Two physical Apple TVs are paired with this Mac, and they are **not** equals:
   - **Home Theater** — Apple TV 4K (3rd generation, `AppleTV14,1`, arm64e), tvOS 26.6, Developer
     Mode enabled, on the local network. **The dev/test device (D005), and still the only one.**
-    Every build, matrix, log and screenshot of evidence comes from here.
+    Every build, check, log and screenshot of evidence comes from here. It carries Marlin Movies,
+    Marlin TV Shows, Marlin Videos and Marlin Music. **It never carries Marlin Adult (D071):** a
+    check of that app puts it on Home Theater at a time the owner picks and removes it straight
+    afterwards. **It is also the household's television:** look at what is on its screen before
+    launching or reinstalling anything, and ask the owner if another app is in use.
   - **Master Bedroom ATV** — Apple TV 4K (1st generation, `AppleTV6,2`, arm64), tvOS 26.6,
-    Developer Mode enabled, on the local network. **It carries the app as a convenience for the
-    household, at the owner's request (D050, pass 5) — it is not a test device.** Nothing is
-    proven there and no evidence is taken there. **Every push pass that follows the owner's
-    acceptance of a pass that changed the app also installs the accepted build there — install
+    Developer Mode enabled, on the local network. **It carries all five apps for the household,
+    Marlin Adult among them (D050, D071) — it is not a test device.** Nothing is proven there and
+    no evidence is taken there, its screen included. **Every push that follows the owner's
+    acceptance of work that changed the apps also installs the accepted builds there — install
     only, no launch (D061).**
-    Before pass 5 this box was off-limits entirely; D050 is the narrow exception and does not
-    reopen it for testing.
 
-  All the facts above were read from `xcrun devicectl` on 2026-09-16.
+  The hardware facts were read from `xcrun devicectl` on 2026-09-16; both boxes were paired and
+  reachable on 2026-10-04.
 - **Xcode:** 27.0 (27A266a), tvOS 27.0 SDK (24J360) — since 2026-09-14 (pass 1e rerun; supersedes
-  26.6 (17F113) / tvOS 26.5 SDK). Bundle id `com.marlin1111.marlin-media-tv`, team `C879JNVK7Z`,
-  automatic signing (both read from Marlin DVR TV). The UI-test target is
-  `com.marlin1111.marlin-media-tv.UITests`.
+  26.6 (17F113) / tvOS 26.5 SDK). Team `C879JNVK7Z`, automatic signing (both read from Marlin DVR
+  TV). **Five bundle ids, one per app:** `com.marlin1111.marlin-movies-tv`,
+  `com.marlin1111.marlin-tv-shows-tv`, `com.marlin1111.marlin-videos-tv`,
+  `com.marlin1111.marlin-music-tv` and `com.marlin1111.marlin-adult-tv`. The old app's
+  `com.marlin1111.marlin-media-tv` is retired (D070); the UI-test target keeps
+  `com.marlin1111.marlin-media-tv.UITests`. The signing profile is the team's wildcard tvOS
+  profile (created 2026-08-17, a year's life, both boxes on it), so a new bundle id needs nothing
+  more.
 
 ## Toolchain facts
 
@@ -142,114 +186,163 @@ is `PUT /api/files/{fileId}/playback`, the app's only write.
   after pass 7 deleted the recon's §6b leftovers from it (D062). It was 22 GB on 2026-09-13.
 - **Minimum tvOS:** 26.0 exactly (`TVOS_DEPLOYMENT_TARGET = 26.0`, D004). Both Apple TVs run 26.6.
 - **No CocoaPods, no xcodegen, no brew installs.** The project file was written by hand
-  (objectVersion 71, file-system-synchronized groups); Xcode opens it normally. Everything in
-  `Marlin Media TV/` is therefore in the app target by virtue of being in the folder.
+  (objectVersion 71, file-system-synchronized groups); Xcode opens it normally. The one source
+  folder, `Marlin Media TV/`, belongs to **all five app targets**, so everything in it is in every
+  app by virtue of being in the folder (D069).
 - **Fonts:** the system font. The design names Inter; no font is bundled — the system font stays
   and Inter is overruled (D059).
-- **Asset catalog:** `Marlin Media TV/Assets.xcassets`, added in pass 4, holding one thing:
-  `AppIcon.brandassets` — the layered tvOS app icon (D048) and, since pass 5, the two Top Shelf
-  banners (D049). `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` on both configurations of the app
-  target is what points at it. There is no accent colour, no launch image and no other asset — the
-  UI's colours are `Theme.swift`'s tokens, not the catalog.
+- **Asset catalog:** `Marlin Media TV/Assets.xcassets` holds five brand-asset sets and nothing
+  else — `AppIcon-Movies`, `AppIcon-TVShows`, `AppIcon-Videos`, `AppIcon-Music` and
+  `AppIcon-Adult` (`.brandassets`), each a layered tvOS app icon (D048's shape) and the two Top
+  Shelf banners (D049's shape), re-lettered for its app (D072). Each target's
+  `ASSETCATALOG_COMPILER_APPICON_NAME` names its own set, and only that set is compiled into the
+  app (read from each built `Assets.car` on 2026-10-04). There is no accent colour, no launch image
+  and no other asset — the UI's colours are `Theme.swift`'s tokens, not the catalog.
 
 ## Build, install, run (all from the repo root)
 
+One scheme, one target and one product per app (D069):
+
+| App | Scheme, target and product name | Bundle id | `MARLIN_APP` |
+|---|---|---|---|
+| Marlin Movies | `Marlin Movies` | `com.marlin1111.marlin-movies-tv` | `movies` |
+| Marlin TV Shows | `Marlin TV Shows` | `com.marlin1111.marlin-tv-shows-tv` | `shows` |
+| Marlin Videos | `Marlin Videos` | `com.marlin1111.marlin-videos-tv` | `videos` |
+| Marlin Music | `Marlin Music` | `com.marlin1111.marlin-music-tv` | `music` |
+| Marlin Adult | `Marlin Adult` | `com.marlin1111.marlin-adult-tv` | `adult` |
+
 ```
-xcodebuild build -project "Marlin Media TV.xcodeproj" -scheme "Marlin Media TV" \
+xcodebuild build -project "Marlin Media TV.xcodeproj" -scheme "<scheme>" \
   -destination 'platform=tvOS,name=Home Theater' -derivedDataPath build/DerivedData -allowProvisioningUpdates
 xcrun devicectl device install app --device <Home Theater identifier> \
-  "build/DerivedData/Build/Products/Debug-appletvos/Marlin Media TV.app"
-xcrun devicectl device process launch --console --terminate-existing --device <id> com.marlin1111.marlin-media-tv
+  "build/DerivedData/Build/Products/Debug-appletvos/<scheme>.app"
+xcrun devicectl device process launch --console --terminate-existing --device <id> <bundle id>
 ```
-`xcrun devicectl list devices` gives the identifier. Each launch writes
-`Library/Caches/marlin-media-tv.log` in the app container (VLCKit's debug log plus the app's
-`[player]`, `[playback]`, `[detail]`, `[focus]`, `[hold]`, `[scrub]` and `[thumbs]` lines); copy it
-off with
-`xcrun devicectl device copy from --device <id> --domain-type appDataContainer --domain-identifier com.marlin1111.marlin-media-tv --source Library/Caches/marlin-media-tv.log --destination <file>`.
+**A change to the shared code means building all five schemes**; after the first, each takes a
+few seconds. `xcrun devicectl list devices` gives the identifier. Each launch writes
+`Library/Caches/marlin-media-tv.log` in **that app's own** container (VLCKit's debug log plus the
+app's `[player]`, `[playback]`, `[detail]`, `[focus]`, `[hold]`, `[scrub]`, `[thumbs]`,
+`[continue]`, `[upnext]`, `[music]`, `[album]` and `[app]` lines); copy it off with
+`xcrun devicectl device copy from --device <id> --domain-type appDataContainer --domain-identifier <bundle id> --source Library/Caches/marlin-media-tv.log --destination <file>`.
 `EvidenceLog` opens the file on its **first line**, not when a player starts, because the detail
-screens write with no player up (pass 2).
+screens write with no player up (pass 2). **Marlin Adult's log carries ids only** — no title,
+studio, performer or file name — **and no VLCKit lines at all** (D071).
 
 **Building for the other Apple TV.** The same command with
-`-destination 'platform=tvOS,name=Master Bedroom ATV'` builds and installs on the bedroom box
-(D050). **Every push pass that follows the owner's acceptance of a pass that changed the app
-installs the accepted build there — install only, no launch (D061).** Home Theater is the dev/test
-device (D005), and the bedroom box is in household use — launching there puts the app on a
-television someone may be watching.
+`-destination 'platform=tvOS,name=Master Bedroom ATV'` builds for the bedroom box (D050). Both
+boxes take the same arm64 build: on 2026-10-04 the builds made and checked for Home Theater were
+installed on the bedroom box as they were. **Every push that follows the owner's acceptance of
+work that changed the apps installs the accepted builds there — install only, no launch (D061).**
+Home Theater is the dev/test device (D005), and the bedroom box is in household use — launching
+there puts the app on a television someone may be watching. **Marlin Adult is installed on the
+bedroom box only** (D071).
 
 **Photographing the device without a harness** (pass 4):
 `xcrun devicectl device capture screenshot --device <id> --destination <file.png>` takes a
 3840 × 2160 PNG of whatever is on the screen, **including tvOS's own Home screen and any other
 app** — which the UI-test harnesses cannot reach, because XCUITest only ever sees the app under
 test. `devicectl device info processes --device <id>` says what is running. Use this for anything
-outside Marlin Media TV; use a harness when the shot has to be taken at a particular point in the
-app's own flow.
+outside the Marlin apps; use a harness when the shot has to be taken at a particular point in an
+app's own flow. **It is also how to see whether Home Theater is in use before launching anything**
+— delete such a picture once it has been looked at, and never take one of the bedroom box.
 
-**Evidence harnesses** (the Marlin DVR TV convention — per-pass throwaways, not a standing test
-suite). Each drives the real remote through `XCUIRemote` on Home Theater and photographs the
-screen; each navigates by reading which element has focus (`hasFocus == YES`), never by counting
-presses. Build with `build-for-testing`, then
+**Evidence harnesses** (the Marlin DVR TV convention — throwaways written for one check, not a
+standing test suite). **There is none in the repo or in the working tree** (D076). The UI-test
+target `Marlin Media TVUITests` is still in the project, hosted on Marlin Movies, but its folder
+holds no file and does not exist in a fresh clone: create `Marlin Media TVUITests/`, write the
+harness into it, and delete it after the check. A harness drives the real remote through
+`XCUIRemote` on Home Theater and photographs the screen; it navigates by reading which element has
+focus (`hasFocus == YES`), never by counting presses. **One harness can drive any of the five
+apps** with `XCUIApplication(bundleIdentifier:)`. Build with `build-for-testing` on the
+`Marlin Movies` scheme, then
 `xcodebuild test-without-building … -only-testing:"Marlin Media TVUITests/<Class>/<test>" -resultBundlePath <x.xcresult>`
 and `xcrun xcresulttool export attachments --path <x.xcresult> --output-path <dir>` for the PNGs.
-- **Committed:** `EvidenceUITests.swift` (pass 1, library and player; makes no server write) and
-  `Pass2UITests.swift` (pass 2's resume/watched matrix, which seeds positions by PUT so a resume
-  or a 90 % mark takes seconds rather than an hour).
-- **Deliberately uncommitted**, with the `PlayerHost.swift` Page Up / Page Down hook they need:
-  `Diag2gUITests.swift`, `Pass2bUITests.swift`, `Pass2cUITests.swift`, `Pass3ShotsUITests.swift`,
-  `Pass3bShotsUITests.swift`. They exist only to script touch-surface drags, which `XCUIRemote`
-  cannot perform. The evidence copies of the pass 2g pair,
-  `reports/logs/2g-harness-Diag2gUITests.swift.txt` and `reports/logs/2g-harness-hook.diff`, live
-  in history at `e7676fa` (D066).
+- Each run leaves a `Marlin Media TVUITests-Runner` app with a blank icon on the Home Screen.
+  Remove it when the check is done:
+  `xcrun devicectl device uninstall app --device <id> com.marlin1111.marlin-media-tv.UITests.xctrunner`.
+- On this television `XCUIRemote.press(.home)` opens the Apple TV app; a second press reaches the
+  Home Screen. In a grid, Down from a right-hand column above a short last row goes nowhere — walk
+  back to the row's first column before pressing Down.
+- `XCUIRemote` has no touch-surface API, so a paused scrub drag cannot be scripted by a harness
+  alone. Passes 2a–2g did it with a Page Up / Page Down hook in `PlayerHost.swift` that was never
+  committed. The hook and the pass 2g harness are in history at `e7676fa`
+  (`reports/logs/2g-harness-hook.diff`, `reports/logs/2g-harness-Diag2gUITests.swift.txt`, D066);
+  the other four harnesses of those passes are gone (D076).
+- **Marlin Adult is checked without pictures** (D071): counts and yes/no answers only, and its log
+  searched for the title, studio, performers and file name with only the number of hits printed.
 
 ## How the app is put together
 
-Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app target.
+Twenty-two Swift files, all of them in `Marlin Media TV/` and so in all five app targets. The
+project has six targets: the five apps — alike but for their name, bundle id, icon set and
+`MARLIN_APP` — and the UI-test target.
 
 **Entry and shell**
 - `MarlinMediaTVApp.swift` — the `@main` scene; one `WindowGroup` holding `ContentView`.
-- `ContentView.swift` — the navigation: **Home is the root** (D040), the three Home buttons push a
-  library tab, Menu there pops back, detail screens push above either, and the player is a
-  full-screen cover above everything. It also counts the player's closes (`playerClosed`) and hands
-  that count to Home and every detail screen, because a full-screen cover never takes its content
-  off screen and so fires no appearance callback (D032).
+- `AppKind.swift` — which of the five apps this is (D069). `AppKind.current` reads the Info.plist
+  key `MarlinApp`, which each target fills from its `MARLIN_APP` build setting; a missing or
+  unknown value stops the app at launch rather than opening the wrong library. It also gives the
+  header's word and the first screen's tabs.
+- `ContentView.swift` — the navigation: **the app's own library is the root** (D069), detail
+  screens push above it, and the film player is a full-screen cover above everything. It counts
+  the player's closes (`playerClosed`) and hands that count to every detail screen, because a
+  full-screen cover never takes its content off screen and so fires no appearance callback (D032),
+  and it re-reads the library on each close. In Marlin Music it owns the `MusicPlayer` from launch,
+  sends the remote's Play/Pause to it from any screen, pops Now Playing when the music ends, and
+  stops the music when the app leaves the screen (D073).
 
 **Server and data**
 - `Models.swift` — Decodable models of the server JSON (every field real; decoded with
   `convertFromSnakeCase`), including `Artwork`, `Playback` and `ContinueEntry`, plus `Format`, the
-  display mapping of the server's values (codec names, "7.1", "2 h 20 min", "13.2 GB").
+  display mapping of the server's values (codec names, "7.1", "2 h 20 min", "13.2 GB"). `Movie`
+  also reads Marlin Adult's titles: with the adult flag in the decoder's `userInfo` the TMDB fields
+  are not asked of it and `studio` and `performers` are read; a movie is still read strictly.
+- `MusicModels.swift` — `Album`, `Artist` and `Track` (and `AlbumArtwork`), read against the live
+  server on 2026-10-04, and a track's "FLAC · 96 kHz · 24-bit · 2.0" line.
 - `ServerAPI.swift` — `ServerConfig` (the fixed base URL and path resolution), `APIError` (every
-  failure carries a message the UI shows in full) and `APIClient` with the calls listed above,
-  including the one write.
+  failure carries a message the UI shows in full; `.refused` is a route the app is not allowed to
+  ask for) and `APIClient`, which knows its `AppKind`: the calls listed above, the adult line, and
+  no write in Marlin Music.
 - `ServerImage.swift` — artwork loading from server-relative paths, with the frames' placeholder
   (`InitialTile`: the gradient tile with the title's initial) while loading, when there is no
   artwork and when the load fails.
 - `PlayRequest.swift` — what the player is asked to play: the stream URL, frame 10's two overlay
   lines, and `startMs`, where playback begins (D029). It also decides whether a thumbnail index
   belongs to the file being played (`PlayRequest.matching`).
-- `LibraryModel.swift` — the three lists loaded together (any one failing is the whole library's
-  failure, frame 17), the Continue Watching list (whose failure is only a log line), `SortOrder`
-  (**Title / Year / Recently Added**, D010/D023), every show's episodes for Home, and the three
-  Home rows with their orders (D040).
+- `LibraryModel.swift` — **the lists of its own app's kind and no other** (a failure is the whole
+  library's failure, frame 17), the Continue Watching list (whose failure is only a log line;
+  Marlin Adult's is made from its titles' own positions, and Marlin Music has none), `SortOrder`
+  (**Title / Year / Recently Added**, D010/D023), every show's episodes and the Up next row built
+  from them (D040's order, D069), and Marlin Music's albums and artists.
 
 **Screens**
-- `HomeScreen.swift` — frames 00, 00b, 00c: MARLIN and the three library buttons, then Continue
-  watching (every kind mixed, newest first, hidden when empty), Movies · N, TV Shows · N (up to six
-  **episode** cards in the frames' wide card) and Videos · N. It re-reads itself every time it
-  appears, and it places the launch focus on the first Continue Watching card (D043).
-- `LibraryScreen.swift` — frames 01 (Movies), 02 (TV Shows), 03 (Videos), 04 (Videos empty),
-  05 (the sort control open), 16 (loading) and 17 (can't reach server). Tabs and seasons switch on
-  click (the prototype's behaviour); the sort menu is **Title / Year / Recently Added**; each tab
-  carries a Continue Watching row above its grid holding only that tab's kind, and focus entering
-  that row lands on its first card (D033). Frame 17's "Browse cached" button is not built: no cache
-  and no button, the frame overruled (D059).
+- `LibraryScreen.swift` — **each app's first screen**: frames 01 (Movies), 02 (TV Shows),
+  03 (Videos), 04 (Videos empty), 05 (the sort control open), 16 (loading) and 17 (can't reach
+  server), without the tab bar — the app's word stands where the tabs were, except in Marlin
+  Music, whose tabs are Albums and Artists and switch on click. The sort menu is **Title / Year /
+  Recently Added**; a Continue Watching row sits above the grid, focus entering that row lands on
+  its first card (D033), and **the launch focus goes to that card** (D043, carried over from Home).
+  Marlin TV Shows adds the **Up next** row under it, in frame 00b's wide card. The grid and the
+  video list scroll **clipped**, so a row scrolled away is cut off below the header (D075). The
+  screen re-reads itself every time it appears. Marlin Adult's grid is headed "All titles" and
+  shows the studio under each poster. Frame 17's "Browse cached" button is not built: no cache and
+  no button, the frame overruled (D059).
 - `MovieDetailScreen.swift` — frames 06 (movie detail) and 07 (edition picker), with the watched
   pill, "Resume · N min left" and its in-button bar, "Start over", "Mark watched / unwatched" and
-  the multi-edition rule (D026, D034).
+  the multi-edition rule (D026, D034). In Marlin Adult the meta row is the date, the studio and the
+  file's length, with the performers under it (D071).
 - `ShowDetailScreen.swift` — frame 08: season selector and episode list, "N unwatched" in the meta
   row, the per-episode state column, a click that resumes at the saved position and a
   press-and-hold that opens the mark menu (D027, D031, D039).
 - `VideoDetailScreen.swift` — frame 09, behaving exactly as the movie detail but with one file, so
   no picker and nothing to follow. The owner reports videos run fine on the device, which
   discharges D038's owed check (D052).
+- `MusicScreens.swift` — Marlin Music, in the frames' look with no frames of its own (D073): the
+  square cover card of the Albums and Artists grids; one artist's albums; the album page (cover,
+  the album's lines, Play, and the tracks with disc headings, the playing track marked); and Now
+  Playing (cover, track, artist, album, format, time bar, Previous / Pause / Next and the next
+  track's name). The headers and the album page carry a Now Playing button while music is playing
+  or paused.
 - `NowClock.swift` — the date-and-time pair the new frames put at the top right (D041). It draws
   only the pair; the placement (`right: 80, top: 56`) belongs to each screen. It ticks once a
   second while it is on screen.
@@ -260,55 +353,67 @@ Nineteen Swift files, all of them in `Marlin Media TV/` and so all in the app ta
   paused, and the paused touch-surface scrub with its landing and cancel (D021). It also adds
   `:demux=mkv_trusted` on `.mkv` streams (D014), asks tvOS to match the display to the stream
   (D016), seeks once to a `startMs` at the first `Playing` state (D029), and writes the position on
-  the D028 schedule.
+  the D028 schedule. In Marlin Adult it attaches no VLCKit logger and withholds names from its own
+  log lines (D071).
 - `PlayerHost.swift` — the UIKit surface that owns every press, touch and swipe, and the VLCKit
   drawable. An edge click is a `UIPress`; a swipe is not a press at all; the scrub pan runs
-  alongside the swipe recognizers and begins only while paused. **This file is the one with the
-  uncommitted Page Up / Page Down harness hook in the working tree** — HEAD's copy has no hook.
+  alongside the swipe recognizers and begins only while paused. The uncommitted Page Up / Page
+  Down harness hook this file carried in the working tree from pass 2a is gone (D076).
 - `PlayerScreen.swift` — frames 10–15 plus the scrub bar and its thumbnail, and the clock, which
   shows whenever the film is not playing, scrub and buffering included (D045, D054). Visuals only:
   the whole stack is `allowsHitTesting(false)` and nothing in it is focusable.
 - `ThumbStrip.swift` — the server's timeline stills: the index model (`ThumbIndex`, `ThumbSheet`),
   the arithmetic that turns a target time into a sheet and a tile, the sheet fetches and the draw.
   Where a still does not exist, nothing is drawn (D021).
+- `MusicPlayer.swift` — Marlin Music's player (D073): one VLCKit player with no picture, alive
+  from launch; an album's tracks are its queue. A track's end starts the next; a change of track
+  stops the player first and loads the new one from the `Stopped` state that follows; Previous
+  goes to the track's start after 3 s and to the track before until then. It writes nothing to the
+  server.
 
 **Support**
 - `Theme.swift` — the Nocturne tokens from `Design/_ds/…/styles.css` plus the values the frames use
   inline; screens are 1920 × 1080 at 1×, content 80 pt from the sides. (Its header comment says
   "the 20 frames" of the Design2 export, D042 — corrected in pass 7, D065.)
 - `EvidenceLog.swift` — one log file per launch in `Library/Caches`, VLCKit's own debug logger and
-  the app's bracketed lines interleaved, also echoed to the console (D011).
+  the app's bracketed lines interleaved, also echoed to the console (D011). In Marlin Adult
+  `named()` withholds every name on its way into a line, and no VLCKit logger is handed out (D071).
 
 Outside the Swift files:
-- `Marlin Media TV/Assets.xcassets` — the asset catalog, whose only content is
-  `AppIcon.brandassets`:
-  - the tvOS Home screen icon (`App Icon.imagestack`, 400 × 240 @1x and 800 × 480 @2x) and the App
-    Store icon (`App Icon - App Store.imagestack`, 1280 × 768), each a **two-layer** stack, Front
-    over Back, with no Middle slot (D048);
-  - the **Top Shelf banners** (D049, pass 5) — `Top Shelf Image.imageset` at 1920 × 720 @1x and
-    3840 × 1440 @2x, and `Top Shelf Image Wide.imageset` at 2320 × 720 @1x and 4640 × 1440 @2x,
-    four flat opaque PNGs straight from the export. These are what tvOS draws above the Home
-    screen's top row when the app is the focused one there.
-
-  Being inside `Marlin Media TV/`, it joins the app target through the synchronized group; the
-  build setting `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` selects it.
+- `Marlin Media TV/Assets.xcassets` — the asset catalog: the five apps' brand-asset sets (see
+  Toolchain facts). Each holds the tvOS Home screen icon (`App Icon.imagestack`, 400 × 240 @1x and
+  800 × 480 @2x) and the App Store icon (`App Icon - App Store.imagestack`, 1280 × 768), each a
+  **two-layer** stack, Front over Back, with no Middle slot (D048), and the **Top Shelf banners**
+  (D049) — `Top Shelf Image.imageset` at 1920 × 720 @1x and 3840 × 1440 @2x, and
+  `Top Shelf Image Wide.imageset` at 2320 × 720 @1x and 4640 × 1440 @2x, flat opaque PNGs. The
+  banners are what tvOS draws above the Home screen's top row when the app is the focused one
+  there. Being inside `Marlin Media TV/`, the catalog joins every app target through the
+  synchronized group.
 - `Frameworks/VLCKit.xcframework` — the custom VLCKit (D012/D013), linked and embedded (code-sign
-  on copy) by the project; not in git. Rebuild with `tools/vlckit-truehd/build.sh`.
+  on copy) by each app target; not in git. Rebuild with `tools/vlckit-truehd/build.sh`.
 - `Info.plist` carries `NSAppTransportSecurity` → `NSAllowsLocalNetworking`, so plain HTTP to
-  192.168.1.250 is allowed.
+  192.168.1.250 is allowed, and `MarlinApp` = `$(MARLIN_APP)`, which is how an app knows its kind.
 
 ## Current state
 
-As of **pass 7d (2026-09-19)**, the newest pass. Pass 7 was the cleanup and the owner's calls on
-every open item (D052–D066); pass 7b, notebook only, recorded the last of them (D067); pass 7c,
-notebook only, read this file in full against D052–D067 and corrected the lines that disagreed;
-pass 7d, notebook only, added the two "superseded" notes `DECISIONS.md` was missing.
+As of **2026-10-04**, the evening the app became five (D068–D076). The owner now directs the work
+directly (D068). That session built the five apps from the one code base, checked four of them on
+Home Theater and Marlin Adult briefly there, had the owner's test and acceptance of all five, put
+all five on the bedroom box, removed the old Marlin Media TV app from both boxes, and pushed. The
+last numbered pass before it was pass 7d (2026-09-19), notebook only.
 
 ### Built and owner-accepted
 
 Every feature below has been tested by the owner on the Apple TVs and accepted; **nothing is
 waiting on an owner test.**
 
+- **The five apps (D069–D075, 2026-10-04):** Marlin Movies, Marlin TV Shows, Marlin Videos and
+  Marlin Music on Home Theater — the owner's words, "all work" — and Marlin Adult on the bedroom
+  box — "1 works". Each opens straight onto its own library with its own Continue Watching row;
+  Marlin TV Shows has the Up next row; Marlin Music has Albums, Artists, the album page and Now
+  Playing, plays on while browsing and stops when the app is left; Marlin Adult is the Movies
+  screens on the adult routes with the date, studio, length and performers. Each has its own
+  re-lettered icon and Top Shelf banners (D072).
 - **The library and the player** (pass 1): the three library tabs, movie, show and video detail,
   the edition picker, and VLCKit playing the four MKVs and a Magicians episode directly — the
   overlay, the −10 s / +30 s skips, pause, the audio and subtitle panels, and Menu closing an open
@@ -323,30 +428,29 @@ waiting on an owner test.**
   Play/Pause lands and plays, Menu cancels and stays paused, and arrow clicks are ignored while a
   scrub is up (D056). The owner tried the gesture by hand and accepted it; pushed in pass 2h. **The
   thumbnails' next step is parked on the server (D055).**
-- **Playback state** (D023–D029, D032, D034–D036): Recently Added on all three tabs, the Continue
-  Watching row on Home and each library tab, Resume / Start over / the watched pill / Mark watched
+- **Playback state** (D023–D029, D032, D034–D036): Recently Added in each of the three film apps' sort, the
+  Continue Watching row in each app's library (it was on Home and each library tab until D069), Resume / Start over / the watched pill / Mark watched
   and unwatched on the movie and video details, "N unwatched" and the per-episode state column on
   the show detail, position writes on the D028 schedule with a 120 s floor and the watched mark at
   90 %, and resuming at a saved position with one seek.
 - **The episode row** (D031, D039): a click plays or resumes, a hold of 0.6 s or more opens the
   mark menu, and the focus highlight is back.
-- **The Continue Watching focus rule** (D033) on the library tabs, and **launch focus on the first
-  Continue Watching card** (D043) on Home.
-- **Home as the app's first screen** (D040), frames 00/00b/00c, with Menu on a library tab
-  returning to it. **It stays as built (D053):** one `GET /api/shows/{id}` per show every time it
-  appears, the wide episode cards on the TV Shows row (frames 00b/00c overruled there), the Videos
-  heading always showing, and a header that scrolls with the rows.
-- **The clock** (D041, D044, D045, D054): on Home, the three library tabs, the movie, show and
-  video screens, frames 16 and 17 (a code trace, accepted as such), and the player **whenever the
-  film is not playing — paused, scrubbing or buffering**.
-- **The app icon** (D048, pass 4): the layered tvOS icon from the Claude Design export, Front over
-  Back, on the Home screen icon and the App Store icon.
-- **The Top Shelf banners** (D049, pass 5): the four flat opaque PNGs from the export fill
-  `Top Shelf Image` and `Top Shelf Image Wide`.
+- **The Continue Watching focus rule** (D033) in each app's library, and **launch focus on the
+  first Continue Watching card** (D043) on each app's first screen, carried over from Home (D069).
+- **The combined Home screen is gone** (D069, which supersedes D040's first screen and D053). What
+  it left behind: its TV row's order, now Marlin TV Shows' Up next row without the episodes in
+  progress — still one `GET /api/shows/{id}` per show every time the first screen appears — and
+  its wide episode card.
+- **The library's rows are cut off below the header** when the screen scrolls (D075).
+- **The clock** (D041, D044, D045, D054): on every app's first screen, the movie, show and video
+  screens, Marlin Music's screens, frames 16 and 17 (a code trace, accepted as such), and the
+  player **whenever the film is not playing — paused, scrubbing or buffering**.
 
 **Where the frames are overruled (D059):** the system font stays and Inter is not bundled; there is
 no cache and no "Browse cached" button on frame 17; the rating chip shows the TMDB score, not frame
-06's "R". The audio panel shows what VLC reports (D064).
+06's "R". The audio panel shows what VLC reports (D064). Marlin Music's and Marlin Adult's screens have no
+frames at all and follow the frames' look (D073), and the five icon sets are the old artwork
+re-lettered, not a Claude Design export (D072).
 
 **Known and accepted as behaviour rather than defects, not open:**
 - **D020's two** — Play after any frame step drops the pictures below the demuxer's clock start
@@ -361,7 +465,9 @@ no cache and no "Browse cached" button on frame 17; the rating chip shows the TM
 
 ### Pushed
 
-Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
+Everything up to `015ed7f` is on `origin/main`. **The notebook commit that records the 2026-10-04
+session (this file and `DECISIONS.md`, made at wrap-up) sits on top of it and is pushed when the
+owner says "push it"** — `git status -sb` says whether it has been.
 
 - Passes 1–1e up to `b22f9c9` (pass 1e rerun 4).
 - Passes 1f–1k as `b22f9c9..6bfdbad`, six commits (pass 1l).
@@ -384,12 +490,20 @@ Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
 - **Pass 7d as one notebook commit on top of `ee3613b`**, which is pass 7c's commit
   (`d813054..ee3613b`) — a fast-forward, no force; the three SHAs were compared after the push and
   agree.
+- **The working rules as `7816a21..acd2b29`**, one commit: `CLAUDE.md` and
+  `.claude/commands/wrap.md` (D068). A fast-forward, no force; the three SHAs were compared after
+  the push and agree.
+- **The five apps as `acd2b29..015ed7f`**, four commits, pushed on the owner's word after the
+  acceptance: `c065545` (the five apps), `49559fa` (the album page's track list), `bd708fa` (the
+  rows cut off below the header, D075) and `015ed7f` (the old app's icon set and its two test
+  scripts removed, D070). A fast-forward, no force, no merges; local `main`, `origin/main` and
+  `git ls-remote origin main` were compared after the push and agree.
 - **`e7676fa` is the last commit that holds `reports/screenshots/` and `reports/logs/` (D066).**
   Every path this notebook or any report cites under those two folders resolves only there:
   `git show e7676fa:reports/logs/<file>`. The one file still in the tree is
   `reports/logs/1k-upstream-videolan-draft.md`.
-- `896ee12` is still the newest commit that changed Swift **code**. Pass 7's commit touches one
-  Swift file, `Theme.swift`, and only its header comment ("the 17 frames" → "the 20 frames").
+- `bd708fa` is the newest commit that changed Swift **code**; `015ed7f` after it removed assets
+  and test scripts only. Before 2026-10-04 the newest was `896ee12`.
 - `Frameworks/VLCKit.xcframework` stays git-ignored (`.gitignore:47`). Nothing under `Frameworks/`
   is tracked on any ref, so the 725 MB framework has never been pushed. **Since pass 7 it is the
   only copy of the framework on this Mac**: the byte-identical one under `~/vlckit-build` was
@@ -398,46 +512,41 @@ Everything on `main` is on `origin/main`; **nothing is waiting to be pushed.**
 
 ### Deliberately uncommitted
 
-These stay out of git on purpose and are expected in `git status`:
-
-- `Marlin Media TV/PlayerHost.swift` — the Page Up / Page Down hook (pass 2g), the only
-  modification to a tracked file. It exists to script touch-surface drags through the model,
-  because `XCUIRemote` has no touch-surface API. Its evidence copy,
-  `reports/logs/2g-harness-hook.diff`, is in history at `e7676fa` (D066).
-- Five UI-test harnesses, all in `Marlin Media TVUITests/`: `Diag2gUITests.swift`,
-  `Pass2bUITests.swift`, `Pass2cUITests.swift`, `Pass3ShotsUITests.swift`,
-  `Pass3bShotsUITests.swift`. The pass 2g one has an evidence copy in history at `e7676fa`
-  (`reports/logs/2g-harness-Diag2gUITests.swift.txt`); **the other four exist nowhere but the
-  working tree.**
 - **`icon pixel/` and `Notes/` — the owner's own files, deliberately outside git (D063).** They
-  are not opened, moved, staged or committed by any pass.
+  are not opened, moved, staged or committed by any work here. They are the only entries
+  `git status` shows.
+- **Nothing else.** The Page Up / Page Down hook in `PlayerHost.swift` and the five UI-test
+  harnesses that were kept uncommitted from passes 2a–3b were deleted on 2026-10-04, at the
+  owner's word (D076): they drove the old app's Home screen and tabs and could no longer run.
 
 The owner's `Design/Marlin Media tvOS Design2.zip` is not in the folder at all: pass 3 unzipped it
 and deleted the zip (D042). The older `Design/Marlin Media tvOS Design.zip` is tracked and stays.
 
 ### What the Apple TVs run
 
-Both carry the **pass 5 build** — `896ee12`'s Swift source plus the pass 4 icon, the pass 5 Top
-Shelf banners and the app-icon build setting, built from the working tree and so carrying the
-uncommitted `PlayerHost.swift` hook. Pass 7 built once on the Mac to prove the cleanup broke
-nothing (`** BUILD SUCCEEDED **`) and **installed and launched nowhere**; that build differs from
-the one on the devices by one comment line.
+Both carry **the builds of 2026-10-04, 20:37–20:38**: `bd708fa`'s Swift code, built from a working
+tree that still held the `PlayerHost.swift` harness hook. That hook is the only difference from
+the code on `main`, and the next install replaces it. The old Marlin Media TV app was removed
+from both boxes on 2026-10-04 (D070).
 
-- **Home Theater** — the dev/test device (D005). In the owner's everyday use: its app log of
-  2026-09-19 17:53 shows the owner's own launch and two short plays.
-- **Master Bedroom ATV** — carries the app for the household (D050). **Standing rule (D061): every
-  push pass that follows the owner's acceptance of a pass that changed the app also installs the
-  accepted build there — install only, no launch.** That install is also what renews its
-  provisioning profile; if the app ever refuses to open there, the remedy is a reinstall. D005 is
-  unchanged: no evidence is taken there. The owner reports playback works on it.
+- **Home Theater** — the dev/test device (D005): Marlin Movies, Marlin TV Shows, Marlin Videos and
+  Marlin Music; on 2026-10-04 they sat in the Home Screen's top row. **No Marlin Adult** (D071):
+  it was there for its check that evening, from 21:05 for a few minutes, and was removed.
+- **Master Bedroom ATV** — all five, installed and never launched from here. **Standing rule
+  (D061): every push that follows the owner's acceptance of work that changed the apps also
+  installs the accepted builds there — install only, no launch.** That install is also what renews
+  the provisioning; if an app ever refuses to open there, the remedy is a reinstall. D005 is
+  unchanged: no evidence is taken there.
 
 ### The server's state
 
-Not re-read by pass 7. The last read is pass 2 recon's `GET /api/health` of 2026-09-15 — 3 movies,
-2 shows, 3 seasons, 16 episodes, **0 videos** — and the owner's report that videos run on the
-device (D052) means that count is out of date. Pass 3c's reset (D047) is history too: the app's log
-of 2026-09-19 shows `[continue] 3 entries: movie/3@3026s, movie/4@3851s, episode/17@1008s`, the
-owner's own viewing, so Home opens with a Continue Watching row again.
+Read on 2026-10-04 at wrap-up: image **0.10.0**; 3 movies, 5 shows, 20 seasons, 344 episodes,
+3 videos, 11 albums by 4 artists, 155 tracks (`GET /api/health`, which does not count adult), and
+4 adult titles (`GET /api/adult/titles`, counted, not read). It grew during the session: 4 shows
+and no adult title at about 19:40, one adult title by 21:00. The in-progress list held two
+entries, the owner's own viewing (`movie/4`, `episode/17`), and the session's checks left both as
+they were. The music is FLAC but for one album in APE (album 5, nine tracks), all of it stereo at
+44.1 or 96 kHz.
 
 ### Open items
 
@@ -458,6 +567,19 @@ The owner ruled on every open item on 2026-09-19 (D052–D067): 49 of the recon'
    Not built. — D064.
 3. **PARKED — badges on shows, possibly later.** `/api/shows` carries no per-file resolution or
    HDR. The owner reports the posters show no badges at all today. — D064.
+
+**From the five apps (2026-10-04) — known, not open:**
+- **Not tried by anyone:** whether Marlin Music keeps playing when the screensaver comes on, and
+  whether a gap is heard between tracks (each track starts when the one before it has ended;
+  nothing was measured).
+- **The icons and Top Shelf banners are the old artwork re-lettered** (D072); the owner may send
+  designed ones.
+- **Marlin Music and Marlin Adult have no design frames** (D073); they follow the frames' look.
+- **The adult title played in the check had no timeline stills:** the server answered its index
+  with `state failed`. A server matter; the app drew no thumbnail, as D021 has it.
+- **The UI-test target has no file** (D076); see Evidence harnesses under Build, install, run.
+- A stale `Marlin Media TV.app` from before the split is still among the products in the shared
+  `build/` folder. Nothing uses it.
 
 ## Pass history
 
@@ -995,3 +1117,75 @@ was written; nothing was built, installed or launched; neither Apple TV and noth
 - **Committed and pushed** as one fast-forward commit on top of `ee3613b` (pass 7c). Still
   uncommitted, unchanged, and deliberate: the `PlayerHost.swift` hook, the five harnesses, and the
   owner's `icon pixel/` and `Notes/` (D063).
+
+### 2026-10-04 — the owner takes over, and Marlin Media becomes five apps (no report file)
+
+- **How the work is run changed (D068).** The owner dropped the foreman and directs the work in
+  the chat. `CLAUDE.md` and `.claude/commands/wrap.md` were written from the owner's text and
+  pushed as `acd2b29`. Neither notebook file said a foreman ran the work, so no line needed
+  correcting; the two mentions in `reports/2026-09-15-pass2-recon.md` are history and stay. The
+  owner's own rules file for all projects, outside this repo, was trimmed of pass and pasted-brief
+  wording the same evening.
+- **The brief.** "I want the Apple TV app split the same way I just split the PC box app": five
+  apps, one per kind, on the one server (0.10.0, no server change). A look-only pass read this app,
+  the PC box's notes and code as the feature list (marlin1111ai/marlin-tv-box: its D54–D58 and
+  `api.py`, `app.py`, `music.py` — no code copied), the server's COLD-START and its pass-8 report,
+  and the live server's shapes. The owner then answered four decisions and a fifth that the
+  answers raised (D070–D072), and chose one build and one test (D074).
+- **What was built (`c065545`).** Five app targets on the one source folder, each told its kind by
+  `MARLIN_APP`. The first screen is the app's own library; the combined Home screen and
+  `HomeScreen.swift` are gone; Marlin TV Shows has Up next; Marlin Music is new (`MusicModels.swift`,
+  `MusicPlayer.swift`, `MusicScreens.swift`); Marlin Adult is the Movies screens on the adult
+  routes, with the client refusing routes across that line and its log kept to ids. The five icon
+  and Top Shelf sets were drawn by re-lettering the old ones (D072). All five built clean; the only
+  compiler warnings are the three that were there before (two in `PlayerModel.swift`, one in a
+  VLCKit header).
+- **Checked on Home Theater, the four apps installed there**, with a throwaway harness that
+  launched each by its bundle id. Home Theater was in use when the build finished, so nothing was
+  launched until the owner said the television was free.
+  - **Marlin Movies:** no tab bar, the header's word, Continue Watching (Wonder Woman) with the
+    launch focus on its card, "All movies · 3". Stargate played from its page to 16.6 s.
+  - **Marlin TV Shows:** Continue Watching (The Magicians S1 E10) and an Up next row of six in
+    D040's order — The Magicians S1 E1, Stargate Atlantis S1 E1, Stargate SG-1 S1 E1, The Magicians
+    S1 E2, Stargate Atlantis S1 E3, Stargate SG-1 S1 E3. The library holds no S1 E2 of either
+    Stargate show, and The Food That Built America has nothing after its last finished episode. An
+    Up next card played its episode.
+  - **Marlin Videos:** the list of three, a video's page, a video playing.
+  - **Marlin Music:** the Albums grid (11) and the Artists tab (4); an album page; a track started
+    the album from there and opened Now Playing; Pause and Play; Previous after 3 s went to the
+    track's start; Menu left the music playing and the album page marked the playing track;
+    Play/Pause on the remote paused and resumed it from the album page; the last track ran out at
+    86.7 s, the log said "the album has ended" and Now Playing was gone; the APE album played
+    (VLC's `avcodec` decoder, "codec (ape) started") and Next moved to its second track; leaving
+    the app logged the scene going to the background and the music stopping.
+  - **The icons and a Top Shelf banner** were seen on the Home Screen with their own words.
+  - **Nothing was written to the server:** every film played had no saved position and stayed
+    under the 120 s floor, no log held a `PUT`, and afterwards the in-progress list and the played
+    files' playback blocks were as before.
+- **Two faults the check found, both fixed and checked again on the device.** The album page's
+  track list ran under the clock when it scrolled (`49559fa`: the list stops short of it). And in
+  every library the row above slid up over the header when focus moved down — the old app's tabs
+  did the same; the owner chose to have it fixed (`bd708fa`, D075).
+- **The owner's test:** "all work" for the four on Home Theater.
+- **Marlin Adult (D071).** The server had no adult title when the apps were built and one by the
+  time of the check. First, on the Mac, the app's own `Models.swift` read the live title (studio,
+  date, two performers, poster, backdrop, the adult stream route) with nothing but counts printed.
+  Then the app went onto Home Theater at 21:05 with the owner's word: the library loaded with one
+  title under "All titles" and the header's "Adult"; the title's page showed a date and a length
+  and neither a runtime nor a TMDB rating; it played to 13.1 s on `/api/adult/stream/…` and Menu
+  came back. No screenshot was taken. Its log held no title, studio, performer or file name (each
+  searched for, the hits counted: none but the word "adult" in the stream's own address), three
+  "(withheld)" marks, no VLCKit line and no `PUT`; the title's playback block was untouched. The
+  app was then removed from Home Theater and installed, unopened, on the bedroom box, where the
+  owner tested it: "1 works". Saving a position, Resume and its Continue Watching row were the
+  owner's to try, not the check's.
+- **After the acceptance.** The other four were installed on the bedroom box (install only), the
+  old Marlin Media TV app was removed from both boxes, its icon set and its two test scripts were
+  taken out of the project (`015ed7f`, D070), all five still built, and `acd2b29..015ed7f` was
+  pushed.
+- **At wrap-up** the owner had the five old uncommitted harnesses and the `PlayerHost.swift` hook
+  deleted (D076); all five apps built without the hook, and so did Marlin Movies with no UI-test
+  folder at all, as a fresh clone has it.
+- **The check's screenshots, logs and scripts were session scratch** and were deleted when each
+  check was done, with the test runner app the checks left on Home Theater; what they showed is
+  written here.
