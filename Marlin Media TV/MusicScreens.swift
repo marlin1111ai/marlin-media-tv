@@ -283,6 +283,8 @@ struct AlbumScreen: View {
                 .accessibilityIdentifier("track.\(index + 1)")
             }
         }
+        // Short of the clock at the top right, which stays put while a long list scrolls past it.
+        .frame(width: 1500, alignment: .leading)
     }
 
     private func load() async {
