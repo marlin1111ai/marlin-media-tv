@@ -41,12 +41,20 @@ enum EvidenceLog {
         return handle
     }
 
-    /// VLCKit's file logger on the same handle (nil if the file could not be opened).
+    /// VLCKit's file logger on the same handle (nil if the file could not be opened). **Marlin
+    /// Adult gets none:** VLC's own lines can carry a title embedded in the file, and that app's
+    /// log carries ids, not titles.
     static func fileLogger() -> VLCFileLogger? {
-        guard let handle = ensureHandle() else { return nil }
+        guard AppKind.current != .adult, let handle = ensureHandle() else { return nil }
         let logger = VLCFileLogger(fileHandle: handle)
         logger.level = .debug
         return logger
+    }
+
+    /// A title, file name or track name on its way into a log line. In Marlin Adult the log carries
+    /// ids, not titles, as the server's does for adult, so there it is withheld.
+    static func named(_ text: String) -> String {
+        AppKind.current == .adult ? "(withheld)" : text
     }
 
     static func line(_ text: String) {

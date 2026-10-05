@@ -9,6 +9,11 @@
 //  `GET /api/continue-watching` list. Every playback write goes through `PlaybackWrite` so that a
 //  failure is a log line and nothing else.
 //
+//  2026-10-04, the five apps: the client knows which app it serves. The server keeps adult under
+//  `/api/adult/` only; Marlin Adult uses those routes and no others, and the other four apps are
+//  refused them here, before the request leaves the Apple TV. Marlin Music reads albums and artists
+//  and writes nothing.
+//
 
 import Foundation
 
@@ -28,6 +33,8 @@ enum APIError: LocalizedError {
     case http(status: Int, path: String, body: String)
     case decoding(String, path: String)
     case invalidResponse(path: String)
+    /// The route belongs to another of the five apps and was not sent.
+    case refused(path: String)
 
     /// True when the server did not answer at all (frame 17 copy applies).
     var isUnreachable: Bool {
@@ -45,35 +52,51 @@ enum APIError: LocalizedError {
             return "\(path): the response did not decode — \(detail)"
         case let .invalidResponse(path):
             return "\(path): not an HTTP response"
+        case let .refused(path):
+            return "\(path): this app does not use that part of the server; the request was not sent"
         }
     }
 }
 
 struct APIClient: Sendable {
+    let kind: AppKind
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
 
-    init() {
+    private var adult: Bool { kind == .adult }
+    /// Playback and timeline stills live under this.
+    private var files: String { adult ? "/api/adult/files" : "/api/files" }
+
+    init(kind: AppKind = .current) {
+        self.kind = kind
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 15
         config.waitsForConnectivity = false
         session = URLSession(configuration: config)
         decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
+        if kind == .adult { decoder.userInfo[Movie.adultShape] = true }
         encoder = JSONEncoder()
     }
 
-    func movies() async throws -> [Movie] { try await get("/api/movies") }
-    func movie(id: Int) async throws -> Movie { try await get("/api/movies/\(id)") }
+    /// Marlin Adult's titles are the movie shape on the adult routes.
+    func movies() async throws -> [Movie] { try await get(adult ? "/api/adult/titles" : "/api/movies") }
+    func movie(id: Int) async throws -> Movie {
+        try await get(adult ? "/api/adult/titles/\(id)" : "/api/movies/\(id)")
+    }
     func shows() async throws -> [Show] { try await get("/api/shows") }
     func show(id: Int) async throws -> Show { try await get("/api/shows/\(id)") }
     func videos() async throws -> [Video] { try await get("/api/videos") }
+    func albums() async throws -> [Album] { try await get("/api/albums") }
+    /// One album with its tracks.
+    func album(id: Int) async throws -> Album { try await get("/api/albums/\(id)") }
+    func artists() async throws -> [Artist] { try await get("/api/artists") }
 
     /// The file's timeline stills (pass 2g). The first request starts generation on the server, so
     /// this is asked once per detail screen and never polled (the index is a snapshot).
     func thumbs(fileId: Int) async throws -> FileThumbs {
-        FileThumbs(fileId: fileId, index: try await get("/api/files/\(fileId)/thumbs"))
+        FileThumbs(fileId: fileId, index: try await get("\(files)/\(fileId)/thumbs"))
     }
 
     /// Pass 2 (D024): the server's in-progress list — `position > 0` and not watched, newest
@@ -93,7 +116,10 @@ struct APIClient: Sendable {
             let position: Double?
             let watched: Bool?
         }
-        let path = "/api/files/\(fileId)/playback"
+        let path = "\(files)/\(fileId)/playback"
+        // Nothing is saved to the server for music.
+        guard kind != .music else { throw APIError.refused(path: path) }
+        try check(path)
         var request = URLRequest(url: ServerConfig.baseURL.appending(path: path))
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -101,7 +127,14 @@ struct APIClient: Sendable {
         return try await send(request, path: path)
     }
 
+    /// Adult routes for Marlin Adult and for no other app; every other route for the other four
+    /// and never for Marlin Adult.
+    private func check(_ path: String) throws {
+        guard path.hasPrefix("/api/adult/") == adult else { throw APIError.refused(path: path) }
+    }
+
     private func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+        try check(path)
         var url = ServerConfig.baseURL.appending(path: path)
         if !query.isEmpty { url.append(queryItems: query) }
         var request = URLRequest(url: url)

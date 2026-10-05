@@ -186,15 +186,18 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
         library = VLCLibrary.shared()
         var loggers: [any VLCLogging] = []
         if let file = EvidenceLog.fileLogger() { loggers.append(file) }
-        let console = VLCConsoleLogger()
-        console.level = .info
-        loggers.append(console)
+        // Marlin Adult: no VLC lines at all, in the file or on the console (see EvidenceLog).
+        if AppKind.current != .adult {
+            let console = VLCConsoleLogger()
+            console.level = .info
+            loggers.append(console)
+        }
         library.loggers = loggers
         player = VLCMediaPlayer(library: library)
         super.init()
         player.delegate = self
-        EvidenceLog.line("[player] request \(request.title) — \(request.subtitle) — \(request.url.absoluteString)")
-        EvidenceLog.line("[player] file \(request.file.path) \(request.file.resolution ?? "?") hdr=\(request.file.hdr) video=\(request.file.videoCodec ?? "?") audio=\(request.file.audioTracks.map { "\($0.codec) \($0.layout)" }.joined(separator: ", "))")
+        EvidenceLog.line("[player] request \(EvidenceLog.named(request.title)) — \(EvidenceLog.named(request.subtitle)) — \(request.url.absoluteString)")
+        EvidenceLog.line("[player] file \(EvidenceLog.named(request.file.path)) \(request.file.resolution ?? "?") hdr=\(request.file.hdr) video=\(request.file.videoCodec ?? "?") audio=\(request.file.audioTracks.map { "\($0.codec) \($0.layout)" }.joined(separator: ", "))")
         EvidenceLog.line("[playback] file \(request.file.fileId) saved position \(request.file.playback.position) s watched=\(request.file.playback.watched); starting at \(request.startMs) ms")
         if let thumbs = request.thumbs {
             thumbStrip = ThumbStrip(thumbs)
@@ -727,7 +730,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
             let tracks = player.audioTracks
             guard tracks.indices.contains(index) else { return }
             let track = tracks[index]
-            EvidenceLog.line("[audio] select \(track.trackId) \(track.trackName) \(track.codecName()) ch=\(track.audio?.channelsNumber ?? 0)")
+            EvidenceLog.line("[audio] select \(track.trackId) \(EvidenceLog.named(track.trackName)) \(track.codecName()) ch=\(track.audio?.channelsNumber ?? 0)")
             track.isSelectedExclusively = true
         case .subtitles:
             if index == 0 {
@@ -737,7 +740,7 @@ final class PlayerModel: NSObject, VLCMediaPlayerDelegate, VLCMediaParserDelegat
                 let tracks = player.textTracks
                 guard tracks.indices.contains(index - 1) else { return }
                 let track = tracks[index - 1]
-                EvidenceLog.line("[subtitles] select \(track.trackId) \(track.trackName) \(track.codecName())")
+                EvidenceLog.line("[subtitles] select \(track.trackId) \(EvidenceLog.named(track.trackName)) \(track.codecName())")
                 track.isSelectedExclusively = true
             }
         }

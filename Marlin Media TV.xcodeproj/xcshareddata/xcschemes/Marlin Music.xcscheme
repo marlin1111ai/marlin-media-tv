@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BB0000000000000000000005"
-               BuildableName = "Marlin Media TV.app"
-               BlueprintName = "Marlin Media TV"
+               BlueprintIdentifier = "BB0000000000000003000005"
+               BuildableName = "Marlin Music.app"
+               BlueprintName = "Marlin Music"
                ReferencedContainer = "container:Marlin Media TV.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,18 +29,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
-      <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BB00000000000000000000C5"
-               BuildableName = "Marlin Media TVUITests.xctest"
-               BlueprintName = "Marlin Media TVUITests"
-               ReferencedContainer = "container:Marlin Media TV.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -56,9 +44,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BB0000000000000000000005"
-            BuildableName = "Marlin Media TV.app"
-            BlueprintName = "Marlin Media TV"
+            BlueprintIdentifier = "BB0000000000000003000005"
+            BuildableName = "Marlin Music.app"
+            BlueprintName = "Marlin Music"
             ReferencedContainer = "container:Marlin Media TV.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -72,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BB0000000000000000000005"
-            BuildableName = "Marlin Media TV.app"
-            BlueprintName = "Marlin Media TV"
+            BlueprintIdentifier = "BB0000000000000003000005"
+            BuildableName = "Marlin Music.app"
+            BlueprintName = "Marlin Music"
             ReferencedContainer = "container:Marlin Media TV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

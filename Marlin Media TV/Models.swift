@@ -88,6 +88,51 @@ struct Movie: Decodable, Hashable, Identifiable {
     let rating: Double?
     let artwork: Artwork
     let editions: [Edition]
+    /// Marlin Adult only (server 0.10.0): a title's studio and performers.
+    let studio: String?
+    let performers: [String]?
+
+    /// Set in the decoder's `userInfo` by Marlin Adult's client. An adult title is the movie shape
+    /// without the TMDB fields, so those are not asked of it; a movie is still read strictly.
+    static let adultShape = CodingUserInfoKey(rawValue: "marlin.adultShape")!
+
+    private enum CodingKeys: String, CodingKey {
+        case id, title, parsedTitle, year, added, tmdbId, unmatched, manualMatch, overview, releaseDate,
+             runtime, genres, rating, artwork, editions, studio, performers
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(Int.self, forKey: .id)
+        title = try c.decode(String.self, forKey: .title)
+        year = try c.decodeIfPresent(Int.self, forKey: .year)
+        added = try c.decode(String.self, forKey: .added)
+        overview = try c.decodeIfPresent(String.self, forKey: .overview)
+        releaseDate = try c.decodeIfPresent(String.self, forKey: .releaseDate)
+        artwork = try c.decode(Artwork.self, forKey: .artwork)
+        editions = try c.decode([Edition].self, forKey: .editions)
+        if decoder.userInfo[Movie.adultShape] as? Bool == true {
+            parsedTitle = title
+            tmdbId = nil
+            unmatched = try c.decodeIfPresent(Bool.self, forKey: .unmatched) ?? false
+            manualMatch = try c.decodeIfPresent(Bool.self, forKey: .manualMatch) ?? false
+            runtime = nil
+            genres = []
+            rating = nil
+            studio = try c.decodeIfPresent(String.self, forKey: .studio)
+            performers = try c.decodeIfPresent([String].self, forKey: .performers)
+        } else {
+            parsedTitle = try c.decode(String.self, forKey: .parsedTitle)
+            tmdbId = try c.decodeIfPresent(Int.self, forKey: .tmdbId)
+            unmatched = try c.decode(Bool.self, forKey: .unmatched)
+            manualMatch = try c.decode(Bool.self, forKey: .manualMatch)
+            runtime = try c.decodeIfPresent(Int.self, forKey: .runtime)
+            genres = try c.decode([String].self, forKey: .genres)
+            rating = try c.decodeIfPresent(Double.self, forKey: .rating)
+            studio = nil
+            performers = nil
+        }
+    }
 }
 
 struct Show: Decodable, Hashable, Identifiable {
@@ -339,6 +384,19 @@ nonisolated enum Format {
         let parser = ISO8601DateFormatter()
         guard let date = parser.date(from: rfc3339) else { return rfc3339 }
         return date.formatted(.dateTime.day().month(.abbreviated).year())
+    }
+
+    /// A day from the server, "2024-03-05" → "5 Mar 2024" (Marlin Adult's release date). Anything
+    /// that is not a day is shown as it came.
+    static func day(_ value: String) -> String {
+        let parser = DateFormatter()
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        parser.timeZone = TimeZone(identifier: "UTC")
+        parser.dateFormat = "yyyy-MM-dd"
+        guard let date = parser.date(from: String(value.prefix(10))) else { return value }
+        var style = Date.FormatStyle.dateTime.day().month(.abbreviated).year()
+        style.timeZone = TimeZone(identifier: "UTC")!
+        return date.formatted(style)
     }
 
     static func year(fromDate date: String?) -> String? {

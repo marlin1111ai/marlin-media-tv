@@ -9,8 +9,14 @@
 //  continue-watching list is *not* part of the library's success: if that one call fails the row
 //  is simply absent and the failure is a log line, because the library itself is fine.
 //
-//  Pass 3 (D040) adds what Home needs: every show's episodes (the shows list carries none), and
-//  the three Home rows with their orders.
+//  Pass 3 (D040) adds every show's episodes (the shows list carries none) and the order of the
+//  next-episode row built from them.
+//
+//  2026-10-04, the five apps: the model loads **only its own app's kind** (`AppKind`). Marlin TV
+//  Shows keeps the next-episode order for its Up next row; Marlin Adult's Continue Watching row is
+//  made from its titles' own positions, because the server keeps no continue list for adult; Marlin
+//  Music loads albums and artists and has no Continue Watching at all. The combined Home screen
+//  and its Movies and Videos rows are gone.
 //
 
 import Foundation
@@ -20,13 +26,18 @@ enum LibraryTab: String, CaseIterable, Hashable {
     case movies = "Movies"
     case shows = "TV Shows"
     case videos = "Videos"
+    /// Marlin Music's two.
+    case albums = "Albums"
+    case artists = "Artists"
 
-    /// The continue-watching kind this tab shows (D025: each tab shows only its own kind).
-    var continueKind: ContinueEntry.Kind {
+    /// The continue-watching kind this tab shows (D025: each tab shows only its own kind). Music
+    /// has none.
+    var continueKind: ContinueEntry.Kind? {
         switch self {
         case .movies: return .movie
         case .shows: return .episode
         case .videos: return .video
+        case .albums, .artists: return nil
         }
     }
 }
@@ -38,8 +49,8 @@ enum SortOrder: String, CaseIterable, Hashable {
     case recentlyAdded = "Recently Added"
 }
 
-/// D040: one episode of one show, as Home's TV Shows row shows it.
-struct HomeEpisode: Identifiable, Hashable {
+/// D040: one episode of one show, as Marlin TV Shows' Up next row shows it.
+struct UpNextEpisode: Identifiable, Hashable {
     let show: Show
     let episode: Episode
     var id: Int { episode.file.fileId }
@@ -54,32 +65,30 @@ final class LibraryModel {
         case failed(String, unreachable: Bool)
     }
 
+    let kind = AppKind.current
     let api = APIClient()
     private(set) var phase: Phase = .loading
+    /// Marlin Movies' movies, and Marlin Adult's titles.
     private(set) var movies: [Movie] = []
     private(set) var shows: [Show] = []
     private(set) var videos: [Video] = []
+    private(set) var albums: [Album] = []
+    private(set) var artists: [Artist] = []
     /// D025: the server's in-progress list, in the server's order (newest `last_played` first).
     private(set) var continueWatching: [ContinueEntry] = []
-    /// D040: each show with its seasons and episodes — `GET /api/shows` carries none, and Home's
-    /// TV row is built from episodes.
+    /// D040: each show with its seasons and episodes — `GET /api/shows` carries none, and the
+    /// Up next row is built from episodes.
     private(set) var showDetails: [Show] = []
-    var tab: LibraryTab = .movies
+    var tab: LibraryTab = AppKind.current.tabs[0]
     /// Every tab still opens on Title (D023).
     var sort: SortOrder = .title
 
     func load() async {
         phase = .loading
         do {
-            async let m = api.movies()
-            async let s = api.shows()
-            async let v = api.videos()
-            let (movies, shows, videos) = try await (m, s, v)
-            self.movies = movies
-            self.shows = shows
-            self.videos = videos
+            try await fetchLists()
             phase = .loaded
-            print("[library] loaded \(movies.count) movies, \(shows.count) shows, \(videos.count) videos from \(ServerConfig.baseURL)")
+            print("[library] \(kind.rawValue): loaded \(movies.count) movies, \(shows.count) shows, \(videos.count) videos, \(albums.count) albums, \(artists.count) artists from \(ServerConfig.baseURL)")
         } catch let error as APIError {
             print("[library] failed: \(error.localizedDescription)")
             phase = .failed(error.localizedDescription, unreachable: error.isUnreachable)
@@ -91,24 +100,36 @@ final class LibraryModel {
         await refreshShowDetails()
     }
 
-    /// D040: everything again — the three lists, the in-progress list and every show's episodes.
-    /// Home asks for this each time it appears, including on the way back from the player. It does
-    /// nothing while the first load is still running, and a failure keeps what is already on screen
-    /// rather than emptying it.
+    /// The lists of this app's kind, and no other's.
+    private func fetchLists() async throws {
+        switch kind {
+        case .movies, .adult:
+            movies = try await api.movies()
+        case .shows:
+            shows = try await api.shows()
+        case .videos:
+            videos = try await api.videos()
+        case .music:
+            async let a = api.albums()
+            async let r = api.artists()
+            let (albums, artists) = try await (a, r)
+            self.albums = albums
+            self.artists = artists
+        }
+    }
+
+    /// D040: everything again — the app's lists, the in-progress list and every show's episodes.
+    /// The first screen asks for this each time it appears, and again on the way back from the
+    /// player. It does nothing while the first load is still running, and a failure keeps what is
+    /// already on screen rather than emptying it.
     func refresh() async {
         if case .loading = phase { return }
         do {
-            async let m = api.movies()
-            async let s = api.shows()
-            async let v = api.videos()
-            let (movies, shows, videos) = try await (m, s, v)
-            self.movies = movies
-            self.shows = shows
-            self.videos = videos
+            try await fetchLists()
             phase = .loaded
         } catch {
             let detail = (error as? APIError)?.localizedDescription ?? String(describing: error)
-            EvidenceLog.line("[home] refresh failed, keeping what is on screen: \(detail)")
+            EvidenceLog.line("[library] refresh failed, keeping what is on screen: \(detail)")
         }
         await refreshContinueWatching()
         await refreshShowDetails()
@@ -117,6 +138,16 @@ final class LibraryModel {
     /// D025: asked for every time the library appears, including on the way back from the player,
     /// so a position written during playback is on the row at once.
     func refreshContinueWatching() async {
+        switch kind {
+        case .music:
+            return      // nothing is saved to the server for music, so there is nothing to continue
+        case .adult:
+            continueWatching = adultContinue()
+            EvidenceLog.line("[continue] \(continueWatching.count) entries from the titles' own positions: \(continueWatching.map { "file \($0.fileId)@\(Int($0.playback.position))s" }.joined(separator: ", "))")
+            return
+        case .movies, .shows, .videos:
+            break
+        }
         do {
             let entries = try await api.continueWatching()
             continueWatching = entries
@@ -128,9 +159,24 @@ final class LibraryModel {
         }
     }
 
-    /// D040: one `GET /api/shows/{id}` per show, together, for Home's TV row. A show that fails is
-    /// left out of the row rather than failing the screen.
+    /// The server keeps no continue list for adult, so Marlin Adult's row is made here: every
+    /// edition with a position and no watched mark, newest `last_played` first.
+    private func adultContinue() -> [ContinueEntry] {
+        movies.flatMap { movie in movie.editions.filter { inProgress($0.file) }.map { (movie, $0) } }
+            .sorted { Format.rfc3339($0.1.file.playback.lastPlayed) > Format.rfc3339($1.1.file.playback.lastPlayed) }
+            .map { movie, edition in
+                ContinueEntry(kind: .movie, fileId: edition.file.fileId, stream: edition.file.stream,
+                              playback: edition.file.playback, duration: edition.file.duration,
+                              movieId: movie.id, year: movie.year, edition: edition.name,
+                              showId: nil, showTitle: nil, season: nil, episode: nil, videoId: nil,
+                              title: movie.title, artwork: movie.artwork)
+            }
+    }
+
+    /// D040: one `GET /api/shows/{id}` per show, together, for the Up next row. A show that fails
+    /// is left out of the row rather than failing the screen. Marlin TV Shows only.
     func refreshShowDetails() async {
+        guard kind == .shows else { return }
         let list = shows
         guard !list.isEmpty else { showDetails = []; return }
         let api = self.api
@@ -143,73 +189,36 @@ final class LibraryModel {
             return out
         }
         showDetails = details.sorted { $0.id < $1.id }
-        EvidenceLog.line("[home] \(showDetails.count) of \(list.count) shows detailed for the TV row")
+        EvidenceLog.line("[upnext] \(showDetails.count) of \(list.count) shows detailed for the Up next row")
     }
 
     /// The entries of one tab, in the server's order.
     func continueEntries(for tab: LibraryTab) -> [ContinueEntry] {
-        continueWatching.filter { $0.kind == tab.continueKind }
+        guard let kind = tab.continueKind else { return [] }
+        return continueWatching.filter { $0.kind == kind }
     }
 
-    // MARK: - Home rows (D040)
+    // MARK: - Up next (D040)
 
-    static let homeRowLimit = 6
+    static let upNextLimit = 6
 
     private func inProgress(_ file: MediaInfo) -> Bool {
         file.playback.position > 0 && !file.playback.watched
     }
 
-    /// The latest `last_played` of any of a movie's editions.
-    private func lastPlayed(_ movie: Movie) -> Date {
-        movie.editions.map { Format.rfc3339($0.file.playback.lastPlayed) }.max() ?? .distantPast
-    }
-
-    /// D040: in-progress movies first (most recently played first), then the rest by title.
-    var homeMovies: [Movie] {
-        let started = movies.filter { m in m.editions.contains { inProgress($0.file) } }
-            .sorted { lastPlayed($0) > lastPlayed($1) }
-        let startedIds = Set(started.map(\.id))
-        let rest = movies.filter { !startedIds.contains($0.id) }
-            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
-        return Array((started + rest).prefix(Self.homeRowLimit))
-    }
-
-    /// D040: in-progress videos first (most recently played first), then the rest by title.
-    var homeVideos: [Video] {
-        let started = videos.filter { inProgress($0.file) }
-            .sorted { Format.rfc3339($0.file.playback.lastPlayed) > Format.rfc3339($1.file.playback.lastPlayed) }
-        let startedIds = Set(started.map(\.id))
-        let rest = videos.filter { !startedIds.contains($0.id) }
-            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
-        return Array((started + rest).prefix(Self.homeRowLimit))
-    }
-
-    /// D040, the TV row's order: the episodes in progress (newest watched first); then, for each
-    /// show, the next episode after the last one it finished; then on down each show, a step at a
-    /// time, until the row is full. A show never watched joins from its first episode, after the
-    /// shows that have been watched.
-    var homeEpisodes: [HomeEpisode] {
+    /// Marlin TV Shows' Up next row, in D040's order: for each show, the next episode after the
+    /// last one it finished; then on down each show, a step at a time, until the row is full. Shows
+    /// with any history come first, most recently watched first, then the rest by title, each from
+    /// its first episode. **Episodes in progress are left to the Continue Watching row above it.**
+    var upNext: [UpNextEpisode] {
         func ordered(_ show: Show) -> [Episode] {
             (show.seasons ?? []).flatMap(\.episodes)
                 .sorted { ($0.season, $0.number) < ($1.season, $1.number) }
         }
 
-        var row: [HomeEpisode] = []
-        var taken = Set<Int>()
+        var row: [UpNextEpisode] = []
+        var taken = Set(showDetails.flatMap { ordered($0).filter { inProgress($0.file) }.map(\.file.fileId) })
 
-        // 1 — everything in progress, most recently played first.
-        let started = showDetails.flatMap { show in
-            ordered(show).filter { inProgress($0.file) }.map { HomeEpisode(show: show, episode: $0) }
-        }
-        .sorted {
-            Format.rfc3339($0.episode.file.playback.lastPlayed) > Format.rfc3339($1.episode.file.playback.lastPlayed)
-        }
-        for item in started where row.count < Self.homeRowLimit {
-            row.append(item); taken.insert(item.id)
-        }
-
-        // 2 — the shows themselves: those with any history first, most recent first, then the rest
-        // by title.
         func history(_ show: Show) -> Date {
             ordered(show).map { Format.rfc3339($0.file.playback.lastPlayed) }.max() ?? .distantPast
         }
@@ -217,19 +226,18 @@ final class LibraryModel {
         let fresh = showDetails.filter { history($0) == .distantPast }
             .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
 
-        // 3 — from after each show's last finished episode, a step at a time across the shows.
-        let queues: [[HomeEpisode]] = (watched + fresh).map { show in
+        let queues: [[UpNextEpisode]] = (watched + fresh).map { show in
             let episodes = ordered(show)
             let lastFinished = episodes.lastIndex { $0.file.playback.watched }
             let start = lastFinished.map { $0 + 1 } ?? 0
             guard start < episodes.count else { return [] }
-            return episodes[start...].map { HomeEpisode(show: show, episode: $0) }
+            return episodes[start...].map { UpNextEpisode(show: show, episode: $0) }
         }
 
         var depth = 0
-        while row.count < Self.homeRowLimit {
+        while row.count < Self.upNextLimit {
             var addedOne = false
-            for queue in queues where row.count < Self.homeRowLimit {
+            for queue in queues where row.count < Self.upNextLimit {
                 guard depth < queue.count else { continue }
                 let item = queue[depth]
                 guard !taken.contains(item.id) else { addedOne = true; continue }
@@ -281,8 +289,8 @@ final class LibraryModel {
         }
     }
 
-    /// D040: a card in Home's TV row plays its episode, resuming where it was left.
-    func playRequest(for item: HomeEpisode) async -> PlayRequest? {
+    /// D040: a card in the Up next row plays its episode, resuming where it was left.
+    func playRequest(for item: UpNextEpisode) async -> PlayRequest? {
         PlayRequest.episode(item.episode, of: item.show, thumbs: await thumbs(item.episode.file.fileId), resume: true)
     }
 
@@ -320,5 +328,28 @@ final class LibraryModel {
         case .year: return videos.sorted { ($0.year ?? Int.min) > ($1.year ?? Int.min) }
         case .recentlyAdded: return videos.sorted { Format.addedAt($0.added) > Format.addedAt($1.added) }
         }
+    }
+
+    // MARK: - Marlin Music
+
+    private func sorted(_ list: [Album]) -> [Album] {
+        switch sort {
+        case .title: return byTitle(list, \.title)
+        case .year: return list.sorted { ($0.year ?? Int.min) > ($1.year ?? Int.min) }
+        case .recentlyAdded: return list.sorted { Format.addedAt($0.added) > Format.addedAt($1.added) }
+        }
+    }
+
+    var sortedAlbums: [Album] { sorted(albums) }
+
+    /// Artists are always by name; the sort control belongs to the albums.
+    var sortedArtists: [Artist] { byTitle(artists, \.name) }
+
+    func albums(of artist: Artist) -> [Album] { sorted(albums.filter { $0.artistId == artist.id }) }
+
+    /// An artist has no picture on the server: the card shows the cover of the artist's first
+    /// album, by title, that has one.
+    func cover(of artist: Artist) -> String? {
+        byTitle(albums.filter { $0.artistId == artist.id }, \.title).compactMap(\.cover).first
     }
 }

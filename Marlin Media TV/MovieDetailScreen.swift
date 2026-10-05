@@ -14,6 +14,10 @@
 //  Pass 2b (D032): the screen re-reads the movie every time the player closes, so Start over,
 //  a finished film or a 90 % mark is reflected in the button, the bar and the pill on the way back.
 //
+//  2026-10-04: Marlin Adult is this screen on the server's adult routes. There the meta row shows
+//  the date, the studio and the file's length — an adult title has no runtime, rating or genres —
+//  and the performers stand under it.
+//
 
 import SwiftUI
 
@@ -52,6 +56,20 @@ struct MovieDetailScreen: View {
     private var resumeShare: Double? {
         guard let followed else { return nil }
         return Format.share(position: savedPosition, duration: followed.file.duration)
+    }
+
+    /// Marlin Adult's meta row: the release date (the year when there is none), the studio, and
+    /// the length of the file the buttons follow.
+    private var adultMeta: [String] {
+        var items: [String] = []
+        if let date = shown.releaseDate, !date.isEmpty {
+            items.append(Format.day(date))
+        } else if let year = shown.year {
+            items.append(String(year))
+        }
+        if let studio = shown.studio, !studio.isEmpty { items.append(studio) }
+        if let duration = followed?.file.duration { items.append(Format.minutes(duration)) }
+        return items
     }
 
     var body: some View {
@@ -111,20 +129,27 @@ struct MovieDetailScreen: View {
                     .lineLimit(2)
                     .accessibilityIdentifier("detail.title")
                 HStack(spacing: 20) {
-                    if let year = shown.year { Text(String(year)) }
-                    Dot()
-                    Text(Format.runtime(shown.runtime))
-                    if let rating = Format.rating(shown.rating) {
+                    if api.kind == .adult {
+                        ForEach(Array(adultMeta.enumerated()), id: \.offset) { index, item in
+                            if index > 0 { Dot() }
+                            Text(item)
+                        }
+                    } else {
+                        if let year = shown.year { Text(String(year)) }
                         Dot()
-                        Text(rating)
-                            .font(.nocturne(19))
-                            .kerning(1.1)
-                            .padding(.vertical, 6).padding(.horizontal, 12)
-                            .overlay(RoundedRectangle(cornerRadius: 4).stroke(Nocturne.neutral600, lineWidth: 1))
-                    }
-                    if !shown.genres.isEmpty {
-                        Dot()
-                        Text(Format.genres(shown.genres))
+                        Text(Format.runtime(shown.runtime))
+                        if let rating = Format.rating(shown.rating) {
+                            Dot()
+                            Text(rating)
+                                .font(.nocturne(19))
+                                .kerning(1.1)
+                                .padding(.vertical, 6).padding(.horizontal, 12)
+                                .overlay(RoundedRectangle(cornerRadius: 4).stroke(Nocturne.neutral600, lineWidth: 1))
+                        }
+                        if !shown.genres.isEmpty {
+                            Dot()
+                            Text(Format.genres(shown.genres))
+                        }
                     }
                     // D026: frame 06's pill, at the end of the meta row, only when watched.
                     if isWatched { WatchedPill() }
@@ -132,6 +157,14 @@ struct MovieDetailScreen: View {
                 .font(.nocturne(24))
                 .foregroundStyle(Nocturne.neutral300)
                 .padding(.top, 22)
+                if let performers = shown.performers, !performers.isEmpty {
+                    Text(performers.joined(separator: ", "))
+                        .font(.nocturne(24))
+                        .foregroundStyle(Nocturne.neutral400)
+                        .lineLimit(2)
+                        .frame(maxWidth: 960, alignment: .leading)
+                        .padding(.top, 14)
+                }
                 if let overview = shown.overview, !overview.isEmpty {
                     Text(overview)
                         .font(.nocturne(26))
@@ -242,7 +275,7 @@ struct MovieDetailScreen: View {
         do {
             thumbs = try await api.thumbs(fileId: file.fileId)
         } catch {
-            print("[thumbs] \(shown.title): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
+            print("[thumbs] movie \(movie.id): \((error as? APIError)?.localizedDescription ?? String(describing: error))")
         }
     }
 

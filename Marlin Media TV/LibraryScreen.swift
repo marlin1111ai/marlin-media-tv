@@ -15,14 +15,24 @@
 //  and the first card is its preferred default focus; without that the focus engine picks the card
 //  nearest the header item focus came from, which on the TV Shows tab is the second card.
 //
+//  2026-10-04, the five apps: this is each app's **first screen**. An app of one kind has no tab
+//  bar — its word stands where the tabs were — and Marlin Music's tabs are Albums and Artists.
+//  Marlin TV Shows adds the Up next row under Continue Watching (the old Home's TV row, D040,
+//  without the episodes in progress). The screen re-reads itself every time it appears, and the
+//  launch focus goes to the first Continue Watching card, as Home's did (D040, D043).
+//
 
 import SwiftUI
 
 struct LibraryScreen: View {
     @Bindable var model: LibraryModel
+    /// Marlin Music's player, for the header's Now Playing button; nil in the other four apps.
+    let music: MusicPlayer?
     let open: (Destination) -> Void
     /// D025: a Continue Watching card plays its file directly.
     let openEntry: (ContinueEntry) -> Void
+    /// D040: an Up next card plays its episode.
+    let openEpisode: (UpNextEpisode) -> Void
 
     @State private var sortOpen = false
     @FocusState private var focusedTab: LibraryTab?
@@ -31,6 +41,8 @@ struct LibraryScreen: View {
     /// D033: which card of the Continue Watching row has focus, so that focus arriving from
     /// outside the row can be moved to its first card.
     @FocusState private var focusedCard: Int?
+    /// D043: the launch focus is placed once in a session, and never again.
+    @State private var launchFocusPlaced = false
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -74,9 +86,12 @@ struct LibraryScreen: View {
                     .zIndex(5)
             }
         }
-        // D025: the row is asked for again every time the library appears — including the return
-        // from a detail screen or from the player.
-        .onAppear { Task { await model.refreshContinueWatching() } }
+        // D025/D040: the screen is re-read every time it appears — including the return from a
+        // detail screen. ContentView does the same when the player closes.
+        .onAppear { Task { await model.refresh() }; placeLaunchFocus() }
+        // D043: the in-progress list arrives after the first appearance, so the cards exist only
+        // once it has — that is where the launch focus is placed.
+        .onChange(of: model.continueWatching.count) { _, _ in placeLaunchFocus() }
         .onChange(of: sortOpen) { _, open in
             if open {
                 Task { @MainActor in
@@ -93,29 +108,64 @@ struct LibraryScreen: View {
         }
     }
 
+    /// D043, carried over from Home: when the app opens, focus lands on the **first** Continue
+    /// Watching card. It is placed once in a session — on the first list the screen receives — so
+    /// moving along the row, coming back from the player and every later re-read are untouched.
+    /// With nothing in progress there is no row and nothing is placed.
+    ///
+    /// The card is asked for until it takes focus, because the focus engine ignores a request for a
+    /// view that is not on screen yet and the row is built from a list that has just arrived. The
+    /// loop stops the moment any card of the row holds focus, so a viewer who moves first is not
+    /// pulled back.
+    private func placeLaunchFocus() {
+        guard !launchFocusPlaced, let first = model.continueEntries(for: model.tab).first?.fileId else { return }
+        launchFocusPlaced = true
+        Task { @MainActor in
+            for _ in 0..<12 {
+                if focusedCard != nil { break }
+                focusedCard = first
+                try? await Task.sleep(for: .milliseconds(120))
+            }
+            EvidenceLog.line("[focus] launch: asked for the first Continue Watching card \(first); "
+                             + "focus is now \(focusedCard.map(String.init) ?? "outside the row")")
+        }
+    }
+
     private var header: some View {
         HStack(alignment: .center) {
             HStack(spacing: 60) {
                 Wordmark()
-                HStack(spacing: 14) {
-                    ForEach(LibraryTab.allCases, id: \.self) { tab in
-                        Button { model.tab = tab } label: {
-                            TabLabel(title: tab.rawValue, selected: model.tab == tab)
+                if model.kind.tabs.count > 1 {
+                    HStack(spacing: 14) {
+                        ForEach(model.kind.tabs, id: \.self) { tab in
+                            Button { model.tab = tab } label: {
+                                TabLabel(title: tab.rawValue, selected: model.tab == tab)
+                            }
+                            .buttonStyle(BareButtonStyle())
+                            .focused($focusedTab, equals: tab)
+                            .accessibilityIdentifier("tab.\(tab.rawValue)")
                         }
-                        .buttonStyle(BareButtonStyle())
-                        .focused($focusedTab, equals: tab)
-                        .accessibilityIdentifier("tab.\(tab.rawValue)")
                     }
+                } else {
+                    SectionLabel(title: model.kind.section)
                 }
             }
             Spacer()
-            Button { sortOpen.toggle() } label: {
-                SortControlLabel(sort: model.sort.rawValue, open: sortOpen)
+            HStack(spacing: 20) {
+                if let music, music.isActive {
+                    NowPlayingButton { open(.nowPlaying) }
+                }
+                // The sort belongs to the albums; artists are always by name.
+                if model.tab != .artists {
+                    Button { sortOpen.toggle() } label: {
+                        SortControlLabel(sort: model.sort.rawValue, open: sortOpen)
+                    }
+                    .buttonStyle(BareButtonStyle())
+                    .focused($sortButtonFocused)
+                    .accessibilityIdentifier("sort")
+                    .accessibilityLabel("Sort \(model.sort.rawValue)")
+                }
             }
-            .buttonStyle(BareButtonStyle())
-            .focused($sortButtonFocused)
-            .accessibilityIdentifier("sort")
-            .accessibilityLabel("Sort \(model.sort.rawValue)")
             // D041: the new frames move the control 260 pt in from the right edge, to clear the
             // clock that now sits there.
             .padding(.trailing, 260)
@@ -186,15 +236,48 @@ struct LibraryScreen: View {
         }
     }
 
+    /// Marlin TV Shows' Up next row (D040's order, the episodes in progress left to the row above
+    /// it): the next episode of each show in the frames' wide card. A click plays it. Nothing at
+    /// all when there is no next episode anywhere.
+    @ViewBuilder
+    private var upNextRow: some View {
+        let items = model.upNext
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: 22) {
+                Kicker(text: "Up next")
+                ScrollView(.horizontal) {
+                    HStack(alignment: .top, spacing: 32) {
+                        ForEach(items) { item in
+                            Button { openEpisode(item) } label: {
+                                WideCardLabel(still: item.episode.artwork.still,
+                                              title: item.show.title,
+                                              subtitle: "S\(item.episode.season) E\(item.episode.number) · \(item.episode.displayTitle)",
+                                              fallbackInitial: item.show.title)
+                            }
+                            .buttonStyle(BareButtonStyle())
+                            .accessibilityIdentifier("upnext.\(item.id)")
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+                .scrollClipDisabled()
+            }
+            .padding(.bottom, 30)
+            .focusSection()
+        }
+    }
+
     @ViewBuilder
     private var content: some View {
         switch model.tab {
         case .movies:
-            PosterGrid(heading: "All movies · \(model.movies.count)", lead: { continueRow }) {
+            // Marlin Adult is this tab on the adult routes: "titles", and the studio under each.
+            let adult = model.kind == .adult
+            PosterGrid(heading: "All \(adult ? "titles" : "movies") · \(model.movies.count)", lead: { continueRow }) {
                 ForEach(model.sortedMovies) { movie in
                     let file = movie.editions.first?.file
                     PosterCard(title: movie.title, year: movie.year, poster: movie.artwork.poster,
-                               badges: badges(file)) {
+                               badges: badges(file), line2: adult ? movie.studio : nil) {
                         open(.movie(movie))
                     }
                     .accessibilityIdentifier("poster.\(movie.title)")
@@ -202,7 +285,7 @@ struct LibraryScreen: View {
             }
         case .shows:
             // The shows list carries no per-file resolution or HDR, so shows get no badges.
-            PosterGrid(heading: "All shows · \(model.shows.count)", lead: { continueRow }) {
+            PosterGrid(heading: "All shows · \(model.shows.count)", lead: { continueRow; upNextRow }) {
                 ForEach(model.sortedShows) { show in
                     PosterCard(title: show.title, year: show.year, poster: show.artwork.poster, badges: []) {
                         open(.show(show))
@@ -215,6 +298,24 @@ struct LibraryScreen: View {
                 VideosEmptyView()
             } else {
                 VideoList(videos: model.sortedVideos, lead: { continueRow }) { open(.video($0)) }
+            }
+        case .albums:
+            PosterGrid(heading: "All albums · \(model.albums.count)", lead: { EmptyView() }) {
+                ForEach(model.sortedAlbums) { album in
+                    CoverCard(title: album.title, line2: album.cardLine, cover: album.cover) {
+                        open(.album(album))
+                    }
+                    .accessibilityIdentifier("album.\(album.id)")
+                }
+            }
+        case .artists:
+            PosterGrid(heading: "All artists · \(model.artists.count)", lead: { EmptyView() }) {
+                ForEach(model.sortedArtists) { artist in
+                    CoverCard(title: artist.name, line2: artist.cardLine, cover: model.cover(of: artist)) {
+                        open(.artist(artist))
+                    }
+                    .accessibilityIdentifier("artist.\(artist.id)")
+                }
             }
         }
     }
@@ -305,6 +406,20 @@ struct Wordmark: View {
     }
 }
 
+/// The app's own word where the tabs were (2026-10-04): an app of one kind has nothing to switch
+/// between. It keeps a tab's height, so the header and the sort menu under it stay where they were.
+struct SectionLabel: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.nocturne(30, .medium))
+            .foregroundStyle(Nocturne.neutral300)
+            .lineLimit(1)
+            .padding(.vertical, 13)
+    }
+}
+
 /// A library tab (frames 01–03): the selected tab carries the accent border, tint and glow; a
 /// focused, unselected tab takes the prototype's hover look (accent border, bright text). Tabs
 /// switch on click, as the prototype does.
@@ -381,7 +496,7 @@ private struct SortOptionLabel: View {
 
 // MARK: - Poster grid (frames 01, 02)
 
-private struct PosterGrid<Lead: View, Content: View>: View {
+struct PosterGrid<Lead: View, Content: View>: View {
     let heading: String
     @ViewBuilder let lead: () -> Lead
     @ViewBuilder let content: () -> Content
@@ -411,11 +526,13 @@ struct PosterCard: View {
     let year: Int?
     let poster: String?
     let badges: [(String, Bool)]
+    /// Marlin Adult: the studio, shown in the year's place when the title has one.
+    var line2: String? = nil
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            PosterCardLabel(title: title, year: year, poster: poster, badges: badges)
+            PosterCardLabel(title: title, line2: line2 ?? year.map(String.init), poster: poster, badges: badges)
         }
         .buttonStyle(BareButtonStyle())
         .accessibilityLabel("\(title), \(year.map(String.init) ?? "")")
@@ -424,7 +541,7 @@ struct PosterCard: View {
 
 private struct PosterCardLabel: View {
     let title: String
-    let year: Int?
+    let line2: String?
     let poster: String?
     let badges: [(String, Bool)]
     @Environment(\.isFocused) private var focused
@@ -454,9 +571,10 @@ private struct PosterCardLabel: View {
                 .foregroundStyle(focused ? Nocturne.accent100 : Nocturne.text)
                 .lineLimit(2)
                 .padding(.top, focused ? 20 : 14)
-            Text(year.map(String.init) ?? " ")
+            Text(line2 ?? " ")
                 .font(.nocturne(19))
                 .foregroundStyle(focused ? Nocturne.neutral400 : Nocturne.neutral500)
+                .lineLimit(1)
                 .padding(.top, 4)
         }
         .frame(width: 250, alignment: .leading)
@@ -570,11 +688,7 @@ private struct LibraryLoadingView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 60) {
                     Wordmark()
-                    HStack(spacing: 14) {
-                        Skeleton(width: 150, height: 52, radius: 10, color: Nocturne.surface)
-                        Skeleton(width: 180, height: 52, radius: 10, color: Color(hex: 0x1F2130))
-                        Skeleton(width: 140, height: 52, radius: 10, color: Color(hex: 0x1F2130))
-                    }
+                    Skeleton(width: 150, height: 52, radius: 10, color: Nocturne.surface)
                 }
                 .padding(.top, 52)
                 .padding(.horizontal, 80)
@@ -708,5 +822,49 @@ struct PrimaryButtonLabel: View {
             else { RoundedRectangle(cornerRadius: 12).stroke(Nocturne.neutral700, lineWidth: 1) }
         }
         .shadow(color: focused ? Nocturne.accent.opacity(0.3) : .clear, radius: 35)
+    }
+}
+
+// MARK: - Up next (frame 00b's card)
+
+/// Frame 00b's wide card (340 × 191), drawn for the old Home's TV Shows row and now used by Marlin
+/// TV Shows' Up next row.
+struct WideCardLabel: View {
+    let still: String?
+    let title: String
+    let subtitle: String
+    let fallbackInitial: String
+    @Environment(\.isFocused) private var focused
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ServerImage(path: still) { InitialTile(title: fallbackInitial, fontSize: 72) }
+                .frame(width: 340, height: 191)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay {
+                    if focused {
+                        RoundedRectangle(cornerRadius: 12).stroke(Nocturne.accent, lineWidth: 4).padding(-8)
+                    } else {
+                        RoundedRectangle(cornerRadius: 8).stroke(Nocturne.neutral800, lineWidth: 1)
+                    }
+                }
+                .shadow(color: focused ? .black.opacity(0.65) : .clear, radius: 35, y: 26)
+                .shadow(color: focused ? Nocturne.accent.opacity(0.3) : .clear, radius: 35)
+            Text(title)
+                .font(.nocturne(22, .medium))
+                .foregroundStyle(focused ? Nocturne.accent100 : Nocturne.text)
+                .lineLimit(1)
+                .padding(.top, 14)
+            Text(subtitle)
+                .font(.nocturne(19))
+                .foregroundStyle(focused ? Nocturne.neutral400 : Nocturne.neutral500)
+                .lineLimit(1)
+                .padding(.top, 4)
+        }
+        .frame(width: 340, alignment: .leading)
+        .opacity(focused ? 1 : 0.86)
+        .scaleEffect(focused ? 1.04 : 1, anchor: .top)
+        .offset(y: focused ? -8 : 0)
+        .animation(.easeOut(duration: 0.15), value: focused)
     }
 }
